@@ -17,6 +17,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      #      TODO: adjust for rust app.
       - id: checkout
         name: Checkout
         uses: actions/checkout@v6.0.2

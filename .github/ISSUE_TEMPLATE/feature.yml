@@ -1,0 +1,34 @@
+name: Feature Request
+description: File a feature request.
+type: "Feature"
+assignees: [ "illyrius666" ]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to fill this out!
+  - type: dropdown
+    attributes:
+      label: Type of Modification
+      description: What are you doing?
+      options:
+        - Adding
+        - Removing
+        - Changing
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: What are you trying to modify
+      description: Give as detailed of a description as you can for the skill that you want (include pictures/Videos if applicable)
+      placeholder: The way I would implement this is ...
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Alternatives
+      description: What alternatives have you considered?
+      placeholder: list any...
+  - type: markdown
+    attributes:
+      value: "Thank you for filling out the form! We will read it soon.."

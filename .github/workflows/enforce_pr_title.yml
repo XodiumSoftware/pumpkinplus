@@ -1,0 +1,41 @@
+name: Xodium CI/CD - Enforce PR Title
+
+on:
+  pull_request_target:
+    types: [ opened ]
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  enforce-title:
+    runs-on: ubuntu-latest
+    steps:
+      - id: enforce_title
+        name: Set PR title to branch name
+        if: github.event.pull_request.title != github.event.pull_request.head.ref
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await github.rest.pulls.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              title: context.payload.pull_request.head.ref
+            });
+
+      - id: notify_user
+        name: Notify User
+        if: steps.enforce_title.outputs.changed == true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh pr comment "$PR_NUMBER" --repo "$REPO" --body \
+            "🤖 I've automatically updated the PR title to match the branch name: \`$BRANCH_NAME\`. This helps maintain consistency in our git history."

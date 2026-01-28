@@ -1,0 +1,50 @@
+name: Xodium CI/CD - Enforce Target Branch
+
+on:
+  pull_request_target:
+    types: [ opened ]
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  enforce-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - id: enforce_branch
+        name: Enforce and Auto-fix Target Branch
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          BASE_REF: ${{ github.base_ref }}
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          if [ "$BASE_REF" == "main" ] && [ "$HEAD_REF" != "dev" ]; then
+            echo "❌ PR is targeting 'main' but not from 'dev'. Changing target to 'dev'..."
+          
+            gh pr edit "$PR_NUMBER" --repo "$REPO" --base dev
+          
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "✅ Target branch automatically changed to 'dev'"
+            echo "⚠️  To merge to 'main', please create a PR from 'dev' branch"
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "✅ Target branch is correct"
+          fi
+
+      - id: notify_user
+        name: Notify User
+        if: steps.enforce_branch.outputs.changed == true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh pr comment "$PR_NUMBER" --repo "$REPO" --body \
+            "🤖 The target branch has been automatically changed from \`main\` to \`dev\`. PRs to \`main\` are only allowed from the \`dev\` branch. Please merge to \`dev\` first."

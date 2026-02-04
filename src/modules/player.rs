@@ -10,7 +10,7 @@ use std::sync::Arc;
 
 /// Module for handling player-related events.
 pub struct PlayerModule {
-    pub config: Config,
+    pub config: PlayerModuleConfig,
 }
 
 #[with_runtime(global)]
@@ -20,10 +20,13 @@ impl EventHandler<PlayerJoinEvent> for PlayerModule {
         _server: &Arc<Server>,
         event: &mut PlayerJoinEvent,
     ) -> BoxFuture<'_, ()> {
+        let msg = self
+            .config
+            .join_msg
+            .replace("{player}", &event.player.gameprofile.name);
+
         Box::pin(async move {
-            event.join_message =
-                TextComponent::text(format!("Welcome, {}!", event.player.gameprofile.name))
-                    .color_named(NamedColor::Green);
+            event.join_message = TextComponent::text(msg).color_named(NamedColor::Green);
         })
     }
 }
@@ -35,16 +38,29 @@ impl EventHandler<PlayerLeaveEvent> for PlayerModule {
         _server: &Arc<Server>,
         event: &mut PlayerLeaveEvent,
     ) -> BoxFuture<'_, ()> {
+        let msg = self
+            .config
+            .leave_msg
+            .replace("{player}", &event.player.gameprofile.name);
+
         Box::pin(async move {
-            event.leave_message =
-                TextComponent::text(format!("Goodbye, {}!", event.player.gameprofile.name))
-                    .color_named(NamedColor::Red);
+            event.leave_message = TextComponent::text(msg).color_named(NamedColor::Red);
         })
     }
 }
 
-#[derive(Debug, Default, Clone, Serialize, Deserialize)]
-pub struct Config {
+/// Configuration for the player module.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PlayerModuleConfig {
     pub join_msg: String,
     pub leave_msg: String,
+}
+
+impl Default for PlayerModuleConfig {
+    fn default() -> Self {
+        Self {
+            join_msg: "Welcome, {player}!".to_string(),
+            leave_msg: "Goodbye, {player}!".to_string(),
+        }
+    }
 }

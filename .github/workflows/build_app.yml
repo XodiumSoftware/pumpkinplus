@@ -31,7 +31,7 @@ jobs:
     steps:
       - id: checkout
         name: Checkout
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v6.0.2
 
       - id: cache_dependencies
         name: Cache dependencies
@@ -81,7 +81,7 @@ jobs:
     steps:
       - id: checkout
         name: Checkout
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v6.0.2
 
       - id: setup_rust
         name: Setup Rust

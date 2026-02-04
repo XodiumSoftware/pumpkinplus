@@ -1,5 +1,4 @@
 mod config;
-mod utils;
 
 mod modules {
     pub mod player;
@@ -8,14 +7,17 @@ mod modules {
 use pumpkin_api_macros::{plugin_impl, plugin_method};
 
 #[plugin_method]
-async fn on_load(&mut self, server: Arc<Context>) -> Result<(), String> {
-    server.init_log();
+async fn on_load(&mut self, ctx: Arc<Context>) -> Result<(), String> {
+    ctx.init_log();
 
-    log::info!("Hello, Pumpkin!");
+    let config = ConfigManager::new(ctx);
 
-    server
-        .register_event(Arc::new(PlayerModule), EventPriority::Lowest, true)
-        .await;
+    ctx.register_event(
+        Arc::new(PlayerModule { config }),
+        EventPriority::Lowest,
+        true,
+    )
+    .await;
 
     Ok(())
 }

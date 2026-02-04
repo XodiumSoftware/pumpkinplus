@@ -2,13 +2,14 @@
 name = "illyriaplus"
 version = "0.0.1"
 edition = "2024"
+authors = ["Xodium"]
 
 [lib]
 crate-type = ["cdylib"]
 
 [dependencies]
 pumpkin = { git = "https://github.com/Pumpkin-MC/Pumpkin.git", branch = "master" }
-pumpkin-util = { git = "https://github.com/Pumpkin-MC/Pumpkin.git", branch = "master", package = "pumpkin-util" }
+pumpkin-util = { git = "https://github.com/Pumpkin-MC/Pumpkin.git", branch = "master" }
 pumpkin-api-macros = { git = "https://github.com/Pumpkin-MC/Pumpkin.git", branch = "master" }
 
 tokio = "1.49.0"

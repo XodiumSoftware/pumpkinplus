@@ -5,10 +5,13 @@ use pumpkin::server::Server;
 use pumpkin_api_macros::with_runtime;
 use pumpkin_util::text::TextComponent;
 use pumpkin_util::text::color::NamedColor;
+use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
 /// Module for handling player-related events.
-pub struct PlayerModule;
+pub struct PlayerModule {
+    pub config: Config,
+}
 
 #[with_runtime(global)]
 impl EventHandler<PlayerJoinEvent> for PlayerModule {
@@ -38,4 +41,10 @@ impl EventHandler<PlayerLeaveEvent> for PlayerModule {
                     .color_named(NamedColor::Red);
         })
     }
+}
+
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+pub struct Config {
+    pub join_msg: String,
+    pub leave_msg: String,
 }

@@ -12,6 +12,7 @@ pumpkin-util = { git = "https://github.com/Pumpkin-MC/Pumpkin.git", branch = "ma
 pumpkin-api-macros = { git = "https://github.com/Pumpkin-MC/Pumpkin.git", branch = "master" }
 
 tokio = "1.49.0"
+serde = { version = "1.0.228", features = ["derive"] }
 
 [profile.release]
 lto = true

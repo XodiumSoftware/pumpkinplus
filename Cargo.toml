@@ -11,5 +11,7 @@ pumpkin = { git = "https://github.com/Pumpkin-MC/Pumpkin.git", branch = "master"
 pumpkin-util = { git = "https://github.com/Pumpkin-MC/Pumpkin.git", branch = "master", package = "pumpkin-util" }
 pumpkin-api-macros = { git = "https://github.com/Pumpkin-MC/Pumpkin.git", branch = "master" }
 
+tokio = "1.49.0"
+
 [profile.release]
 lto = true

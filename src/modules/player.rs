@@ -1,4 +1,5 @@
 use pumpkin::plugin::player::player_join::PlayerJoinEvent;
+use pumpkin::plugin::player::player_leave::PlayerLeaveEvent;
 use pumpkin::plugin::{BoxFuture, EventHandler};
 use pumpkin::server::Server;
 use pumpkin_api_macros::with_runtime;
@@ -20,6 +21,21 @@ impl EventHandler<PlayerJoinEvent> for PlayerModule {
             event.join_message =
                 TextComponent::text(format!("Welcome, {}!", event.player.gameprofile.name))
                     .color_named(NamedColor::Green);
+        })
+    }
+}
+
+#[with_runtime(global)]
+impl EventHandler<PlayerLeaveEvent> for PlayerModule {
+    fn handle_blocking(
+        &self,
+        _server: &Arc<Server>,
+        event: &mut PlayerLeaveEvent,
+    ) -> BoxFuture<'_, ()> {
+        Box::pin(async move {
+            event.leave_message =
+                TextComponent::text(format!("Goodbye, {}!", event.player.gameprofile.name))
+                    .color_named(NamedColor::Red);
         })
     }
 }

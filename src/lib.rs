@@ -1,6 +1,7 @@
 mod config;
 
 mod modules {
+    pub mod motd;
     pub mod player;
 }
 

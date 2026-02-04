@@ -8,7 +8,7 @@ use pumpkin_util::text::color::NamedColor;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
-/// Module for handling player-related events.
+/// Represents a module handling player mechanics within the system.
 pub struct PlayerModule {
     pub config: PlayerModuleConfig,
 }
@@ -49,7 +49,7 @@ impl EventHandler<PlayerLeaveEvent> for PlayerModule {
     }
 }
 
-/// Configuration for the player module.
+/// Represents the config of the module.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PlayerModuleConfig {
     pub join_msg: String,

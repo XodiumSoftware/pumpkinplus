@@ -6,7 +6,7 @@ use pumpkin_util::text::TextComponent;
 use pumpkin_util::text::color::NamedColor;
 use std::sync::Arc;
 
-/// Module for displaying the Message of the Day (MOTD).
+/// Module for handling player-related events.
 pub struct PlayerModule;
 
 #[with_runtime(global)]

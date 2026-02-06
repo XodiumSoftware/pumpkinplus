@@ -30,13 +30,12 @@ impl EventHandler<PlayerJoinEvent> for PlayerModule {
             return;
         }
 
-        let msg = self
-            .config
-            .join_msg
-            .replace("{player}", &event.player.gameprofile.name);
-
         Box::pin(async move {
-            event.join_message = TextComponent::text(msg);
+            event.join_message = TextComponent::text(
+                self.config
+                    .join_msg
+                    .replace("{player}", &event.player.gameprofile.name),
+            );
         })
     }
 }
@@ -52,13 +51,12 @@ impl EventHandler<PlayerLeaveEvent> for PlayerModule {
             return;
         }
 
-        let msg = self
-            .config
-            .leave_msg
-            .replace("{player}", &event.player.gameprofile.name);
-
         Box::pin(async move {
-            event.leave_message = TextComponent::text(msg);
+            event.leave_message = TextComponent::text(
+                self.config
+                    .leave_msg
+                    .replace("{player}", &event.player.gameprofile.name),
+            );
         })
     }
 }

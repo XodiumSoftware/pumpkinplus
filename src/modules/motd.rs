@@ -15,9 +15,11 @@ impl MotdModule {
     }
 
     pub fn motd(&self, server: &mut Server) {
-        if self.enabled() {
-            server.basic_config.motd = self.config.motd.join("\n");
+        if !self.enabled() {
+            return;
         }
+
+        server.basic_config.motd = self.config.motd.join("\n");
     }
 }
 

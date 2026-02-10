@@ -1,4 +1,4 @@
-use crate::modules::player::Config;
+use crate::player::Config;
 use pumpkin::plugin::Context;
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};

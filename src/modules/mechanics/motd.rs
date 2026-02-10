@@ -2,12 +2,12 @@ use crate::modules::module::Module;
 use pumpkin::server::Server;
 use serde::{Deserialize, Serialize};
 
-/// Represents a module handling motd mechanics within the system.
-pub struct MotdModule {
+/// Represents handling motd mechanics within the system.
+pub struct Motd {
     config: Config,
 }
 
-impl MotdModule {
+impl Motd {
     pub fn new() -> Self {
         Self {
             config: Config::default(),
@@ -23,7 +23,7 @@ impl MotdModule {
     }
 }
 
-impl Module for MotdModule {
+impl Module for Motd {
     fn enabled(&self) -> bool {
         self.config.enabled
     }

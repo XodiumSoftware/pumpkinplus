@@ -8,19 +8,19 @@ use pumpkin_util::text::TextComponent;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
-/// Represents a module handling player mechanics within the system.
-pub struct PlayerModule {
+/// Represents handling player mechanics within the system.
+pub struct Player {
     config: Config,
 }
 
-impl Module for PlayerModule {
+impl Module for Player {
     fn enabled(&self) -> bool {
         self.config.enabled
     }
 }
 
 #[with_runtime(global)]
-impl EventHandler<PlayerJoinEvent> for PlayerModule {
+impl EventHandler<PlayerJoinEvent> for Player {
     fn handle_blocking(
         &self,
         _server: &Arc<Server>,
@@ -41,7 +41,7 @@ impl EventHandler<PlayerJoinEvent> for PlayerModule {
 }
 
 #[with_runtime(global)]
-impl EventHandler<PlayerLeaveEvent> for PlayerModule {
+impl EventHandler<PlayerLeaveEvent> for Player {
     fn handle_blocking(
         &self,
         _server: &Arc<Server>,

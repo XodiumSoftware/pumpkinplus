@@ -1,5 +1,10 @@
 use crate::module::Module;
+use pumpkin::command::args::ConsumedArgs;
+use pumpkin::command::dispatcher::CommandError;
+use pumpkin::command::tree::builder::{argument, literal};
 use pumpkin::command::tree::CommandTree;
+use pumpkin::command::{CommandExecutor, CommandSender};
+use pumpkin::server::Server;
 use pumpkin_util::permission::{Permission, PermissionDefault};
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
@@ -26,7 +31,10 @@ impl Module for Locator {
         HashSet::from([CommandTree::new(
             ["locator", "lc"],
             "Allows players to personalise their locator bar",
-        )])
+        )
+            .then(argument("color", ArgumentC).execute(LocatorExecutor))
+            .then(argument("hex", ArgumentC).execute(LocatorExecutor))
+            .then(literal("reset").execute(LocatorExecutor))])
     }
 
     fn perms(&self) -> HashSet<Permission> {
@@ -35,6 +43,28 @@ impl Module for Locator {
             "Allows use of the locator command",
             PermissionDefault::Allow,
         )])
+    }
+}
+
+struct LocatorExecutor;
+
+impl CommandExecutor for LocatorExecutor {
+    fn execute<'a>(
+        &self,
+        sender: &mut CommandSender,
+        _: &Server,
+        _: &ConsumedArgs<'a>,
+    ) -> Result<(), CommandError> {
+        Box::pin(async move {
+            let arg_0 = self.0;
+            let arg_1 = self.1;
+            let arg_2 = self.2;
+            let player = sender.as_player().unwrap();
+
+            player //TODO
+
+            Ok(())
+        })
     }
 }
 

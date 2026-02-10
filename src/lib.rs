@@ -6,6 +6,7 @@ mod modules {
         pub mod sample;
     }
     pub mod mechanics {
+        pub mod locator;
         pub mod motd;
         pub mod player;
     }

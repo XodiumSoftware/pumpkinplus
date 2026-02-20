@@ -1,13 +1,17 @@
 use crate::module::Module;
-use pumpkin::command::args::ConsumedArgs;
+use pumpkin::command::args::simple::SimpleArgConsumer;
+use pumpkin::command::args::{Arg, ConsumedArgs};
 use pumpkin::command::dispatcher::CommandError;
-use pumpkin::command::tree::builder::{argument, literal};
+use pumpkin::command::dispatcher::CommandError::CommandFailed;
 use pumpkin::command::tree::CommandTree;
+use pumpkin::command::tree::builder::{argument, literal};
 use pumpkin::command::{CommandExecutor, CommandSender};
 use pumpkin::server::Server;
 use pumpkin_util::permission::{Permission, PermissionDefault};
+use pumpkin_util::text::TextComponent;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
+use std::pin::Pin;
 
 /// Represents handling locator mechanics within the system.
 pub struct Locator {
@@ -32,9 +36,9 @@ impl Module for Locator {
             ["locator", "lc"],
             "Allows players to personalise their locator bar",
         )
-            .then(argument("color", ArgumentC).execute(LocatorExecutor))
-            .then(argument("hex", ArgumentC).execute(LocatorExecutor))
-            .then(literal("reset").execute(LocatorExecutor))])
+        .then(argument("color", SimpleArgConsumer).execute(LocatorExecutor))
+        .then(argument("hex", SimpleArgConsumer).execute(LocatorExecutor))
+        .then(literal("reset").execute(LocatorExecutor))])
     }
 
     fn perms(&self) -> HashSet<Permission> {
@@ -53,16 +57,28 @@ impl CommandExecutor for LocatorExecutor {
         &self,
         sender: &mut CommandSender,
         _: &Server,
-        _: &ConsumedArgs<'a>,
-    ) -> Result<(), CommandError> {
+        args: &ConsumedArgs<'a>,
+    ) -> Pin<Box<dyn Future<Output = Result<(), CommandError>> + Send + 'a>> {
         Box::pin(async move {
-            let arg_0 = self.0;
-            let arg_1 = self.1;
-            let arg_2 = self.2;
-            let player = sender.as_player().unwrap();
+            let player = match sender.as_player() {
+                Some(p) => p,
+                None => {
+                    return Err(CommandFailed(TextComponent::text(
+                        "Only players can use this command",
+                    )));
+                }
+            };
 
-            player //TODO
+            // TODO: figure out the api to adjust the locator bar.
 
+            if let Some(Arg::Simple(value)) = args.get("color") {
+                let color: &str = value;
+                player;
+            }
+            if let Some(Arg::Simple(value)) = args.get("hex") {
+                let hex: &str = value;
+                player;
+            }
             Ok(())
         })
     }

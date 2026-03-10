@@ -27,6 +27,8 @@ use crate::player::Player;
 use pumpkin_plugin_api::{Context, PluginMetadata};
 use tracing::info;
 
+pub const PLUGIN_ID: &str = "vanillaplus";
+
 /// IllyriaPlus plugin implementation.
 pub struct IllyriaPlus {}
 

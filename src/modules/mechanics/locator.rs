@@ -1,4 +1,4 @@
-use crate::module::Module;
+use crate::{PLUGIN_ID, module::Module};
 use pumpkin_plugin_api::{
     Server,
     command::{Command, CommandError, CommandNode, CommandSender, ConsumedArgs},
@@ -32,7 +32,7 @@ impl Module for Locator {
     }
 
     fn perms(&self) -> HashSet<String> {
-        HashSet::from(["vanillaplus:command.locator".to_string()])
+        HashSet::from([format!("{}:command.locator", PLUGIN_ID)])
     }
 }
 

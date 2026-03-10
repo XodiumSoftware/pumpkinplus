@@ -6,6 +6,7 @@ mod modules {
         pub mod locator;
         pub mod motd;
         pub mod player;
+        pub mod tablist;
     }
 }
 

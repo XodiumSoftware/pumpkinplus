@@ -1,14 +1,11 @@
 use crate::modules::module::Module;
-use pumpkin::plugin::player::player_join::PlayerJoinEvent;
-use pumpkin::plugin::player::player_leave::PlayerLeaveEvent;
-use pumpkin::plugin::{BoxFuture, EventHandler};
-use pumpkin::server::Server;
-use pumpkin_api_macros::with_runtime;
-use pumpkin_util::text::TextComponent;
-use serde::{Deserialize, Serialize};
-use std::sync::Arc;
 
-/// Represents handling player mechanics within the system.
+use pumpkin_plugin_api::Server;
+use pumpkin_plugin_api::events::{EventHandler, PlayerJoinEventData, PlayerLeaveEventData};
+use pumpkin_plugin_api::text::TextComponent;
+use serde::{Deserialize, Serialize};
+
+#[derive(Default)]
 pub struct Player {
     config: Config,
 }
@@ -19,45 +16,33 @@ impl Module for Player {
     }
 }
 
-#[with_runtime(global)]
-impl EventHandler<PlayerJoinEvent> for Player {
-    fn handle_blocking(
-        &self,
-        _server: &Arc<Server>,
-        event: &mut PlayerJoinEvent,
-    ) -> BoxFuture<'_, ()> {
-        if !self.enabled() {
-            return;
-        }
-
-        Box::pin(async move {
+impl EventHandler<PlayerJoinEventData> for Player {
+    fn handle(&self, _server: Server, mut event: PlayerJoinEventData) -> PlayerJoinEventData {
+        if self.enabled() {
             event.join_message = TextComponent::text(
                 self.config
                     .join_msg
-                    .replace("{player}", &event.player.gameprofile.name),
-            );
-        })
+                    .replace("{player}", &event.player.name)
+                    .as_str(),
+            )
+        }
+
+        event
     }
 }
 
-#[with_runtime(global)]
-impl EventHandler<PlayerLeaveEvent> for Player {
-    fn handle_blocking(
-        &self,
-        _server: &Arc<Server>,
-        event: &mut PlayerLeaveEvent,
-    ) -> BoxFuture<'_, ()> {
-        if !self.enabled() {
-            return;
-        }
-
-        Box::pin(async move {
+impl EventHandler<PlayerLeaveEventData> for Player {
+    fn handle(&self, _server: Server, mut event: PlayerLeaveEventData) -> PlayerLeaveEventData {
+        if self.enabled() {
             event.leave_message = TextComponent::text(
                 self.config
                     .leave_msg
-                    .replace("{player}", &event.player.gameprofile.name),
+                    .replace("{player}", &event.player.name)
+                    .as_str(),
             );
-        })
+        }
+
+        event
     }
 }
 
@@ -72,11 +57,9 @@ pub struct Config {
 impl Default for Config {
     fn default() -> Self {
         Self {
-            enabled: true,
-            join_msg: "<green>➕<reset> <gradient:#FFE259:#FFA751>›</gradient> {player}!"
-                .to_string(),
-            leave_msg: "<red>➖<reset> <gradient:#FFE259:#FFA751>›</gradient> {player}!"
-                .to_string(),
+            enabled: false,
+            join_msg: "<green>➕<reset> <gradient:#FFE259:#FFA751>›</gradient> {player}!".into(),
+            leave_msg: "<red>➖<reset> <gradient:#FFE259:#FFA751>›</gradient> {player}!".into(),
         }
     }
 }

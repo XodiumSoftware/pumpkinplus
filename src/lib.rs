@@ -21,36 +21,36 @@ pub use mechanics::*;
 pub use modules::*;
 pub use recipes::*;
 
-use pumpkin_api_macros::{plugin_impl, plugin_method};
-
-#[plugin_method]
-async fn on_load(&mut self, ctx: Arc<Context>) -> Result<(), String> {
-    ctx.init_log();
-
-    let config = ConfigManager::new(ctx);
-
-    ctx.register_event(
-        Arc::new(PlayerModule { config }),
-        EventPriority::Lowest,
-        true,
-    )
-    .await;
-
-    Ok(())
-}
+use crate::player::Player;
+use pumpkin_plugin_api::events::EventPriority;
+use pumpkin_plugin_api::{Context, PluginMetadata};
+use tracing::info;
 
 /// IllyriaPlus plugin implementation.
-#[plugin_impl]
 pub struct IllyriaPlus {}
 
 impl IllyriaPlus {
-    pub fn new() -> Self {
+    fn new() -> Self {
         IllyriaPlus {}
     }
-}
 
-impl Default for IllyriaPlus {
-    fn default() -> Self {
-        Self::new()
+    fn metadata(&self) -> PluginMetadata {
+        PluginMetadata {
+            name: "IllyriaPlus".into(),
+            version: env!("CARGO_PKG_VERSION").into(),
+            authors: vec!["Xodium".into()],
+            description: " Minecraft plugin that enhances the base gameplay in Rust".into(),
+        }
+    }
+
+    fn on_load(&mut self, context: Context) -> pumpkin_plugin_api::Result<()> {
+        context.register_event_handler(Player::default(), EventPriority::Highest, true)?;
+        info!("IllyriaPlus loaded. NICE TO CYA!");
+        Ok(())
+    }
+
+    fn on_unload(&mut self, _context: Context) -> pumpkin_plugin_api::Result<()> {
+        info!("IllyriaPlus unloaded. CYA NEXT TIME!");
+        Ok(())
     }
 }

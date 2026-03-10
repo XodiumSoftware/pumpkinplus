@@ -45,7 +45,7 @@ jobs:
 
       - id: setup_rust
         name: Setup Rust
-        uses: actions-rust-lang/setup-rust-toolchain@806aa7ddf5d59f36fb30048411f6bde29364a53f
+        uses: actions-rust-lang/setup-rust-toolchain@a0b538fa0b742a6aa35d6e2c169b4bd06d225a98
         with:
           toolchain: stable
           components: rustfmt, clippy
@@ -63,7 +63,7 @@ jobs:
 
       - id: upload_artifact
         name: Upload Artifact
-        uses: actions/upload-artifact@v6.0.0
+        uses: actions/upload-artifact@v7.0.0
         with:
           name: ${{ env.APP_NAME }}-${{ matrix.os }}
           path: target/release/${{ env.APP_NAME }}
@@ -85,7 +85,7 @@ jobs:
 
       - id: setup_rust
         name: Setup Rust
-        uses: actions-rust-lang/setup-rust-toolchain@806aa7ddf5d59f36fb30048411f6bde29364a53f
+        uses: actions-rust-lang/setup-rust-toolchain@a0b538fa0b742a6aa35d6e2c169b4bd06d225a98
         with:
           toolchain: stable
 
@@ -107,7 +107,7 @@ jobs:
     steps:
       - id: download_artifact
         name: Download Artefact
-        uses: actions/download-artifact@v7.0.0
+        uses: actions/download-artifact@v8.0.0
         with:
           name: ${{ env.APP_NAME }}
 

@@ -1,7 +1,8 @@
 use crate::modules::module::Module;
+use pumpkin_plugin_api::events::{EventData, PlayerJoinEvent, PlayerLeaveEvent};
 use pumpkin_plugin_api::{
     Context, Server,
-    events::{EventHandler, EventPriority, PlayerJoinEventData, PlayerLeaveEventData},
+    events::{EventHandler, EventPriority},
     text::TextComponent,
 };
 use serde::{Deserialize, Serialize};
@@ -20,14 +21,14 @@ impl Module for Player {
 
     fn events(&self, context: &Context) {
         context
-            .register_event_handler::<PlayerJoinEventData, _>(
+            .register_event_handler::<PlayerJoinEvent, _>(
                 Player::default(),
                 EventPriority::Highest,
                 true,
             )
             .expect("failed to register player join event handler");
         context
-            .register_event_handler::<PlayerLeaveEventData, _>(
+            .register_event_handler::<PlayerLeaveEvent, _>(
                 Player::default(),
                 EventPriority::Highest,
                 true,
@@ -36,8 +37,12 @@ impl Module for Player {
     }
 }
 
-impl EventHandler<PlayerJoinEventData> for Player {
-    fn handle(&self, _server: Server, mut event: PlayerJoinEventData) -> PlayerJoinEventData {
+impl EventHandler<PlayerJoinEvent> for Player {
+    fn handle(
+        &self,
+        _server: Server,
+        mut event: EventData<PlayerJoinEvent>,
+    ) -> EventData<PlayerJoinEvent> {
         event.join_message = TextComponent::text(
             self.config
                 .join_msg
@@ -48,8 +53,12 @@ impl EventHandler<PlayerJoinEventData> for Player {
     }
 }
 
-impl EventHandler<PlayerLeaveEventData> for Player {
-    fn handle(&self, _server: Server, mut event: PlayerLeaveEventData) -> PlayerLeaveEventData {
+impl EventHandler<PlayerLeaveEvent> for Player {
+    fn handle(
+        &self,
+        _server: Server,
+        mut event: EventData<PlayerLeaveEvent>,
+    ) -> EventData<PlayerLeaveEvent> {
         event.leave_message = TextComponent::text(
             self.config
                 .leave_msg

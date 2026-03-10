@@ -2,24 +2,16 @@ mod config;
 
 mod modules {
     pub mod module;
-    pub mod enchantments {
-        pub mod sample;
-    }
     pub mod mechanics {
         pub mod locator;
         pub mod motd;
         pub mod player;
     }
-    pub mod recipes {
-        pub mod sample;
-    }
 }
 
 pub use config::*;
-pub use enchantments::*;
 pub use mechanics::*;
 pub use modules::*;
-pub use recipes::*;
 
 use crate::module::Module;
 use crate::motd::Motd;

@@ -18,7 +18,8 @@ impl Module for Motd {
 impl Motd {
     pub fn motd(&self, server: &mut Server) {
         if self.enabled() {
-            server.set_motd(self.config.motd.join("\n"));
+            todo!("api is not ready yet")
+            //server.set_motd(self.config.motd.join("\n"));
         }
     }
 }

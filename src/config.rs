@@ -32,7 +32,7 @@ impl ConfigManager {
 
     /// Returns the path to the configuration file within the plugin's data folder.
     fn path(context: Context) -> PathBuf {
-        context.get_data_folder().join("config.json")
+        PathBuf::from(context.get_data_folder()).join("config.json")
     }
 
     /// Reads and deserializes the configuration from `path`.

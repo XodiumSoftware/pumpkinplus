@@ -6,12 +6,12 @@
       <img src="https://gist.githubusercontent.com/illyrius666/a38f03b4fbe9b43faa2c5623137c1250/raw/3a1410e77807097bcfbcf963822b41fadd495d9f/xodium.svg" alt="Xodium Logo" width="200">
     </a>
   <br /><br />
-  xMC
+  Pumpkin+
   <br />
   <br />
 </h1>
 
-<h4 align="center">Minecraft plugin that enhances the base gameplay</h4><br />
+<h4 align="center">Minecraft Pumpkin plugin that enhances the base gameplay</h4><br />
 
 <div align="center">
 

@@ -7,7 +7,7 @@ please report it to us responsibly through GitHub's private vulnerability report
 
 ### How to Report
 
-1. Navigate to the [Security tab](https://github.com/XodiumSoftware/illyriaplus/security) in this repository
+1. Navigate to the [Security tab](https://github.com/XodiumSoftware/pumpkinplus/security) in this repository
 2. Click on "Advisories"
 3. Select "Report a vulnerability"
 4. Complete the vulnerability report form

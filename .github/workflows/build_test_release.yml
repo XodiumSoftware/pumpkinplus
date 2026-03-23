@@ -19,11 +19,8 @@ env:
 
 jobs:
   build:
-    name: Build (\${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+    name: Build
+    runs-on: ubuntu-latest
     environment:
       name: "${{ github.ref_name }}"
       url: "${{ steps.upload_artifact.outputs.artifact-url }}"
@@ -41,18 +38,19 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-wasm32-wasip2-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - id: setup_rust
         name: Setup Rust
         uses: actions-rust-lang/setup-rust-toolchain@d197c158264056996cfba74a9c2d93886346edc3
         with:
           toolchain: stable
+          target: wasm32-wasip2
           components: rustfmt, clippy
 
       - id: build_artifact
         name: Build Artefact
-        run: cargo build --release --timings
+        run: cargo build --release --target wasm32-wasip2 --timings
         shell: bash
 
       - id: get_version
@@ -65,17 +63,14 @@ jobs:
         name: Upload Artifact
         uses: actions/upload-artifact@v7.0.0
         with:
-          name: ${{ env.APP_NAME }}-${{ matrix.os }}
-          path: target/release/${{ env.APP_NAME }}
+          name: ${{ env.APP_NAME }}-wasm32-wasip2
+          path: target/wasm32-wasip2/release/${{ env.APP_NAME }}.wasm
           retention-days: 7
 
   test:
-    name: Test (\${{ matrix.os }})
+    name: Test
     needs: [ build ]
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+    runs-on: ubuntu-latest
     environment:
       name: "${{ github.ref_name }}"
     steps:
@@ -105,16 +100,9 @@ jobs:
       name: "${{ github.ref_name }}"
       url: "${{ steps.create_release.outputs.url }}"
     steps:
-      - id: download_artifact
-        name: Download Artefact
+      - id: download_artifacts
+        name: Download Artefacts
         uses: actions/download-artifact@v8.0.1
-        with:
-          name: ${{ env.APP_NAME }}
-
-      - id: verify_binary
-        name: Verify Binary
-        run: ./${{ env.APP_NAME }} --version
-        shell: bash
 
       - id: create_release
         name: Create Release
@@ -126,4 +114,4 @@ jobs:
           generate_release_notes: true
           prerelease: ${{ contains(github.event.head_commit.message, '.pre') }}
           tag_name: v${{ needs.build.outputs.VERSION }}
-          files: ${{ env.APP_NAME }}-*/${{ env.APP_NAME }}
+          files: ${{ env.APP_NAME }}-wasm32-wasip2/${{ env.APP_NAME }}.wasm

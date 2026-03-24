@@ -36,7 +36,7 @@ pub struct Config {
 impl Default for Config {
     fn default() -> Self {
         Self {
-            enabled: true,
+            enabled: false,
             motd: vec![
                 "<gradient:#CB2D3E:#EF473A><b>Ultimate Private SMP</b></gradient>".into(),
                 "<gradient:#FFE259:#FFA751><b>➤ WELCOME BACK LADS!</b></gradient>".into(),

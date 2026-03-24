@@ -21,14 +21,8 @@ impl Module for Tablist {
 }
 
 /// Configuration for the player mechanics module.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct Config {
     /// Whether this module is active.
     pub enabled: bool,
-}
-
-impl Default for Config {
-    fn default() -> Self {
-        Self { enabled: false }
-    }
 }

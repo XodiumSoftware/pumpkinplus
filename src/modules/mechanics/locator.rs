@@ -52,14 +52,8 @@ impl CommandHandler for LocatorExecutor {
 }
 
 /// Configuration for the locator mechanics module.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct Config {
     /// Whether this module is active.
     pub enabled: bool,
-}
-
-impl Default for Config {
-    fn default() -> Self {
-        Self { enabled: true }
-    }
 }

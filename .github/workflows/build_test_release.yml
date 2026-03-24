@@ -101,6 +101,8 @@ jobs:
     name: Release
     needs: [ build, test ]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     environment:
       name: "${{ github.ref_name }}"
       url: "${{ steps.create_release.outputs.url }}"

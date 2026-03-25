@@ -1,10 +1,8 @@
 use crate::modules::module::Module;
-use pumpkin_plugin_api::events::{EventData, PlayerJoinEvent, PlayerLeaveEvent};
-use pumpkin_plugin_api::{
-    Context, Server,
-    events::{EventHandler, EventPriority},
-    text::TextComponent,
+use pumpkin_plugin_api::events::{
+    EventData, EventHandler, EventPriority, PlayerJoinEvent, PlayerLeaveEvent, PlayerLoginEvent,
 };
+use pumpkin_plugin_api::{Context, Server, text::TextComponent};
 use serde::{Deserialize, Serialize};
 
 /// Handles player join and leave mechanics, including custom messages.
@@ -34,6 +32,13 @@ impl Module for Player {
                 true,
             )
             .expect("failed to register player leave event handler");
+        context
+            .register_event_handler::<PlayerLoginEvent, _>(
+                Player::default(),
+                EventPriority::Highest,
+                true,
+            )
+            .expect("failed to register player login event handler");
     }
 }
 
@@ -75,6 +80,25 @@ impl EventHandler<PlayerLeaveEvent> for Player {
     }
 }
 
+impl EventHandler<PlayerLoginEvent> for Player {
+    fn handle(
+        &self,
+        _server: Server,
+        mut event: EventData<PlayerLoginEvent>,
+    ) -> EventData<PlayerLoginEvent> {
+        if self.config.kick_msg.is_empty() {
+            return event;
+        }
+        event.kick_message = TextComponent::text(
+            self.config
+                .kick_msg
+                .replace("{player}", &event.player.get_name())
+                .as_str(),
+        );
+        event
+    }
+}
+
 /// Configuration for the player mechanics module.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Config {
@@ -84,4 +108,6 @@ pub struct Config {
     pub join_msg: String,
     /// Message broadcast when a player leaves. Use `{player}` as a placeholder for the player identifier.
     pub leave_msg: String,
+    /// Message shown to the player when they are kicked during login. Use `{player}` as a placeholder for the player identifier.
+    pub kick_msg: String,
 }

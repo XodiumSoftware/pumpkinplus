@@ -16,7 +16,7 @@ impl ConfigManager {
     ///
     /// # Errors
     /// Returns an [`io::Error`] if an I/O or deserialization error occurs.
-    pub fn new(context: Context) -> Result<Self, io::Error> {
+    pub fn new(context: &Context) -> Result<Self, io::Error> {
         let path = Self::path(context);
 
         match Self::load(&path) {
@@ -31,7 +31,7 @@ impl ConfigManager {
     }
 
     /// Returns the path to the configuration file within the plugin's data folder.
-    fn path(context: Context) -> PathBuf {
+    fn path(context: &Context) -> PathBuf {
         PathBuf::from(context.get_data_folder()).join("config.json")
     }
 

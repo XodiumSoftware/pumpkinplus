@@ -55,7 +55,6 @@ impl EventHandler<PlayerJoinEvent> for Player {
             .player
             .get_display_name()
             .map(|t| t.get_text())
-            .or_else(|_| event.player.get_name())
             .unwrap_or_default();
         event.join_message =
             TextComponent::text(self.config.join_msg.replace("{player}", &name).as_str());
@@ -76,7 +75,6 @@ impl EventHandler<PlayerLeaveEvent> for Player {
             .player
             .get_display_name()
             .map(|t| t.get_text())
-            .or_else(|_| event.player.get_name())
             .unwrap_or_default();
         event.leave_message =
             TextComponent::text(self.config.leave_msg.replace("{player}", &name).as_str());
@@ -97,7 +95,6 @@ impl EventHandler<PlayerLoginEvent> for Player {
             .player
             .get_display_name()
             .map(|t| t.get_text())
-            .or_else(|_| event.player.get_name())
             .unwrap_or_default();
         event.kick_message =
             TextComponent::text(self.config.kick_msg.replace("{player}", &name).as_str());

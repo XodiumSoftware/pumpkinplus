@@ -1,6 +1,6 @@
 # Locator
 
-Allows players to personalise the colour of their locator bar.
+Allows players to personalize the colour of their locator bar.
 
 > **Status: Stub** — The command is registered but the implementation is pending the Pumpkin API exposing locator bar controls.
 

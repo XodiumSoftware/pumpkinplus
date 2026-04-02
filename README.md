@@ -18,10 +18,12 @@
 [![Contributors][contributors_shield_url]][contributors_url]
 [![Issues][issues_shield_url]][issues_url]
 [![Roadmap][roadmap_shield_url]][roadmap_url]
+[![Docs][docs_shield_url]][docs_url]
 </div>
 
 ## Table of Contents
 
+- [Architecture](ARCHITECTURE.md)
 - [Built With](#built-with)
 - [Code of Conduct][code_of_conduct_url]
 - [Contributing][contributing_url]
@@ -43,11 +45,15 @@
 
 [code_of_conduct_url]: https://github.com/XodiumSoftware/pumpkinplus?tab=coc-ov-file
 
-[contributing_url]: https://github.com/XodiumSoftware/pumpkinplus/blob/main/CONTRIBUTING.md
+[contributing_url]: https://github.com/XodiumSoftware/pumpkinplus?tab=contributing-ov-file
 
 [contributors_shield_url]: https://img.shields.io/github/contributors/XodiumSoftware/pumpkinplus?style=for-the-badge&color=blue
 
 [contributors_url]: https://github.com/XodiumSoftware/pumpkinplus/graphs/contributors
+
+[docs_shield_url]: https://img.shields.io/badge/Docs-Click%20Me!-blue.svg?style=for-the-badge
+
+[docs_url]: https://pumpkinplus.xodium.org
 
 [issues_shield_url]: https://img.shields.io/github/issues/XodiumSoftware/pumpkinplus?style=for-the-badge&color=yellow
 

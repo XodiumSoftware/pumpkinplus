@@ -1,4 +1,4 @@
-name: Xodium CI/CD - Build | Test | Release
+name: Xodium CI/CD - Build | Test | Nightly Release
 
 on:
   push:
@@ -97,28 +97,47 @@ jobs:
           cargo fmt --all -- --check
         shell: bash
 
-  release:
-    name: Release
+  nightly_release:
+    name: Nightly Release
     needs: [ build, test ]
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    environment:
-      name: "${{ github.ref_name }}"
-      url: "${{ steps.create_release.outputs.url }}"
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
+      - id: checkout
+        name: Checkout
+        uses: actions/checkout@v6.0.2
+
       - id: download_artifacts
         name: Download Artefacts
         uses: actions/download-artifact@v8.0.1
+        with:
+          pattern: "${{ needs.build.outputs.NAME }}-*"
+          path: dist/
+          merge-multiple: true
 
-      - id: create_release
-        name: Create Release
+      - id: generate_release_notes
+        name: Generate Release Notes
+        run: |
+          echo "From commit: $(git rev-parse --short HEAD)" > dist/RELEASE.md
+          echo "Generated on: $(date -u +"%Y-%m-%d %H:%M") UTC" >> dist/RELEASE.md
+
+      - id: update_nightly_tag
+        name: Update Nightly Tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag --force nightly && git push --force origin tag nightly
+
+      - id: create_nightly_release
+        name: Create Nightly Release
         uses: softprops/action-gh-release@153bb8e04406b158c6c84fc1615b65b24149a1fe
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         with:
-          draft: ${{ contains(github.event.head_commit.message, '.draft') }}
-          generate_release_notes: true
-          prerelease: ${{ contains(github.event.head_commit.message, '.pre') }}
-          tag_name: v${{ needs.build.outputs.VERSION }}
-          files: ${{ needs.build.outputs.NAME }}.wasm
+          prerelease: true
+          files: dist/${{ needs.build.outputs.NAME }}*
+          tag_name: nightly
+          name: Nightly Build
+          body_path: dist/RELEASE.md

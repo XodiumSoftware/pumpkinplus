@@ -51,12 +51,14 @@ impl EventHandler<PlayerJoinEvent> for Player {
         if self.config.join_msg.is_empty() {
             return event;
         }
-        event.join_message = TextComponent::text(
-            self.config
-                .join_msg
-                .replace("{player}", &event.player.get_name().unwrap_or_default())
-                .as_str(),
-        );
+        let name = event
+            .player
+            .get_display_name()
+            .map(|t| t.get_text())
+            .or_else(|_| event.player.get_name())
+            .unwrap_or_default();
+        event.join_message =
+            TextComponent::text(self.config.join_msg.replace("{player}", &name).as_str());
         event
     }
 }
@@ -70,12 +72,14 @@ impl EventHandler<PlayerLeaveEvent> for Player {
         if self.config.leave_msg.is_empty() {
             return event;
         }
-        event.leave_message = TextComponent::text(
-            self.config
-                .leave_msg
-                .replace("{player}", &event.player.get_name().unwrap_or_default())
-                .as_str(),
-        );
+        let name = event
+            .player
+            .get_display_name()
+            .map(|t| t.get_text())
+            .or_else(|_| event.player.get_name())
+            .unwrap_or_default();
+        event.leave_message =
+            TextComponent::text(self.config.leave_msg.replace("{player}", &name).as_str());
         event
     }
 }
@@ -89,12 +93,14 @@ impl EventHandler<PlayerLoginEvent> for Player {
         if self.config.kick_msg.is_empty() {
             return event;
         }
-        event.kick_message = TextComponent::text(
-            self.config
-                .kick_msg
-                .replace("{player}", &event.player.get_name().unwrap_or_default())
-                .as_str(),
-        );
+        let name = event
+            .player
+            .get_display_name()
+            .map(|t| t.get_text())
+            .or_else(|_| event.player.get_name())
+            .unwrap_or_default();
+        event.kick_message =
+            TextComponent::text(self.config.kick_msg.replace("{player}", &name).as_str());
         event
     }
 }
@@ -104,10 +110,10 @@ impl EventHandler<PlayerLoginEvent> for Player {
 pub struct Config {
     /// Whether this module is active.
     pub enabled: bool,
-    /// Message broadcast when a player joins. Use `{player}` as a placeholder for the player identifier.
+    /// Message broadcast when a player joins. Use `{player}` as a placeholder for the player's name.
     pub join_msg: String,
-    /// Message broadcast when a player leaves. Use `{player}` as a placeholder for the player identifier.
+    /// Message broadcast when a player leaves. Use `{player}` as a placeholder for the player's name.
     pub leave_msg: String,
-    /// Message shown to the player when they are kicked during login. Use `{player}` as a placeholder for the player identifier.
+    /// Message shown to the player when they are kicked during login. Use `{player}` as a placeholder for the player's name.
     pub kick_msg: String,
 }

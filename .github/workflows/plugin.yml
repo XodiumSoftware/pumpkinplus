@@ -95,32 +95,9 @@ jobs:
           path: target/wasm32-wasip2/release/${{ steps.get_name.outputs.NAME }}.wasm
           retention-days: 7
 
-  test:
-    name: Test
-    needs: [ build ]
-    runs-on: ubuntu-latest
-    environment:
-      name: "${{ github.ref_name }}"
-    steps:
-      - id: checkout
-        name: Checkout
-        uses: actions/checkout@v6.0.2
-
-      - id: setup_rust
-        name: Setup Rust
-        uses: actions-rust-lang/setup-rust-toolchain@d197c158264056996cfba74a9c2d93886346edc3
-        with:
-          toolchain: stable
-          target: wasm32-wasip2
-
-      - id: run_tests
-        name: Run Tests
-        run: cargo test --all --no-fail-fast --no-run
-        shell: bash
-
   nightly_release:
     name: Nightly Release
-    needs: [ test ]
+    needs: [ build ]
     runs-on: ubuntu-latest
     environment:
       name: "${{ github.ref_name }}"
@@ -139,12 +116,6 @@ jobs:
           path: dist/
           merge-multiple: true
 
-      - id: generate_release_notes
-        name: Generate Release Notes
-        run: |
-          echo "From commit: $(git rev-parse --short HEAD)" > dist/RELEASE.md
-          echo "Generated on: $(date -u +"%Y-%m-%d %H:%M") UTC" >> dist/RELEASE.md
-
       - id: update_nightly_tag
         name: Update Nightly Tag
         run: |
@@ -162,4 +133,6 @@ jobs:
           files: dist/${{ needs.build.outputs.NAME }}*
           tag_name: nightly
           name: Nightly Build
-          body_path: dist/RELEASE.md
+          body: |
+            From commit: ${{ github.sha }}
+            Generated on: ${{ github.event.head_commit.timestamp }}

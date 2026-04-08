@@ -23,7 +23,7 @@ use crate::module::Module;
 use pumpkin_plugin_api::{Context, Plugin, PluginMetadata};
 use tracing::info;
 
-pub const PLUGIN_ID: &str = "pumpkinplus";
+pub const PLUGIN_ID: &str = env!("CARGO_PKG_NAME");
 
 /// Module names for config lookup
 pub mod module_names {

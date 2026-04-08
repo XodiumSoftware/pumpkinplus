@@ -4,7 +4,7 @@ This file provides guidance when working with code in this repository.
 
 ## Project Overview
 
-PumpkinPlus is a Pumpkin Minecraft plugin (0.0.1) that enhances base gameplay. Built with Rust + Cargo, targeting `wasm32-wasip2` as a `cdylib`. Uses the `pumpkin-plugin-api` for event handling, commands, and server interaction.
+PumpkinPlus is a Pumpkin Minecraft plugin that enhances base gameplay. Built with Rust + Cargo, targeting `wasm32-wasip2` as a `cdylib`. Uses the `pumpkin-plugin-api` for event handling, commands, and server interaction.
 
 ## Build & Run Commands
 
@@ -16,7 +16,7 @@ cargo build --target wasm32-wasip2
 cargo build --release --target wasm32-wasip2
 ```
 
-There are no automated tests in this project.
+Unit tests are in `src/config.rs` under `#[cfg(test)]` for the configuration system.
 
 ## Architecture
 

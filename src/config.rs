@@ -14,41 +14,23 @@ use tracing::error;
 /// For example:
 /// - `crate::modules::mechanics::player::Config` -> "player"
 /// - `crate::modules::mechanics::player::PlayerConfig` -> "player"
-pub fn config_key<T>() -> &'static str {
+pub fn config_key<T>() -> String {
     use std::any::type_name;
-    use std::sync::OnceLock;
 
-    static CACHE: OnceLock<std::sync::Mutex<HashMap<String, &'static str>>> = OnceLock::new();
-
-    let cache = CACHE.get_or_init(|| std::sync::Mutex::new(HashMap::new()));
     let full_name = type_name::<T>();
-
-    if let Ok(map) = cache.lock() {
-        if let Some(&key) = map.get(full_name) {
-            return key;
-        }
-    }
-
     let parts: Vec<&str> = full_name.split("::").collect();
-    let key = if parts.len() >= 2 {
-        parts[parts.len() - 2]
+
+    if parts.len() >= 2 {
+        parts[parts.len() - 2].to_string()
     } else if let Some(&last) = parts.last() {
         if last.ends_with("Config") {
-            &last[..last.len() - 6]
+            last[..last.len() - 6].to_string()
         } else {
-            last
+            last.to_string()
         }
     } else {
-        full_name
-    };
-
-    let key: &'static str = Box::leak(key.to_string().into_boxed_str());
-
-    if let Ok(mut map) = cache.lock() {
-        map.insert(full_name.to_string(), key);
+        full_name.to_string()
     }
-
-    key
 }
 
 thread_local! {
@@ -82,8 +64,12 @@ impl ConfigManager {
     pub fn get_config<T: DeserializeOwned + Default + 'static>(&self) -> T {
         let key = config_key::<T>();
         self.configs
-            .get(key)
-            .and_then(|v| serde_json::from_value(v.clone()).ok())
+            .get(&key)
+            .and_then(|v| {
+                serde_json::from_value(v.clone())
+                    .inspect_err(|e| error!("Failed to parse config for key '{}': {}", key, e))
+                    .ok()
+            })
             .unwrap_or_default()
     }
 
@@ -92,8 +78,12 @@ impl ConfigManager {
     pub fn register<T: Serialize + Default + 'static>(&mut self) {
         let key = config_key::<T>();
         let config = T::default();
-        self.configs
-            .insert(key.to_string(), serde_json::to_value(config).unwrap());
+        match serde_json::to_value(config) {
+            Ok(value) => {
+                self.configs.insert(key, value);
+            }
+            Err(e) => error!("Failed to serialize config for key: {}", e),
+        }
     }
 
     /// Loads config from disk, merging with registered defaults.
@@ -153,5 +143,92 @@ fn merge_json(a: &Value, b: &Value) -> Value {
             Value::Object(result)
         }
         _ => b.clone(),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde::{Deserialize, Serialize};
+
+    #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+    struct TestConfig {
+        pub enabled: bool,
+        pub name: String,
+        pub count: u32,
+    }
+
+    #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+    struct OtherConfig {
+        pub value: i64,
+    }
+
+    #[test]
+    fn test_config_key_derives_from_type_name() {
+        let key = config_key::<TestConfig>();
+        // Type name is pumpkinplus::config::tests::TestConfig
+        // So the key should be "tests" (parent module)
+        assert_eq!(key, "tests");
+    }
+
+    #[test]
+    fn test_config_manager_register_and_get() {
+        let mut manager = ConfigManager::empty();
+        manager.register::<TestConfig>();
+
+        let config: TestConfig = manager.get_config();
+        assert!(!config.enabled); // Default is false
+        assert_eq!(config.name, "");
+        assert_eq!(config.count, 0);
+    }
+
+    #[test]
+    fn test_config_manager_multiple_configs() {
+        let mut manager = ConfigManager::empty();
+        manager.register::<TestConfig>();
+        manager.register::<OtherConfig>();
+
+        let test: TestConfig = manager.get_config();
+        let other: OtherConfig = manager.get_config();
+
+        assert_eq!(test.count, 0);
+        assert_eq!(other.value, 0);
+    }
+
+    #[test]
+    fn test_merge_json_objects() {
+        let a = serde_json::json!({
+            "enabled": false,
+            "name": "default",
+            "extra": "value"
+        });
+        let b = serde_json::json!({
+            "enabled": true,
+            "name": "custom"
+        });
+
+        let merged = merge_json(&a, &b);
+        let obj = merged.as_object().unwrap();
+
+        assert_eq!(obj.get("enabled").unwrap(), &serde_json::json!(true));
+        assert_eq!(obj.get("name").unwrap(), &serde_json::json!("custom"));
+        assert_eq!(obj.get("extra").unwrap(), &serde_json::json!("value"));
+    }
+
+    #[test]
+    fn test_merge_json_overwrites_non_objects() {
+        let a = serde_json::json!({"value": [1, 2, 3]});
+        let b = serde_json::json!({"value": "string"});
+
+        let merged = merge_json(&a, &b);
+        assert_eq!(merged.get("value").unwrap(), &serde_json::json!("string"));
+    }
+
+    #[test]
+    fn test_get_config_returns_default_on_missing() {
+        let manager = ConfigManager::empty();
+        // TestConfig was never registered
+        let config: TestConfig = manager.get_config();
+        assert_eq!(config, TestConfig::default());
     }
 }

@@ -29,14 +29,6 @@ use tracing::info;
 
 pub const PLUGIN_ID: &str = env!("CARGO_PKG_NAME");
 
-/// Module names for config lookup
-pub mod module_names {
-    pub const PLAYER: &str = "player";
-    pub const TABLIST: &str = "tablist";
-    pub const MOTD: &str = "motd";
-    pub const LOCATOR: &str = "locator";
-}
-
 /// PumpkinPlus plugin implementation.
 pub struct PumpkinPlus {}
 
@@ -60,10 +52,10 @@ impl Plugin for PumpkinPlus {
     fn on_load(&mut self, context: Context) -> pumpkin_plugin_api::Result<()> {
         let mut manager = ConfigManager::empty();
 
-        manager.register::<PlayerConfig>(module_names::PLAYER);
-        manager.register::<TablistConfig>(module_names::TABLIST);
-        manager.register::<MotdConfig>(module_names::MOTD);
-        manager.register::<LocatorConfig>(module_names::LOCATOR);
+        manager.register::<PlayerConfig>();
+        manager.register::<TablistConfig>();
+        manager.register::<MotdConfig>();
+        manager.register::<LocatorConfig>();
 
         manager.finalize(&context);
 

@@ -1,6 +1,5 @@
 use crate::config::ConfigManager;
 use crate::module::Module;
-use crate::module_names;
 use pumpkin_plugin_api::Server;
 use serde::{Deserialize, Serialize};
 
@@ -11,7 +10,7 @@ pub struct Motd;
 impl Module for Motd {
     fn enabled(&self) -> bool {
         ConfigManager::get()
-            .map(|cm| cm.get_config::<Config>(module_names::MOTD).enabled)
+            .map(|cm| cm.get_config::<Config>().enabled)
             .unwrap_or(true)
     }
 }
@@ -19,7 +18,7 @@ impl Module for Motd {
 impl Motd {
     pub fn motd(&self, _server: &mut Server) {
         let config: Config = ConfigManager::get()
-            .map(|cm| cm.get_config(module_names::MOTD))
+            .map(|cm| cm.get_config())
             .unwrap_or_default();
         if !self.enabled() || config.motd.is_empty() {
             return;

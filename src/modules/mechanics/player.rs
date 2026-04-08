@@ -1,6 +1,5 @@
 use crate::config::ConfigManager;
 use crate::module::Module;
-use crate::module_names;
 use pumpkin_plugin_api::events::{
     EventData, EventHandler, EventPriority, PlayerChatEvent, PlayerJoinEvent, PlayerLeaveEvent,
     PlayerLoginEvent,
@@ -15,7 +14,7 @@ pub struct Player {}
 impl Module for Player {
     fn enabled(&self) -> bool {
         ConfigManager::get()
-            .map(|cm| cm.get_config::<Config>(module_names::PLAYER).enabled)
+            .map(|cm| cm.get_config::<Config>().enabled)
             .unwrap_or(true)
     }
 
@@ -58,7 +57,7 @@ impl EventHandler<PlayerJoinEvent> for Player {
         mut event: EventData<PlayerJoinEvent>,
     ) -> EventData<PlayerJoinEvent> {
         let config: Config = ConfigManager::get()
-            .map(|cm| cm.get_config(module_names::PLAYER))
+            .map(|cm| cm.get_config())
             .unwrap_or_default();
         if config.join_msg.is_empty() {
             return event;
@@ -81,7 +80,7 @@ impl EventHandler<PlayerLeaveEvent> for Player {
         mut event: EventData<PlayerLeaveEvent>,
     ) -> EventData<PlayerLeaveEvent> {
         let config: Config = ConfigManager::get()
-            .map(|cm| cm.get_config(module_names::PLAYER))
+            .map(|cm| cm.get_config())
             .unwrap_or_default();
         if config.leave_msg.is_empty() {
             return event;
@@ -104,7 +103,7 @@ impl EventHandler<PlayerLoginEvent> for Player {
         mut event: EventData<PlayerLoginEvent>,
     ) -> EventData<PlayerLoginEvent> {
         let config: Config = ConfigManager::get()
-            .map(|cm| cm.get_config(module_names::PLAYER))
+            .map(|cm| cm.get_config())
             .unwrap_or_default();
         if config.kick_msg.is_empty() {
             return event;
@@ -127,7 +126,7 @@ impl EventHandler<PlayerChatEvent> for Player {
         mut event: EventData<PlayerChatEvent>,
     ) -> EventData<PlayerChatEvent> {
         let config: Config = ConfigManager::get()
-            .map(|cm| cm.get_config(module_names::PLAYER))
+            .map(|cm| cm.get_config())
             .unwrap_or_default();
         if !config.chat_filter.is_empty() {
             let lower = event.message.to_lowercase();

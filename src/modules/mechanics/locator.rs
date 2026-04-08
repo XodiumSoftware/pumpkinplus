@@ -1,4 +1,4 @@
-use crate::{PLUGIN_ID, config::ConfigManager, module::Module, module_names};
+use crate::{PLUGIN_ID, config::ConfigManager, module::Module};
 use pumpkin_plugin_api::{
     Server,
     command::{Command, CommandError, CommandNode, CommandSender, ConsumedArgs},
@@ -15,7 +15,7 @@ pub struct Locator;
 impl Module for Locator {
     fn enabled(&self) -> bool {
         ConfigManager::get()
-            .map(|cm| cm.get_config::<Config>(module_names::LOCATOR).enabled)
+            .map(|cm| cm.get_config::<Config>().enabled)
             .unwrap_or(true)
     }
 

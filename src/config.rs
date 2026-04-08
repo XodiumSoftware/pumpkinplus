@@ -10,6 +10,47 @@ use std::fs;
 use std::path::PathBuf;
 use tracing::error;
 
+/// Extracts a config key from a type's full name.
+/// For example:
+/// - `crate::modules::mechanics::player::Config` -> "player"
+/// - `crate::modules::mechanics::player::PlayerConfig` -> "player"
+pub fn config_key<T>() -> &'static str {
+    use std::any::type_name;
+    use std::sync::OnceLock;
+
+    static CACHE: OnceLock<std::sync::Mutex<HashMap<String, &'static str>>> = OnceLock::new();
+
+    let cache = CACHE.get_or_init(|| std::sync::Mutex::new(HashMap::new()));
+    let full_name = type_name::<T>();
+
+    if let Ok(map) = cache.lock() {
+        if let Some(&key) = map.get(full_name) {
+            return key;
+        }
+    }
+
+    let parts: Vec<&str> = full_name.split("::").collect();
+    let key = if parts.len() >= 2 {
+        parts[parts.len() - 2]
+    } else if let Some(&last) = parts.last() {
+        if last.ends_with("Config") {
+            &last[..last.len() - 6]
+        } else {
+            last
+        }
+    } else {
+        full_name
+    };
+
+    let key: &'static str = Box::leak(key.to_string().into_boxed_str());
+
+    if let Ok(mut map) = cache.lock() {
+        map.insert(full_name.to_string(), key);
+    }
+
+    key
+}
+
 thread_local! {
     static CONFIG: RefCell<Option<ConfigManager>> = const { RefCell::new(None) };
 }
@@ -36,19 +77,23 @@ impl ConfigManager {
         CONFIG.with(|c| c.borrow().clone())
     }
 
-    /// Gets a config by name, returning defaults if not found or parse fails.
-    pub fn get_config<T: DeserializeOwned + Default>(&self, name: &str) -> T {
+    /// Gets a config by type, deriving the key from the type name.
+    /// Returns defaults if not found or parse fails.
+    pub fn get_config<T: DeserializeOwned + Default + 'static>(&self) -> T {
+        let key = config_key::<T>();
         self.configs
-            .get(name)
+            .get(key)
             .and_then(|v| serde_json::from_value(v.clone()).ok())
             .unwrap_or_default()
     }
 
     /// Registers a config with default values for a module.
-    pub fn register<T: Serialize + Default>(&mut self, name: &str) {
+    /// The key is derived automatically from the type name.
+    pub fn register<T: Serialize + Default + 'static>(&mut self) {
+        let key = config_key::<T>();
         let config = T::default();
         self.configs
-            .insert(name.to_string(), serde_json::to_value(config).unwrap());
+            .insert(key.to_string(), serde_json::to_value(config).unwrap());
     }
 
     /// Loads config from disk, merging with registered defaults.

@@ -20,7 +20,9 @@ impl Module for Tablist {
     }
 }
 
-/// Configuration for the player mechanics module.
+/// Configuration for the tablist mechanics module.
+pub type TablistConfig = Config;
+
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct Config {
     /// Whether this module is active.

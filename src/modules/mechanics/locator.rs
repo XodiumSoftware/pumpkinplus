@@ -51,6 +51,8 @@ impl CommandHandler for LocatorExecutor {
 }
 
 /// Configuration for the locator mechanics module.
+pub type LocatorConfig = Config;
+
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct Config {
     /// Whether this module is active.

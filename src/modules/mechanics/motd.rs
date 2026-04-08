@@ -29,6 +29,8 @@ impl Motd {
 }
 
 /// Configuration for the MOTD mechanics module.
+pub type MotdConfig = Config;
+
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Config {
     /// Whether this module is active.

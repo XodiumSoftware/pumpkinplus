@@ -11,11 +11,15 @@ mod modules {
 }
 
 pub use config::*;
-pub use mechanics::*;
 pub use modules::*;
 
+pub use modules::mechanics::locator::LocatorConfig;
+pub use modules::mechanics::motd::MotdConfig;
+pub use modules::mechanics::player::PlayerConfig;
+pub use modules::mechanics::tablist::TablistConfig;
+
+use crate::mechanics::player::Player;
 use crate::module::Module;
-use crate::player::Player;
 use pumpkin_plugin_api::{Context, Plugin, PluginMetadata};
 use tracing::info;
 

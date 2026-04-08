@@ -156,6 +156,8 @@ impl EventHandler<PlayerChatEvent> for Player {
 }
 
 /// Configuration for the player mechanics module.
+pub type PlayerConfig = Config;
+
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Config {
     /// Whether this module is active.

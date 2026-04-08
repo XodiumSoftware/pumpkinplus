@@ -14,11 +14,12 @@ pub struct ConfigManager {
 }
 
 impl ConfigManager {
-    /// Creates a new [`ConfigManager`], writing the default config if none exists, then loading from disk.
+    /// Creates a new [`ConfigManager`], loading from disk if it exists,
+    /// otherwise writing defaults first.
     pub fn new(context: &Context) -> Self {
         let mut manager = Self::default();
-        manager.write(context);
         manager.read_and_update(context);
+        manager.write(context);
         manager
     }
 

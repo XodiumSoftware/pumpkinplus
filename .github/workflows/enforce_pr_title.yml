@@ -20,7 +20,7 @@ jobs:
       - id: enforce_title
         name: Set PR title to branch name
         if: github.event.pull_request.title != github.event.pull_request.head.ref
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             await github.rest.pulls.update({

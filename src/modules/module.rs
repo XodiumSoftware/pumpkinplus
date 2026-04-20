@@ -1,3 +1,8 @@
+//! Module system for PumpkinPlus.
+//!
+//! Each feature is implemented as a module implementing the [`Module`] trait.
+//! Modules can register event handlers, commands, and permission nodes.
+
 use pumpkin_plugin_api::Context;
 use pumpkin_plugin_api::command::Command;
 use std::collections::HashSet;
@@ -35,7 +40,7 @@ pub trait Module {
 
     /// Registers this module's event handlers and commands with the server.
     ///
-    /// Calls [`Module::register_events`], then registers each command from
+    /// Calls [`Module::events`](Module::events), then registers each command from
     /// [`Module::cmds`] paired with its corresponding permission from [`Module::perms`]
     /// by index. Commands without a paired permission use an empty permission string.
     fn register(&self, context: &Context) {

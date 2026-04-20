@@ -1,3 +1,17 @@
+//! Locator module - personalize locator bar color.
+//!
+//! ## Commands
+//!
+//! | Command                        | Aliases | Permission                    | Description                |
+//! |--------------------------------|---------|-------------------------------|----------------------------|
+//! | `/locator <color\|hex\|reset>` | `lc`    | `pumpkinplus:command.locator` | Set locator bar color      |
+//!
+//! ## Configuration
+//!
+//! | Field     | Default | Description                   |
+//! |-----------|---------|-------------------------------|
+//! | `enabled` | `false` | Whether this module is active |
+
 use crate::{PLUGIN_ID, config::ConfigManager, module::Module};
 use pumpkin_plugin_api::{
     Server,

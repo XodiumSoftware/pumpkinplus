@@ -1,3 +1,23 @@
+//! Player module - handles join/leave messages and chat customization.
+//!
+//! ## Configuration
+//!
+//! | Field         | Default | Description                                                        |
+//! |---------------|---------|--------------------------------------------------------------------|
+//! | `enabled`     | `false` | Whether this module is active                                      |
+//! | `join_msg`    | `""`    | Message broadcast when a player joins                              |
+//! | `leave_msg`   | `""`    | Message broadcast when a player leaves                             |
+//! | `kick_msg`    | `""`    | Message shown when a player is kicked during login               |
+//! | `chat_format` | `""`    | Custom chat format. Use `{player}` and `{message}` placeholders    |
+//! | `chat_filter` | `[]`    | List of blocked words/phrases (case-insensitive)                   |
+//!
+//! ## Placeholders
+//!
+//! | Placeholder | Available in                                    |
+//! |-------------|-------------------------------------------------|
+//! | `{player}`  | `join_msg`, `leave_msg`, `kick_msg`, `chat_format` |
+//! | `{message}` | `chat_format`                                   |
+
 use crate::config::ConfigManager;
 use crate::module::Module;
 use pumpkin_plugin_api::events::{
@@ -9,7 +29,7 @@ use serde::{Deserialize, Serialize};
 
 /// Handles player join and leave mechanics, including custom messages.
 #[derive(Default)]
-pub struct Player {}
+pub struct Player;
 
 impl Module for Player {
     fn enabled(&self) -> bool {

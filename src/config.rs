@@ -1,3 +1,13 @@
+//! Configuration management system.
+//!
+//! Uses a registry pattern where modules register their configs by name,
+//! and ConfigManager handles loading from disk with merge semantics.
+//!
+//! ## Config Location
+//!
+//! The config file is stored at `{data_folder}/config.json`.
+//! It is created automatically on first load with all registered defaults.
+
 use figment::Figment;
 use figment::providers::{Format, Json};
 use pumpkin_plugin_api::Context;

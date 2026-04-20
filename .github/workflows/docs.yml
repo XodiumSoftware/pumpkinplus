@@ -4,9 +4,9 @@ on:
   push:
     branches: [ main ]
     paths:
-      - "docs/**"
-      - "mkdocs.yml"
-      - "requirements-docs.txt"
+      - "src/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
   workflow_dispatch:
 
 concurrency:
@@ -26,25 +26,22 @@ jobs:
         name: Checkout
         uses: actions/checkout@v6.0.2
 
-      - id: setup-python
-        name: Setup Python
-        uses: actions/setup-python@v6
+      - id: setup_rust
+        name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@d197c158264056996cfba74a9c2d93886346edc3
         with:
-          python-version: "3.x"
-
-      - id: install-deps
-        name: Install dependencies
-        run: pip install -r requirements-docs.txt
+          toolchain: stable
+          target: wasm32-wasip2
 
       - id: build
         name: Build docs
-        run: mkdocs build
+        run: cargo doc --no-deps --target wasm32-wasip2
 
       - id: upload-artifact
         name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: site/
+          path: target/wasm32-wasip2/doc/
 
   deploy:
     environment:

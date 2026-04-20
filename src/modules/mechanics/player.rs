@@ -40,32 +40,16 @@ impl Module for Player {
 
     fn events(&self, context: &Context) {
         context
-            .register_event_handler::<PlayerJoinEvent, _>(
-                Player::default(),
-                EventPriority::Highest,
-                true,
-            )
+            .register_event_handler::<PlayerJoinEvent, _>(Player, EventPriority::Highest, true)
             .expect("failed to register player join event handler");
         context
-            .register_event_handler::<PlayerLeaveEvent, _>(
-                Player::default(),
-                EventPriority::Highest,
-                true,
-            )
+            .register_event_handler::<PlayerLeaveEvent, _>(Player, EventPriority::Highest, true)
             .expect("failed to register player leave event handler");
         context
-            .register_event_handler::<PlayerLoginEvent, _>(
-                Player::default(),
-                EventPriority::Highest,
-                true,
-            )
+            .register_event_handler::<PlayerLoginEvent, _>(Player, EventPriority::Highest, true)
             .expect("failed to register player login event handler");
         context
-            .register_event_handler::<PlayerChatEvent, _>(
-                Player::default(),
-                EventPriority::Highest,
-                true,
-            )
+            .register_event_handler::<PlayerChatEvent, _>(Player, EventPriority::Highest, true)
             .expect("failed to register player chat event handler");
     }
 }

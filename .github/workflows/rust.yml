@@ -1,17 +1,26 @@
-name: Xodium CI/CD - Plugin
+name: Xodium CI/CD
 
 on:
   push:
+    branches: [ main ]
+  pull_request:
     branches: [ main ]
   workflow_dispatch:
 
 permissions:
   contents: read
   packages: write
+  pages: write
+  id-token: write
 
 concurrency:
   group: "${{ github.workflow }}-${{ github.ref }}"
   cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  SCCACHE_GHA_ENABLED: "true"
+  RUSTC_WRAPPER: "sccache"
 
 jobs:
   lint:
@@ -31,6 +40,10 @@ jobs:
           toolchain: stable
           target: wasm32-wasip2
           components: rustfmt, clippy
+
+      - id: run_sccache_cache
+        name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@7d986dd989559c6ecdb630a3fd2557667be217ad
 
       - id: run_lint
         name: Run Lint
@@ -70,6 +83,10 @@ jobs:
         with:
           toolchain: stable
           target: wasm32-wasip2
+
+      - id: run_sccache_cache
+        name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@7d986dd989559c6ecdb630a3fd2557667be217ad
 
       - id: build_artifact
         name: Build Artefact
@@ -143,3 +160,49 @@ jobs:
           body: |
             From commit: ${{ github.sha }}
             Generated on: ${{ github.event.head_commit.timestamp }}
+
+  docs:
+    name: Documentation
+    needs: [ lint ]
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: "${{ steps.deployment.outputs.page_url }}"
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - id: checkout
+        name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - id: setup_rust
+        name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@d197c158264056996cfba74a9c2d93886346edc3
+        with:
+          toolchain: stable
+          target: wasm32-wasip2
+
+      - id: run_sccache_cache
+        name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@7d986dd989559c6ecdb630a3fd2557667be217ad
+
+      - id: build_docs
+        name: Build Documentation
+        run: cargo doc --no-deps --target wasm32-wasip2
+
+      - id: flatten_docs
+        name: Flatten Docs
+        run: |
+          cp -r target/wasm32-wasip2/doc/pumpkinplus/* target/wasm32-wasip2/doc/
+          rm -rf target/wasm32-wasip2/doc/pumpkinplus
+
+      - id: upload_artifact
+        name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: target/wasm32-wasip2/doc/
+
+      - id: deployment
+        name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v5

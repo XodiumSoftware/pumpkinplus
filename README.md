@@ -24,29 +24,12 @@
 ## Table of Contents
 
 - [Architecture](ARCHITECTURE.md)
-- [Documentation](#documentation)
+- [Guide](GUIDE.md)
 - [Built With](#built-with)
 - [Code of Conduct][code_of_conduct_url]
 - [Contributing][contributing_url]
 - [License][license_url]
 - [Security][security_url]
-
-## Documentation
-
-Generate and view the documentation locally:
-
-```bash
-cargo doc --open
-```
-
-Or build and serve:
-
-```bash
-cargo doc --no-deps
-cd target/doc && python -m http.server 8080
-```
-
-Open http://localhost:8080/pumpkinplus in your browser.
 
 ## Built With
 

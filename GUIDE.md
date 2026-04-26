@@ -82,12 +82,12 @@ enabled = false
 
 ### Configuration Options
 
-| Module | Description | Default |
-|--------|-------------|---------|
-| `player` | Custom join/leave/kick messages | Enabled |
-| `motd` | Custom server MOTD | Disabled |
-| `tablist` | Custom tablist header/footer | Disabled |
-| `locator` | Locator bar personalization | Disabled |
+| Module    | Description                     | Default  |
+|-----------|---------------------------------|----------|
+| `player`  | Custom join/leave/kick messages | Enabled  |
+| `motd`    | Custom server MOTD              | Disabled |
+| `tablist` | Custom tablist header/footer    | Disabled |
+| `locator` | Locator bar personalization     | Disabled |
 
 ### Placeholders
 

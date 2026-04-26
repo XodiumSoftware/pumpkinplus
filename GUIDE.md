@@ -59,28 +59,25 @@ Build the plugin yourself using Rust.
 
 ## Configuration
 
-The plugin uses a JSON configuration file (`config.json`) that is automatically created on first run.
+The plugin uses a TOML configuration file (`config.toml`) that is automatically created on first run.
 
 ### Default Config Structure
 
-```json
-{
-  "player": {
-    "enabled": true,
-    "join_message": "Welcome {player}!",
-    "leave_message": "Goodbye {player}!",
-    "kick_message": "{player} was kicked"
-  },
-  "motd": {
-    "enabled": false
-  },
-  "tablist": {
-    "enabled": false
-  },
-  "locator": {
-    "enabled": false
-  }
-}
+```toml
+[player]
+enabled = true
+join_message = "Welcome {player}!"
+leave_message = "Goodbye {player}!"
+kick_message = "{player} was kicked"
+
+[motd]
+enabled = false
+
+[tablist]
+enabled = false
+
+[locator]
+enabled = false
 ```
 
 ### Configuration Options
@@ -100,8 +97,8 @@ The plugin uses a JSON configuration file (`config.json`) that is automatically 
 
 1. Place `pumpkinplus.wasm` in your Pumpkin server's `plugins/` directory
 2. Start the server
-3. The plugin will load and create `config.json` in the plugin data folder
-4. Stop the server and edit `config.json` as needed
+3. The plugin will load and create `config.toml` in the plugin data folder
+4. Stop the server and edit `config.toml` as needed
 5. Restart the server
 
 ## Usage
@@ -134,13 +131,13 @@ When enabled, provides the `/locator` (or `/lc`) command:
 
 ### "Config not loading"
 
-- Check that `config.json` is valid JSON
+- Check that `config.toml` is valid TOML
 - The plugin will regenerate the config if it's invalid
 - Stop the server before editing the config file
 
 ### Commands not working
 
-- Ensure the module is enabled in `config.json`
+- Ensure the module is enabled in `config.toml`
 - Check that you have the required permission node
 - Verify the plugin loaded successfully in server logs
 

@@ -16,14 +16,14 @@ cargo build --target wasm32-wasip2
 cargo build --release --target wasm32-wasip2
 ```
 
-Unit tests are in `src/config.rs` under `#[cfg(test)]` for the configuration system.
+Testing is done via integration testing: build the WASM plugin and load it in a Pumpkin server.
 
 ## Architecture
 
 ### Entry Point
 
 - **`PumpkinPlus`** — implements `Plugin` from `pumpkin_plugin_api`. Registered via `register_plugin!(PumpkinPlus)`.
-    - `on_load`: initializes `ConfigManager` (loads or creates `config.json`), then registers all modules via `Module::register`.
+    - `on_load`: initializes `ConfigManager` (loads or creates `config.toml`), then registers all modules via `Module::register`.
     - `on_unload`: logs a farewell message.
 
 ### Module System
@@ -42,7 +42,7 @@ Modules are plain structs (not singletons) instantiated with `Default::default()
 
 **`ConfigManager`** (`src/config.rs`) is a single JSON-backed struct that aggregates all module configs. On `on_load`:
 
-- If `config.json` exists in the plugin data folder, it is deserialized and returned.
+- If `config.toml` exists in the plugin data folder, it is deserialized and returned.
 - If not found, the default config is written to disk and returned.
 - Any other I/O error is surfaced as a plugin load error.
 
@@ -62,7 +62,7 @@ Each module owns a nested **`Config`** struct (derived `Serialize`/`Deserialize`
 | Path                     | Contents                                                |
 |--------------------------|---------------------------------------------------------|
 | `src/lib.rs`             | `PumpkinPlus` plugin struct, entry point                |
-| `src/config.rs`          | `ConfigManager` — JSON config load/save                 |
+| `src/config.rs`          | `ConfigManager` — TOML config load/save                 |
 | `src/modules/module.rs`  | `Module` trait definition                               |
 | `src/modules/mechanics/` | Feature modules: `player`, `motd`, `tablist`, `locator` |
 

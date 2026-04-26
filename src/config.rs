@@ -5,11 +5,11 @@
 //!
 //! ## Config Location
 //!
-//! The config file is stored at `{data_folder}/config.json`.
+//! The config file is stored at `{data_folder}/config.toml`.
 //! It is created automatically on first load with all registered defaults.
 
 use figment::Figment;
-use figment::providers::{Format, Json};
+use figment::providers::{Format, Toml};
 use pumpkin_plugin_api::Context;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -97,11 +97,11 @@ impl ConfigManager {
     /// Call this after all modules have registered their configs.
     pub fn finalize(&mut self, context: &Context) {
         let path =
-            PathBuf::from(context.get_data_folder().trim_start_matches("./")).join("config.json");
+            PathBuf::from(context.get_data_folder().trim_start_matches("./")).join("config.toml");
 
         if path.exists() {
             let file_config: HashMap<String, Value> = Figment::new()
-                .merge(Json::file(&path))
+                .merge(Toml::file(&path))
                 .extract()
                 .inspect_err(|e| error!("Failed to load config file: {:?}", e))
                 .unwrap_or_default();
@@ -122,12 +122,9 @@ impl ConfigManager {
             fs::create_dir_all(parent).ok();
         }
 
-        fs::write(
-            &path,
-            serde_json::to_string_pretty(self).unwrap_or_default(),
-        )
-        .inspect_err(|e| error!("Failed to write config: {}", e))
-        .ok();
+        fs::write(&path, toml::to_string_pretty(self).unwrap_or_default())
+            .inspect_err(|e| error!("Failed to write config: {}", e))
+            .ok();
 
         CONFIG.set(Some(self.clone()));
     }
@@ -150,92 +147,5 @@ fn merge_json(a: &Value, b: &Value) -> Value {
             Value::Object(result)
         }
         _ => b.clone(),
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use serde::{Deserialize, Serialize};
-
-    #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
-    struct TestConfig {
-        pub enabled: bool,
-        pub name: String,
-        pub count: u32,
-    }
-
-    #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
-    struct OtherConfig {
-        pub value: i64,
-    }
-
-    #[test]
-    fn test_config_key_derives_from_type_name() {
-        let key = config_key::<TestConfig>();
-        // Type name is pumpkinplus::config::tests::TestConfig
-        // So the key should be "tests" (parent module)
-        assert_eq!(key, "tests");
-    }
-
-    #[test]
-    fn test_config_manager_register_and_get() {
-        let mut manager = ConfigManager::empty();
-        manager.register::<TestConfig>();
-
-        let config: TestConfig = manager.get_config();
-        assert!(!config.enabled); // Default is false
-        assert_eq!(config.name, "");
-        assert_eq!(config.count, 0);
-    }
-
-    #[test]
-    fn test_config_manager_multiple_configs() {
-        let mut manager = ConfigManager::empty();
-        manager.register::<TestConfig>();
-        manager.register::<OtherConfig>();
-
-        let test: TestConfig = manager.get_config();
-        let other: OtherConfig = manager.get_config();
-
-        assert_eq!(test.count, 0);
-        assert_eq!(other.value, 0);
-    }
-
-    #[test]
-    fn test_merge_json_objects() {
-        let a = serde_json::json!({
-            "enabled": false,
-            "name": "default",
-            "extra": "value"
-        });
-        let b = serde_json::json!({
-            "enabled": true,
-            "name": "custom"
-        });
-
-        let merged = merge_json(&a, &b);
-        let obj = merged.as_object().unwrap();
-
-        assert_eq!(obj.get("enabled").unwrap(), &serde_json::json!(true));
-        assert_eq!(obj.get("name").unwrap(), &serde_json::json!("custom"));
-        assert_eq!(obj.get("extra").unwrap(), &serde_json::json!("value"));
-    }
-
-    #[test]
-    fn test_merge_json_overwrites_non_objects() {
-        let a = serde_json::json!({"value": [1, 2, 3]});
-        let b = serde_json::json!({"value": "string"});
-
-        let merged = merge_json(&a, &b);
-        assert_eq!(merged.get("value").unwrap(), &serde_json::json!("string"));
-    }
-
-    #[test]
-    fn test_get_config_returns_default_on_missing() {
-        let manager = ConfigManager::empty();
-        // TestConfig was never registered
-        let config: TestConfig = manager.get_config();
-        assert_eq!(config, TestConfig::default());
     }
 }

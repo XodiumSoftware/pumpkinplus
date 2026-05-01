@@ -99,6 +99,10 @@ impl Plugin for PumpkinPlus {
                 .collect(),
             description: env!("CARGO_PKG_DESCRIPTION").into(),
             dependencies: vec![],
+            permissions: vec![
+                pumpkin_plugin_api::permissions::FS_READ_DATA.into(),
+                pumpkin_plugin_api::permissions::FS_WRITE_DATA.into(),
+            ],
         }
     }
 

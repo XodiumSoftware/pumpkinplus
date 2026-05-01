@@ -58,6 +58,7 @@ mod config;
 mod modules {
     pub mod module;
     pub mod mechanics {
+        pub mod double_doors;
         pub mod locator;
         pub mod player;
         pub mod tablist;
@@ -67,13 +68,13 @@ mod modules {
 pub use config::*;
 pub use modules::*;
 
+pub use modules::mechanics::double_doors::Config as DoubleDoorsConfig;
 pub use modules::mechanics::locator::Config as LocatorConfig;
 pub use modules::mechanics::player::Config as PlayerConfig;
 pub use modules::mechanics::tablist::Config as TablistConfig;
 
-use crate::mechanics::locator::Locator;
-use crate::mechanics::player::Player;
 use crate::mechanics::tablist::Tablist;
+use crate::mechanics::{double_doors::DoubleDoors, player::Player};
 use crate::module::Module;
 use pumpkin_plugin_api::{Context, Plugin, PluginMetadata};
 use std::time::Instant;
@@ -111,14 +112,16 @@ impl Plugin for PumpkinPlus {
 
         manager.register::<PlayerConfig>();
         manager.register::<TablistConfig>();
-        manager.register::<LocatorConfig>();
+        manager.register::<DoubleDoorsConfig>();
+        //manager.register::<LocatorConfig>();
 
         manager.finalize(&context);
 
         let player = Player {};
         let tablist = Tablist;
-        let locator = Locator;
-        let modules: Vec<&dyn Module> = vec![&player, &tablist, &locator];
+        //let locator = Locator;
+        let double_doors = DoubleDoors;
+        let modules: Vec<&dyn Module> = vec![&player, &tablist, &double_doors];
         let enabled_count = modules.iter().filter(|m| m.enabled()).count();
 
         let mut total_ms = 0u128;

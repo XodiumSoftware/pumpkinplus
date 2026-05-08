@@ -48,10 +48,7 @@ impl EventHandler<PlayerInteractEvent> for DoubleDoors {
             return event;
         }
 
-        if !matches!(
-            event.action,
-            pumpkin_plugin_api::events::InteractAction::RightClickBlock
-        ) {
+        if format!("{:?}", event.action) != "RightClickBlock" {
             return event;
         }
 
@@ -62,6 +59,8 @@ impl EventHandler<PlayerInteractEvent> for DoubleDoors {
         let Some(clicked_pos) = event.clicked_pos else {
             return event;
         };
+
+        let clicked_pos = tuple_to_block_pos(clicked_pos);
 
         let world = event.player.get_world();
 
@@ -85,9 +84,9 @@ impl EventHandler<PlayerInteractEvent> for DoubleDoors {
         if let (Some(new_clicked), Some(new_adjacent)) = (toggled_clicked_id, toggled_adjacent_id) {
             event.cancelled = true;
 
-            let flags = pumpkin_plugin_api::world::BlockFlags::new()
-                .with_notify_neighbors(true)
-                .with_notify_listeners(true);
+            let flags = pumpkin_plugin_api::world::BlockFlags::empty()
+                .union(pumpkin_plugin_api::world::BlockFlags::NOTIFY_NEIGHBORS)
+                .union(pumpkin_plugin_api::world::BlockFlags::NOTIFY_LISTENERS);
 
             world.set_block_state(clicked_pos, new_clicked, flags);
             world.set_block_state(adjacent_pos, new_adjacent, flags);
@@ -107,17 +106,42 @@ impl EventHandler<PlayerInteractEvent> for DoubleDoors {
     }
 }
 
+/// Converts a `(i32, i32, i32)` tuple to a `BlockPos` struct.
+fn tuple_to_block_pos(pos: (i32, i32, i32)) -> pumpkin_plugin_api::world::BlockPos {
+    pumpkin_plugin_api::world::BlockPos {
+        x: pos.0,
+        y: pos.1,
+        z: pos.2,
+    }
+}
+
 /// Searches the four horizontal neighbors for a door of the same material.
 fn find_adjacent_door(
     world: &pumpkin_plugin_api::world::World,
-    pos: (i32, i32, i32),
+    pos: pumpkin_plugin_api::world::BlockPos,
     door_type: &str,
-) -> Option<(i32, i32, i32)> {
+) -> Option<pumpkin_plugin_api::world::BlockPos> {
     let neighbors = [
-        (pos.0 + 1, pos.1, pos.2),
-        (pos.0 - 1, pos.1, pos.2),
-        (pos.0, pos.1, pos.2 + 1),
-        (pos.0, pos.1, pos.2 - 1),
+        pumpkin_plugin_api::world::BlockPos {
+            x: pos.x + 1,
+            y: pos.y,
+            z: pos.z,
+        },
+        pumpkin_plugin_api::world::BlockPos {
+            x: pos.x - 1,
+            y: pos.y,
+            z: pos.z,
+        },
+        pumpkin_plugin_api::world::BlockPos {
+            x: pos.x,
+            y: pos.y,
+            z: pos.z + 1,
+        },
+        pumpkin_plugin_api::world::BlockPos {
+            x: pos.x,
+            y: pos.y,
+            z: pos.z - 1,
+        },
     ];
 
     for neighbor in &neighbors {
@@ -134,7 +158,7 @@ fn find_adjacent_door(
 /// Returns None if we can't determine the block type.
 fn get_block_registry_key(
     world: &pumpkin_plugin_api::world::World,
-    pos: (i32, i32, i32),
+    pos: pumpkin_plugin_api::world::BlockPos,
 ) -> Option<String> {
     let state = world.get_block_state(pos);
     if state.is_air || state.is_liquid {

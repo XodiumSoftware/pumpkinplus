@@ -21,9 +21,14 @@ use toml::Value;
 use tracing::error;
 
 /// Extracts a config key from a type's full name.
-/// For example:
-/// - `crate::modules::mechanics::player::Config` -> "player"
-/// - `crate::modules::mechanics::player::PlayerConfig` -> "player"
+///
+/// This helper inspects the fully-qualified type name at compile time and
+/// derives a short, snake_case key suitable for a TOML table name.
+///
+/// # Examples
+///
+/// - `crate::modules::mechanics::player::Config` → `"player"`
+/// - `crate::modules::mechanics::player::PlayerConfig` → `"player"`
 pub fn config_key<T>() -> String {
     use std::any::type_name;
 
@@ -132,7 +137,15 @@ impl ConfigManager {
 }
 
 /// Merge two TOML values, preferring values from `b` when both exist.
-/// For tables, recursively merges fields.
+///
+/// For tables, recursively merges fields so that missing keys from the
+/// default config are filled in, while keys present in the file config
+/// override the defaults.
+///
+/// # Behavior
+///
+/// - If both values are tables, fields are merged recursively.
+/// - For any other type, `b` completely replaces `a`.
 fn merge_toml(a: &Value, b: &Value) -> Value {
     match (a, b) {
         (Value::Table(a_map), Value::Table(b_map)) => {

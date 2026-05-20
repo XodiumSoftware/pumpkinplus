@@ -48,6 +48,7 @@ impl EventHandler<PlayerInteractEvent> for DoubleDoors {
             return event;
         }
 
+        // NOTE: InteractAction is not re-exported, have to maybe make an PR?
         if format!("{:?}", event.action) != "RightClickBlock" {
             return event;
         }
@@ -59,8 +60,6 @@ impl EventHandler<PlayerInteractEvent> for DoubleDoors {
         let Some(clicked_pos) = event.clicked_pos else {
             return event;
         };
-
-        let clicked_pos = tuple_to_block_pos(clicked_pos);
 
         let world = event.player.get_world();
 
@@ -106,16 +105,11 @@ impl EventHandler<PlayerInteractEvent> for DoubleDoors {
     }
 }
 
-/// Converts a `(i32, i32, i32)` tuple to a `BlockPos` struct.
-fn tuple_to_block_pos(pos: (i32, i32, i32)) -> pumpkin_plugin_api::world::BlockPos {
-    pumpkin_plugin_api::world::BlockPos {
-        x: pos.0,
-        y: pos.1,
-        z: pos.2,
-    }
-}
-
 /// Searches the four horizontal neighbors for a door of the same material.
+///
+/// Iterates over the four cardinal directions (±x, ±z) and checks whether
+/// the block at each neighbor position has the same registry key as
+/// `door_type`. Returns the first match found.
 fn find_adjacent_door(
     world: &pumpkin_plugin_api::world::World,
     pos: pumpkin_plugin_api::world::BlockPos,
@@ -154,8 +148,13 @@ fn find_adjacent_door(
     None
 }
 
-/// Gets the block registry key (e.g. "minecraft:oak_door") at a position.
-/// Returns None if we can't determine the block type.
+/// Gets the block registry key (e.g. `"minecraft:oak_door"`) at a position.
+///
+/// Currently returns `None` for air or liquid blocks, and a placeholder
+/// `"unknown_door"` for everything else. This may be refined once the
+/// plugin API exposes block state properties directly.
+///
+/// Returns `None` if the block is air or liquid.
 fn get_block_registry_key(
     world: &pumpkin_plugin_api::world::World,
     pos: pumpkin_plugin_api::world::BlockPos,

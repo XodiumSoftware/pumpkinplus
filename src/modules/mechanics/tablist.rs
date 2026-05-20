@@ -48,6 +48,8 @@ impl Module for Tablist {
 }
 
 impl Tablist {
+    /// Replaces `{player}`, `{online}`, `{tps}`, and `{mspt}` placeholders in
+    /// a string with live server and player data.
     fn replace_placeholders(
         text: &str,
         server: &Server,
@@ -64,6 +66,8 @@ impl Tablist {
             .replace("{mspt}", &format!("{:.1}", mspt))
     }
 
+    /// Applies the configured header and footer to a single player,
+    /// resolving placeholders for that player.
     fn update_tablist_for_player(
         config: &Config,
         server: &Server,
@@ -75,6 +79,7 @@ impl Tablist {
             .set_tab_list_header_footer(TextComponent::text(&header), TextComponent::text(&footer));
     }
 
+    /// Refreshes the tab list header and footer for every online player.
     fn update_tablist_for_all_players(server: &Server) {
         let config: Config = ConfigManager::get()
             .map(|cm| cm.get_config())

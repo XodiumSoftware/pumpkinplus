@@ -91,7 +91,7 @@ impl EventHandler<PlayerInteractEvent> for Openable {
         let clicked_state_id = world.get_block_state_id(clicked_pos);
         info!("[Openable] clicked_state_id = {}", clicked_state_id);
 
-        let adjacent_pos = find_adjacent_door(&world, clicked_pos, &event.block);
+        let adjacent_pos = find_adjacent_door(&world, clicked_pos);
 
         let Some(adjacent_pos) = adjacent_pos else {
             info!("[Openable] no adjacent door found, returning early");
@@ -140,15 +140,15 @@ impl EventHandler<PlayerInteractEvent> for Openable {
     }
 }
 
-/// Searches the four horizontal neighbors for a door of the same material.
+/// Searches the four horizontal neighbors for a door block.
 ///
-/// Iterates over the four cardinal directions (±x, ±z) and checks whether
-/// the block at each neighbor position has the same registry key as
-/// `door_type`. Returns the first match found.
+/// Iterates over the four cardinal directions (±x, ±z) and returns the first
+/// neighbor that is not air or liquid. In a valid double-door setup this
+/// will be the paired door, since the two door halves are the only blocks
+/// occupying those adjacent positions at the same Y level.
 fn find_adjacent_door(
     world: &pumpkin_plugin_api::world::World,
     pos: pumpkin_plugin_api::world::BlockPos,
-    door_type: &str,
 ) -> Option<pumpkin_plugin_api::world::BlockPos> {
     let neighbors = [
         pumpkin_plugin_api::world::BlockPos {
@@ -174,38 +174,13 @@ fn find_adjacent_door(
     ];
 
     for neighbor in &neighbors {
-        let neighbor_type = get_block_registry_key(world, *neighbor);
-        if neighbor_type.as_deref() == Some(door_type) {
+        let state = world.get_block_state(*neighbor);
+        if !state.is_air && !state.is_liquid {
             return Some(*neighbor);
         }
     }
 
     None
-}
-
-/// Gets the block registry key (e.g. `"minecraft:oak_door"`) at a position.
-///
-/// Currently returns `None` for air or liquid blocks, and a placeholder
-/// `"unknown_door"` for everything else. This may be refined once the
-/// plugin API exposes block state properties directly.
-///
-/// Returns `None` if the block is air or liquid.
-fn get_block_registry_key(
-    world: &pumpkin_plugin_api::world::World,
-    pos: pumpkin_plugin_api::world::BlockPos,
-) -> Option<String> {
-    let state = world.get_block_state(pos);
-    info!(
-        "[Openable] get_block_registry_key at {:?}: is_air={}, is_liquid={}",
-        pos, state.is_air, state.is_liquid
-    );
-    if state.is_air || state.is_liquid {
-        return None;
-    }
-    // FIXME: Plugin API does not expose the actual registry key yet.
-    // We return a placeholder here, which breaks find_adjacent_door's type matching.
-    info!("[Openable] returning placeholder unknown_door");
-    Some("unknown_door".to_string())
 }
 
 /// Attempts to find the toggled (open <-> closed) state ID for a door.

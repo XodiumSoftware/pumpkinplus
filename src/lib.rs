@@ -59,6 +59,9 @@ mod mirror_types;
 mod modules {
     pub mod module;
     pub mod mechanics {
+        pub mod entity {
+            pub mod bat;
+        }
         pub mod world {
             pub mod openable;
         }
@@ -77,12 +80,14 @@ mod modules {
 pub use config::*;
 pub use modules::*;
 
+pub use modules::mechanics::entity::bat::BatConfig;
 pub use modules::mechanics::player::enderchest::EnderchestConfig;
 pub use modules::mechanics::player::messages::MessagesConfig;
 pub use modules::mechanics::server::chat::ChatConfig;
 pub use modules::mechanics::server::tablist::TablistConfig;
 pub use modules::mechanics::world::openable::OpenableConfig;
 
+use crate::mechanics::entity::bat::Bat;
 use crate::mechanics::player::messages::Messages;
 use crate::mechanics::server::chat::Chat;
 use crate::mechanics::server::tablist::Tablist;
@@ -121,6 +126,7 @@ impl Plugin for PumpkinPlus {
     fn on_load(&mut self, context: Context) -> pumpkin_plugin_api::Result<()> {
         let mut manager = ConfigManager::empty();
 
+        manager.register::<BatConfig>();
         manager.register::<MessagesConfig>();
         manager.register::<ChatConfig>();
         manager.register::<TablistConfig>();
@@ -128,11 +134,12 @@ impl Plugin for PumpkinPlus {
 
         manager.finalize(&context);
 
+        let bat = Bat;
         let messages = Messages {};
         let chat = Chat {};
         let tablist = Tablist;
         let openable = Openable;
-        let modules: Vec<&dyn Module> = vec![&messages, &chat, &tablist, &openable];
+        let modules: Vec<&dyn Module> = vec![&bat, &messages, &chat, &tablist, &openable];
         let enabled_count = modules.iter().filter(|m| m.enabled()).count();
 
         let mut total_ms = 0u128;

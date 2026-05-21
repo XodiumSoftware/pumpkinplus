@@ -38,7 +38,6 @@ use tracing::error;
 
 use std::cell::RefCell;
 
-// Thread-local storage for the data folder path used by NicknamesStore.
 thread_local! {
     static DATA_FOLDER: RefCell<Option<String>> = const { RefCell::new(None) };
 }
@@ -50,13 +49,13 @@ struct NicknamesStore {
 }
 
 impl NicknamesStore {
-    fn path() -> PathBuf {
-        let folder = DATA_FOLDER.with(|f| f.borrow().clone().unwrap_or_default());
-        PathBuf::from(folder.trim_start_matches("./")).join("nicknames.json")
+    /// Builds the file path for `nicknames.json` inside the given data folder.
+    fn path(data_folder: &str) -> PathBuf {
+        PathBuf::from(data_folder.trim_start_matches("./")).join("nicknames.json")
     }
 
-    fn load() -> Self {
-        let path = Self::path();
+    fn load(data_folder: &str) -> Self {
+        let path = Self::path(data_folder);
         if path.exists() {
             fs::read_to_string(&path)
                 .ok()
@@ -67,8 +66,8 @@ impl NicknamesStore {
         }
     }
 
-    fn save(&self) {
-        let path = Self::path();
+    fn save(&self, data_folder: &str) {
+        let path = Self::path(data_folder);
         if let Some(parent) = path.parent() {
             fs::create_dir_all(parent).ok();
         }
@@ -84,13 +83,13 @@ impl NicknamesStore {
         self.nicknames.get(uuid)
     }
 
-    fn set(&mut self, uuid: &str, nickname: String) {
+    fn set(&mut self, data_folder: &str, uuid: &str, nickname: String) {
         if nickname.is_empty() {
             self.nicknames.remove(uuid);
         } else {
             self.nicknames.insert(uuid.to_string(), nickname);
         }
-        self.save();
+        self.save(data_folder);
     }
 }
 
@@ -125,7 +124,9 @@ impl Module for Nickname {
     }
 
     fn events(&self, context: &Context) {
-        DATA_FOLDER.with(|f| *f.borrow_mut() = Some(context.get_data_folder().to_string()));
+        DATA_FOLDER.with(|f| {
+            *f.borrow_mut() = Some(context.get_data_folder().to_string());
+        });
 
         context
             .register_event_handler::<PlayerJoinEvent, _>(Nickname, EventPriority::Normal, true)
@@ -145,14 +146,15 @@ impl CommandHandler for NicknameExecutor {
         let player = sender.as_player().ok_or(CommandError::PermissionDenied)?;
         let uuid = format!("{}-{}", player.get_id().high, player.get_id().low);
 
-        let mut store = NicknamesStore::load();
+        let data_folder = DATA_FOLDER.with(|f| f.borrow().clone().unwrap_or_default());
+        let mut store = NicknamesStore::load(&data_folder);
 
         // Try to get the "name" argument; if missing, treat as clear
         let arg = args.get_value("name");
         let nickname = match arg {
             pumpkin_plugin_api::command_wit::Arg::Simple(name) => name,
             _ => {
-                store.set(&uuid, String::new());
+                store.set(&data_folder, &uuid, String::new());
                 update_player(&player, None);
                 sender.send_message(TextComponent::text("Nickname cleared."));
                 return Ok(0);
@@ -161,11 +163,11 @@ impl CommandHandler for NicknameExecutor {
 
         let trimmed = nickname.trim();
         if trimmed.is_empty() {
-            store.set(&uuid, String::new());
+            store.set(&data_folder, &uuid, String::new());
             update_player(&player, None);
             sender.send_message(TextComponent::text("Nickname cleared."));
         } else {
-            store.set(&uuid, trimmed.to_string());
+            store.set(&data_folder, &uuid, trimmed.to_string());
             update_player(&player, Some(trimmed));
             sender.send_message(TextComponent::text(&format!(
                 "Nickname updated to: {}",
@@ -187,7 +189,8 @@ impl EventHandler<PlayerJoinEvent> for Nickname {
             return event;
         }
 
-        let store = NicknamesStore::load();
+        let data_folder = DATA_FOLDER.with(|f| f.borrow().clone().unwrap_or_default());
+        let store = NicknamesStore::load(&data_folder);
         let uuid = format!(
             "{}-{}",
             event.player.get_id().high,

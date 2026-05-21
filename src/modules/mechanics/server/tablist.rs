@@ -18,7 +18,7 @@
 //! | `{mspt}`    | Milliseconds per tick            | `5.2`          |
 
 use crate::config::ConfigManager;
-use crate::module::Module;
+use crate::mechanics::mechanic::Mechanic;
 use pumpkin_plugin_api::events::{
     EventData, EventHandler, EventPriority, PlayerJoinEvent, PlayerLeaveEvent,
 };
@@ -30,7 +30,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Default)]
 pub struct Tablist;
 
-impl Module for Tablist {
+impl Mechanic for Tablist {
     fn enabled(&self) -> bool {
         ConfigManager::get()
             .map(|cm| cm.get_config::<TablistConfig>().enabled)

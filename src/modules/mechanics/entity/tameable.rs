@@ -25,7 +25,7 @@
 //! Until these APIs are available, ownership transfer cannot be implemented.
 
 use crate::config::ConfigManager;
-use crate::module::Module;
+use crate::mechanics::mechanic::Mechanic;
 use pumpkin_plugin_api::Context;
 use serde::{Deserialize, Serialize};
 
@@ -33,7 +33,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Default)]
 pub struct Tameable;
 
-impl Module for Tameable {
+impl Mechanic for Tameable {
     fn enabled(&self) -> bool {
         ConfigManager::get()
             .map(|cm| cm.get_config::<TameableConfig>().enabled)

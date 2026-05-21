@@ -12,7 +12,7 @@
 //! | `actions`   | `["RightClickAir"]`     | Actions that trigger the sync |
 
 use crate::config::ConfigManager;
-use crate::module::Module;
+use crate::mechanics::mechanic::Mechanic;
 use crate::{GameMode, InteractionAction};
 use pumpkin_plugin_api::events::{EventData, EventHandler, EventPriority, PlayerInteractEvent};
 use pumpkin_plugin_api::{Context, Server};
@@ -23,7 +23,7 @@ use tracing::{debug, info};
 #[derive(Default)]
 pub struct Openable;
 
-impl Module for Openable {
+impl Mechanic for Openable {
     fn enabled(&self) -> bool {
         ConfigManager::get()
             .map(|cm| cm.get_config::<OpenableConfig>().enabled)

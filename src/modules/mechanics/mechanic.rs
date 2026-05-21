@@ -1,29 +1,29 @@
-//! Module system for PumpkinPlus.
+//! Mechanic system for PumpkinPlus.
 //!
-//! Each feature is implemented as a module implementing the [`Module`] trait.
-//! Modules can register event handlers, commands, and permission nodes.
+//! Each gameplay feature is implemented as a module implementing the [`Mechanic`] trait.
+//! Mechanics can register event handlers, commands, and permission nodes.
 
 use pumpkin_plugin_api::Context;
 use pumpkin_plugin_api::command::Command;
 use std::collections::HashSet;
 
-/// A trait representing a plugin module that can be enabled or disabled.
+/// A trait representing a plugin mechanic that can be enabled or disabled.
 ///
-/// Modules may optionally expose commands, permission nodes, and event handlers,
-/// all registered with the server via [`Module::register`].
-pub trait Module {
+/// Mechanics may optionally expose commands, permission nodes, and event handlers,
+/// all registered with the server via [`Mechanic::register`].
+pub trait Mechanic {
     /// Returns `true` if the module is enabled, `false` otherwise.
     fn enabled(&self) -> bool;
 
-    /// Returns the commands provided by this module.
+    /// Returns the commands provided by this mechanic.
     ///
     /// Each [`Command`] returned here will be registered with the server when
-    /// [`Module::register`] is called. Returns an empty vec by default.
+    /// [`Mechanic::register`] is called. Returns an empty vec by default.
     fn cmds(&self) -> Vec<Command> {
         vec![]
     }
 
-    /// Returns the permission nodes required by this module.
+    /// Returns the permission nodes required by this mechanic.
     ///
     /// Permissions are paired with commands by index when registering. If there
     /// are fewer permissions than commands, remaining commands are registered
@@ -32,16 +32,16 @@ pub trait Module {
         HashSet::new()
     }
 
-    /// Registers event handlers for this module.
+    /// Registers event handlers for this mechanic.
     ///
     /// Override this to call [`Context::register_event_handler`] for each event
-    /// this module handles. No-op by default.
+    /// this mechanic handles. No-op by default.
     fn events(&self, _context: &Context) {}
 
-    /// Registers this module's event handlers and commands with the server.
+    /// Registers this mechanic's event handlers and commands with the server.
     ///
-    /// Calls [`Module::events`](Module::events), then registers each command from
-    /// [`Module::cmds`] paired with its corresponding permission from [`Module::perms`]
+    /// Calls [`Mechanic::events`](Mechanic::events), then registers each command from
+    /// [`Mechanic::cmds`] paired with its corresponding permission from [`Mechanic::perms`]
     /// by index. Commands without a paired permission use an empty permission string.
     fn register(&self, context: &Context) {
         if !self.enabled() {

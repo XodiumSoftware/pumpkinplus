@@ -14,7 +14,7 @@
 //! hooked until upstream support is added.
 
 use crate::config::ConfigManager;
-use crate::module::Module;
+use crate::mechanics::mechanic::Mechanic;
 use pumpkin_plugin_api::Context;
 use serde::{Deserialize, Serialize};
 
@@ -22,7 +22,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Default)]
 pub struct SpawnEgg;
 
-impl Module for SpawnEgg {
+impl Mechanic for SpawnEgg {
     fn enabled(&self) -> bool {
         ConfigManager::get()
             .map(|cm| cm.get_config::<SpawnEggConfig>().enabled)

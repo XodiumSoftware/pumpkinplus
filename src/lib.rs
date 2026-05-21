@@ -65,8 +65,9 @@ pub use mirror_types::gamemode::GameMode;
 pub use mirror_types::interaction::InteractionAction;
 
 mod modules {
-    pub mod module;
+    pub mod recipes {}
     pub mod mechanics {
+        pub mod mechanic;
         pub mod entity {
             pub mod bat;
             pub mod griefing;
@@ -114,9 +115,9 @@ use crate::mechanics::player::nickname::Nickname;
 // use crate::mechanics::player::locator::Locator;
 use crate::mechanics::player::messages::Messages;
 // use crate::mechanics::world::openable::Openable;
+use crate::mechanics::mechanic::Mechanic;
 use crate::mechanics::server::chat::Chat;
 use crate::mechanics::server::tablist::Tablist;
-use crate::module::Module;
 use pumpkin_plugin_api::{Context, Plugin, PluginMetadata};
 use std::time::Instant;
 use tracing::info;
@@ -179,7 +180,7 @@ impl Plugin for PumpkinPlus {
         let chat = Chat;
         let tablist = Tablist;
         // let openable = Openable;
-        let modules: Vec<&dyn Module> = vec![
+        let modules: Vec<&dyn Mechanic> = vec![
             // &bat,
             // &griefing,
             // &husk,

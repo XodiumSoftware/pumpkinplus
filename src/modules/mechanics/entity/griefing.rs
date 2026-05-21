@@ -15,7 +15,7 @@
 
 use crate::EntityType;
 use crate::config::ConfigManager;
-use crate::module::Module;
+use crate::mechanics::mechanic::Mechanic;
 use pumpkin_plugin_api::Context;
 use serde::{Deserialize, Serialize};
 
@@ -23,7 +23,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Default)]
 pub struct Griefing;
 
-impl Module for Griefing {
+impl Mechanic for Griefing {
     fn enabled(&self) -> bool {
         ConfigManager::get()
             .map(|cm| cm.get_config::<GriefingConfig>().enabled)

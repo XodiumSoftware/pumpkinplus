@@ -12,7 +12,7 @@
 //! |-----------|---------|-------------------------------|
 //! | `enabled` | `false` | Whether this module is active |
 
-use crate::{PLUGIN_ID, config::ConfigManager, module::Module};
+use crate::{PLUGIN_ID, config::ConfigManager, mechanics::mechanic::Mechanic};
 use pumpkin_plugin_api::{
     Server,
     command::{Command, CommandError, CommandNode, CommandSender, ConsumedArgs},
@@ -26,7 +26,7 @@ use std::collections::HashSet;
 #[derive(Default)]
 pub struct Locator;
 
-impl Module for Locator {
+impl Mechanic for Locator {
     fn enabled(&self) -> bool {
         ConfigManager::get()
             .map(|cm| cm.get_config::<LocatorConfig>().enabled)

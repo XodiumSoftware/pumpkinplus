@@ -9,7 +9,7 @@
 //! | `actions`   | `["RightClickAir"]`        | Interaction actions that trigger the GUI  |
 
 use crate::config::ConfigManager;
-use crate::module::Module;
+use crate::mechanics::mechanic::Mechanic;
 use crate::{GameMode, InteractionAction};
 use pumpkin_plugin_api::events::{EventData, EventHandler, EventPriority, PlayerInteractEvent};
 use pumpkin_plugin_api::{Context, Server};
@@ -19,7 +19,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Default)]
 pub struct Enderchest;
 
-impl Module for Enderchest {
+impl Mechanic for Enderchest {
     fn enabled(&self) -> bool {
         ConfigManager::get()
             .map(|cm| cm.get_config::<EnderchestConfig>().enabled)

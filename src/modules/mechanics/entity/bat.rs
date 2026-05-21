@@ -16,7 +16,7 @@
 //! an `EntityDeathEvent` (or equivalent), so bat drop mechanics cannot be hooked
 //! until upstream support is added.
 
-use crate::{config::ConfigManager, module::Module};
+use crate::{config::ConfigManager, mechanics::mechanic::Mechanic};
 use pumpkin_plugin_api::Context;
 use serde::{Deserialize, Serialize};
 
@@ -24,7 +24,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Default)]
 pub struct Bat;
 
-impl Module for Bat {
+impl Mechanic for Bat {
     fn enabled(&self) -> bool {
         ConfigManager::get()
             .map(|cm| cm.get_config::<BatConfig>().enabled)

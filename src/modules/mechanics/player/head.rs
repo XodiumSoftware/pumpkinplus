@@ -21,7 +21,7 @@
 //! available in the WASM plugin environment.
 
 use crate::config::ConfigManager;
-use crate::module::Module;
+use crate::mechanics::mechanic::Mechanic;
 use pumpkin_plugin_api::Context;
 use serde::{Deserialize, Serialize};
 
@@ -29,7 +29,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Default)]
 pub struct Head;
 
-impl Module for Head {
+impl Mechanic for Head {
     fn enabled(&self) -> bool {
         ConfigManager::get()
             .map(|cm| cm.get_config::<HeadConfig>().enabled)

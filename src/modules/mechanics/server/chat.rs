@@ -16,7 +16,7 @@
 //! | `{message}` | `chat_format`                                   |
 
 use crate::config::ConfigManager;
-use crate::module::Module;
+use crate::mechanics::mechanic::Mechanic;
 use pumpkin_plugin_api::events::{EventData, EventHandler, EventPriority, PlayerChatEvent};
 use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};
@@ -25,7 +25,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Default)]
 pub struct Chat;
 
-impl Module for Chat {
+impl Mechanic for Chat {
     fn enabled(&self) -> bool {
         ConfigManager::get()
             .map(|cm| cm.get_config::<ChatConfig>().enabled)

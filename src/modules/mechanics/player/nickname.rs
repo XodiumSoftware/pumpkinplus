@@ -20,7 +20,7 @@
 //! - On join, the stored nickname is applied to the player's display name and tab list name.
 //! - A confirmation message is sent via the action bar.
 
-use crate::{PLUGIN_ID, config::ConfigManager, module::Module};
+use crate::{PLUGIN_ID, config::ConfigManager, mechanics::mechanic::Mechanic};
 use pumpkin_plugin_api::{
     Context, Server,
     command::{Command, CommandError, CommandNode, CommandSender, ConsumedArgs},
@@ -97,7 +97,7 @@ impl NicknamesStore {
 #[derive(Default)]
 pub struct Nickname;
 
-impl Module for Nickname {
+impl Mechanic for Nickname {
     fn enabled(&self) -> bool {
         ConfigManager::get()
             .map(|cm| cm.get_config::<NicknameConfig>().enabled)

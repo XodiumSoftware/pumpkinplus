@@ -52,9 +52,11 @@ Modules are plain structs (not singletons) instantiated with `Default::default()
 |-----------|------------------------------------|--------|----------------------------------------------------------------------------------------------------------------------------------|
 | `Messages` | `src/modules/mechanics/player/messages.rs` | Active | Custom join/leave/kick messages. Handles `PlayerJoinEvent`, `PlayerLeaveEvent`, `PlayerLoginEvent`. Uses `{player}` placeholder. |
 | `Chat`     | `src/modules/mechanics/server/chat.rs`     | Active | Chat formatting and word filtering. Handles `PlayerChatEvent`. Uses `{player}` and `{message}` placeholders. |
-| `Motd`    | `src/modules/mechanics/motd.rs`    | Stub   | Custom server list MOTD. API not yet available in `pumpkin-plugin-api`.                                                          |
 | `Tablist` | `src/modules/mechanics/server/tablist.rs` | Active | Dynamic tab list header/footer with `{player}`, `{online}`, `{tps}`, `{mspt}` placeholders. |
 | `Openable`| `src/modules/mechanics/world/openable.rs` | Active | Double door synchronization. Handles `PlayerInteractEvent`. |
+| `Bat`     | `src/modules/mechanics/entity/bat.rs`       | Stub   | Custom bat drops (phantom membrane). Awaiting `EntityDeathEvent` in Pumpkin API. |
+| `Griefing`| `src/modules/mechanics/entity/griefing.rs`  | Stub   | Mob griefing prevention (block changes and explosions). Awaiting `EntityChangeBlockEvent` / `EntityExplodeEvent` in Pumpkin API. |
+| `Husk`    | `src/modules/mechanics/entity/husk.rs`      | Stub   | Custom husk sand drops with camel rider bonus. Awaiting `EntityDeathEvent` in Pumpkin API. |
 
 ### Package Structure
 

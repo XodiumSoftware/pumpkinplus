@@ -33,7 +33,7 @@ pub struct Tablist;
 impl Module for Tablist {
     fn enabled(&self) -> bool {
         ConfigManager::get()
-            .map(|cm| cm.get_config::<Config>().enabled)
+            .map(|cm| cm.get_config::<TablistConfig>().enabled)
             .unwrap_or(true)
     }
 
@@ -69,7 +69,7 @@ impl Tablist {
     /// Applies the configured header and footer to a single player,
     /// resolving placeholders for that player.
     fn update_tablist_for_player(
-        config: &Config,
+        config: &TablistConfig,
         server: &Server,
         player: &pumpkin_plugin_api::player::Player,
     ) {
@@ -81,7 +81,7 @@ impl Tablist {
 
     /// Refreshes the tab list header and footer for every online player.
     fn update_tablist_for_all_players(server: &Server) {
-        let config: Config = ConfigManager::get()
+        let config: TablistConfig = ConfigManager::get()
             .map(|cm| cm.get_config())
             .unwrap_or_default();
 
@@ -101,7 +101,7 @@ impl EventHandler<PlayerJoinEvent> for Tablist {
         server: Server,
         event: EventData<PlayerJoinEvent>,
     ) -> EventData<PlayerJoinEvent> {
-        let config: Config = ConfigManager::get()
+        let config: TablistConfig = ConfigManager::get()
             .map(|cm| cm.get_config())
             .unwrap_or_default();
 
@@ -138,10 +138,8 @@ impl EventHandler<PlayerLeaveEvent> for Tablist {
 }
 
 /// Configuration for the tablist mechanics module.
-pub type TablistConfig = Config;
-
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
-pub struct Config {
+pub struct TablistConfig {
     /// Whether this module is active.
     pub enabled: bool,
     /// Header text displayed at the top of the tab list. Supports Minecraft formatting codes. Leave empty to disable.

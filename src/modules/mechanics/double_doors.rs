@@ -23,7 +23,7 @@ pub struct DoubleDoors;
 impl Module for DoubleDoors {
     fn enabled(&self) -> bool {
         ConfigManager::get()
-            .map(|cm| cm.get_config::<Config>().enabled)
+            .map(|cm| cm.get_config::<DoubleDoorsConfig>().enabled)
             .unwrap_or(true)
     }
 
@@ -48,8 +48,8 @@ impl EventHandler<PlayerInteractEvent> for DoubleDoors {
             return event;
         }
 
-        // NOTE: InteractAction is not re-exported, have to maybe make an PR?
-        if format!("{:?}", event.action) != "RightClickBlock" {
+        // NOTE: InteractAction is not re-exported, its being investigated.
+        if event.action != InteractAction.RIGHT_CLICKED {
             return event;
         }
 
@@ -189,10 +189,8 @@ fn find_toggled_door_state(state_id: u16) -> Option<u16> {
 }
 
 /// Configuration for the double doors mechanics module.
-pub type DoubleDoorsConfig = Config;
-
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
-pub struct Config {
+pub struct DoubleDoorsConfig {
     /// Whether this module is active.
     pub enabled: bool,
 }

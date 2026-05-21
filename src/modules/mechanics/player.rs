@@ -34,7 +34,7 @@ pub struct Player;
 impl Module for Player {
     fn enabled(&self) -> bool {
         ConfigManager::get()
-            .map(|cm| cm.get_config::<Config>().enabled)
+            .map(|cm| cm.get_config::<PlayerConfig>().enabled)
             .unwrap_or(true)
     }
 
@@ -60,7 +60,7 @@ impl EventHandler<PlayerJoinEvent> for Player {
         _server: Server,
         mut event: EventData<PlayerJoinEvent>,
     ) -> EventData<PlayerJoinEvent> {
-        let config: Config = ConfigManager::get()
+        let config: PlayerConfig = ConfigManager::get()
             .map(|cm| cm.get_config())
             .unwrap_or_default();
         if config.join_msg.is_empty() {
@@ -79,7 +79,7 @@ impl EventHandler<PlayerLeaveEvent> for Player {
         _server: Server,
         mut event: EventData<PlayerLeaveEvent>,
     ) -> EventData<PlayerLeaveEvent> {
-        let config: Config = ConfigManager::get()
+        let config: PlayerConfig = ConfigManager::get()
             .map(|cm| cm.get_config())
             .unwrap_or_default();
         if config.leave_msg.is_empty() {
@@ -98,7 +98,7 @@ impl EventHandler<PlayerLoginEvent> for Player {
         _server: Server,
         mut event: EventData<PlayerLoginEvent>,
     ) -> EventData<PlayerLoginEvent> {
-        let config: Config = ConfigManager::get()
+        let config: PlayerConfig = ConfigManager::get()
             .map(|cm| cm.get_config())
             .unwrap_or_default();
         if config.kick_msg.is_empty() {
@@ -117,7 +117,7 @@ impl EventHandler<PlayerChatEvent> for Player {
         _server: Server,
         mut event: EventData<PlayerChatEvent>,
     ) -> EventData<PlayerChatEvent> {
-        let config: Config = ConfigManager::get()
+        let config: PlayerConfig = ConfigManager::get()
             .map(|cm| cm.get_config())
             .unwrap_or_default();
         if !config.chat_filter.is_empty() {
@@ -144,10 +144,8 @@ impl EventHandler<PlayerChatEvent> for Player {
 }
 
 /// Configuration for the player mechanics module.
-pub type PlayerConfig = Config;
-
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct Config {
+pub struct PlayerConfig {
     /// Whether this module is active.
     pub enabled: bool,
     /// Message broadcast when a player joins. Use `{player}` as a placeholder for the player's name. Leave empty to disable.

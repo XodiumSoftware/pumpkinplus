@@ -68,10 +68,10 @@ mod modules {
 pub use config::*;
 pub use modules::*;
 
-pub use modules::mechanics::double_doors::Config as DoubleDoorsConfig;
-pub use modules::mechanics::locator::Config as LocatorConfig;
-pub use modules::mechanics::player::Config as PlayerConfig;
-pub use modules::mechanics::tablist::Config as TablistConfig;
+pub use modules::mechanics::double_doors::DoubleDoorsConfig;
+pub use modules::mechanics::locator::LocatorConfig;
+pub use modules::mechanics::player::PlayerConfig;
+pub use modules::mechanics::tablist::TablistConfig;
 
 use crate::mechanics::tablist::Tablist;
 use crate::mechanics::{double_doors::DoubleDoors, player::Player};

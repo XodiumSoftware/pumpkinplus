@@ -125,6 +125,12 @@ use crate::mechanics::player::messages::Messages;
 use crate::mechanics::mechanic::Mechanic;
 use crate::mechanics::server::chat::Chat;
 use crate::mechanics::server::tablist::Tablist;
+use crate::modules::recipes::chainmail::Chainmail;
+use crate::modules::recipes::diamond_recycle::DiamondRecycle;
+use crate::modules::recipes::painting::Painting;
+use crate::modules::recipes::recipe::Recipe;
+use crate::modules::recipes::rotten_flesh::RottenFlesh;
+use crate::modules::recipes::wood_log::WoodLog;
 use pumpkin_plugin_api::{Context, Plugin, PluginMetadata};
 use std::time::Instant;
 use tracing::info;
@@ -212,6 +218,22 @@ impl Plugin for PumpkinPlus {
             "Registered: {} module(s) | Took {}ms",
             enabled_count, total_ms
         );
+
+        // Recipe registration (no config toggles yet — always on)
+        let recipes: Vec<&dyn Recipe> = vec![
+            &Chainmail,
+            &DiamondRecycle,
+            &Painting,
+            &RottenFlesh,
+            &WoodLog,
+        ];
+
+        let mut _recipe_total_ms = 0u128;
+        for recipe in recipes {
+            let start = Instant::now();
+            recipe.register();
+            _recipe_total_ms += start.elapsed().as_millis();
+        }
         info!("Pumpkin+ loaded. NICE TO CYA!");
         Ok(())
     }

@@ -57,6 +57,7 @@ Modules are plain structs (not singletons) instantiated with `Default::default()
 | `Bat`     | `src/modules/mechanics/entity/bat.rs`       | Stub   | Custom bat drops (phantom membrane). Awaiting `EntityDeathEvent` in Pumpkin API. |
 | `Griefing`| `src/modules/mechanics/entity/griefing.rs`  | Stub   | Mob griefing prevention (block changes and explosions). Awaiting `EntityChangeBlockEvent` / `EntityExplodeEvent` in Pumpkin API. |
 | `Husk`    | `src/modules/mechanics/entity/husk.rs`      | Stub   | Custom husk sand drops with camel rider bonus. Awaiting `EntityDeathEvent` in Pumpkin API. |
+| `SpawnEgg`| `src/modules/mechanics/entity/spawn_egg.rs` | Stub   | Rare spawn egg drops on entity death. Awaiting `EntityDeathEvent` in Pumpkin API. |
 
 ### Package Structure
 

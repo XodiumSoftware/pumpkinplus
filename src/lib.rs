@@ -65,7 +65,14 @@ pub use mirror_types::gamemode::GameMode;
 pub use mirror_types::interaction::InteractionAction;
 
 mod modules {
-    pub mod recipes {}
+    pub mod recipes {
+        pub mod chainmail;
+        pub mod diamond_recycle;
+        pub mod painting;
+        pub mod recipe;
+        pub mod rotten_flesh;
+        pub mod wood_log;
+    }
     pub mod mechanics {
         pub mod mechanic;
         pub mod entity {

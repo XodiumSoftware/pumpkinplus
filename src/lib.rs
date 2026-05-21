@@ -61,6 +61,7 @@ mod modules {
     pub mod mechanics {
         pub mod entity {
             pub mod bat;
+            pub mod griefing;
         }
         pub mod world {
             pub mod openable;
@@ -81,17 +82,21 @@ pub use config::*;
 pub use modules::*;
 
 pub use modules::mechanics::entity::bat::BatConfig;
+pub use modules::mechanics::entity::griefing::GriefingConfig;
 pub use modules::mechanics::player::enderchest::EnderchestConfig;
 pub use modules::mechanics::player::messages::MessagesConfig;
 pub use modules::mechanics::server::chat::ChatConfig;
 pub use modules::mechanics::server::tablist::TablistConfig;
 pub use modules::mechanics::world::openable::OpenableConfig;
 
-use crate::mechanics::entity::bat::Bat;
+// use crate::mechanics::entity::bat::Bat;
+// use crate::mechanics::entity::griefing::Griefing;
+// use crate::mechanics::player::enderchest::Enderchest;
+// use crate::mechanics::player::locator::Locator;
 use crate::mechanics::player::messages::Messages;
+// use crate::mechanics::world::openable::Openable;
 use crate::mechanics::server::chat::Chat;
 use crate::mechanics::server::tablist::Tablist;
-use crate::mechanics::world::openable::Openable;
 use crate::module::Module;
 use pumpkin_plugin_api::{Context, Plugin, PluginMetadata};
 use std::time::Instant;
@@ -126,20 +131,33 @@ impl Plugin for PumpkinPlus {
     fn on_load(&mut self, context: Context) -> pumpkin_plugin_api::Result<()> {
         let mut manager = ConfigManager::empty();
 
-        manager.register::<BatConfig>();
+        // manager.register::<BatConfig>();
+        // manager.register::<GriefingConfig>();
+        // manager.register::<EnderchestConfig>();
+        // manager.register::<LocatorConfig>();
         manager.register::<MessagesConfig>();
         manager.register::<ChatConfig>();
         manager.register::<TablistConfig>();
-        manager.register::<OpenableConfig>();
+        // manager.register::<OpenableConfig>();
 
         manager.finalize(&context);
 
-        let bat = Bat;
-        let messages = Messages {};
-        let chat = Chat {};
+        // let bat = Bat;
+        // let griefing = Griefing;
+        // let enderchest = Enderchest;
+        // let locator = Locator;
+        let messages = Messages;
+        let chat = Chat;
         let tablist = Tablist;
-        let openable = Openable;
-        let modules: Vec<&dyn Module> = vec![&bat, &messages, &chat, &tablist, &openable];
+        // let openable = Openable;
+        let modules: Vec<&dyn Module> = vec![
+            // &bat,
+            // &griefing,
+            // &enderchest,
+            // &locator,
+            &messages, &chat, &tablist,
+            // &openable,
+        ];
         let enabled_count = modules.iter().filter(|m| m.enabled()).count();
 
         let mut total_ms = 0u128;

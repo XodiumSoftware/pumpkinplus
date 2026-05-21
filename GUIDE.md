@@ -59,35 +59,38 @@ Build the plugin yourself using Rust.
 
 ## Configuration
 
-The plugin uses a TOML configuration file (`config.toml`) that is automatically created on first run.
+The plugin uses a JSON configuration file (`config.json`) that is automatically created on first run.
 
 ### Default Config Structure
 
-```toml
-[player]
-enabled = true
-join_message = "Welcome {player}!"
-leave_message = "Goodbye {player}!"
-kick_message = "{player} was kicked"
-
-[motd]
-enabled = false
-
-[tablist]
-enabled = false
-
-[locator]
-enabled = false
+```json
+{
+  "messages": {
+    "enabled": true,
+    "join_msg": "Welcome {player}!",
+    "leave_msg": "Goodbye {player}!",
+    "kick_msg": "{player} was kicked"
+  },
+  "chat": {
+    "enabled": false,
+    "chat_format": "",
+    "chat_filter": []
+  },
+  "tablist": {
+    "enabled": false,
+    "header": "",
+    "footer": ""
+  }
+}
 ```
 
 ### Configuration Options
 
-| Module    | Description                     | Default  |
-|-----------|---------------------------------|----------|
-| `player`  | Custom join/leave/kick messages | Enabled  |
-| `motd`    | Custom server MOTD              | Disabled |
-| `tablist` | Custom tablist header/footer    | Disabled |
-| `locator` | Locator bar personalization     | Disabled |
+| Module     | Description                     | Default  |
+|------------|---------------------------------|----------|
+| `messages` | Custom join/leave/kick messages | Enabled  |
+| `chat`     | Chat format and word filtering  | Disabled |
+| `tablist`  | Custom tablist header/footer    | Disabled |
 
 ### Placeholders
 
@@ -97,17 +100,21 @@ enabled = false
 
 1. Place `pumpkinplus.wasm` in your Pumpkin server's `plugins/` directory
 2. Start the server
-3. The plugin will load and create `config.toml` in the plugin data folder
-4. Stop the server and edit `config.toml` as needed
+3. The plugin will load and create `config.json` in the plugin data folder
+4. Stop the server and edit `config.json` as needed
 5. Restart the server
 
 ## Usage
 
 Once installed, the plugin runs automatically. Available features depend on enabled modules:
 
-### Player Module
+### Messages Module
 
 Active by default. Provides custom join/leave/kick messages.
+
+### Chat Module
+
+When enabled, provides chat formatting and word filtering.
 
 ### Locator Module
 
@@ -131,13 +138,13 @@ When enabled, provides the `/locator` (or `/lc`) command:
 
 ### "Config not loading"
 
-- Check that `config.toml` is valid TOML
+- Check that `config.json` is valid JSON
 - The plugin will regenerate the config if it's invalid
 - Stop the server before editing the config file
 
 ### Commands not working
 
-- Ensure the module is enabled in `config.toml`
+- Ensure the module is enabled in `config.json`
 - Check that you have the required permission node
 - Verify the plugin loaded successfully in server logs
 

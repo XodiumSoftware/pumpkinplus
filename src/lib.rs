@@ -54,26 +54,57 @@
 //! | `{message}` | The original chat message  |
 
 mod config;
+mod mirror_types {
+    pub mod entity_type;
+    pub mod gamemode;
+    pub mod interaction;
+}
+
+pub use mirror_types::entity_type::EntityType;
+pub use mirror_types::gamemode::GameMode;
+pub use mirror_types::interaction::InteractionAction;
 
 mod modules {
     pub mod module;
     pub mod mechanics {
-        pub mod locator;
-        pub mod player;
-        pub mod tablist;
+        pub mod entity {
+            pub mod bat;
+            pub mod griefing;
+        }
+        pub mod world {
+            pub mod openable;
+        }
+        pub mod player {
+            pub mod enderchest;
+            pub mod locator;
+            pub mod messages;
+        }
+        pub mod server {
+            pub mod chat;
+            pub mod tablist;
+        }
     }
 }
 
 pub use config::*;
 pub use modules::*;
 
-pub use modules::mechanics::locator::Config as LocatorConfig;
-pub use modules::mechanics::player::Config as PlayerConfig;
-pub use modules::mechanics::tablist::Config as TablistConfig;
+pub use modules::mechanics::entity::bat::BatConfig;
+pub use modules::mechanics::entity::griefing::GriefingConfig;
+pub use modules::mechanics::player::enderchest::EnderchestConfig;
+pub use modules::mechanics::player::messages::MessagesConfig;
+pub use modules::mechanics::server::chat::ChatConfig;
+pub use modules::mechanics::server::tablist::TablistConfig;
+pub use modules::mechanics::world::openable::OpenableConfig;
 
-use crate::mechanics::locator::Locator;
-use crate::mechanics::player::Player;
-use crate::mechanics::tablist::Tablist;
+// use crate::mechanics::entity::bat::Bat;
+// use crate::mechanics::entity::griefing::Griefing;
+// use crate::mechanics::player::enderchest::Enderchest;
+// use crate::mechanics::player::locator::Locator;
+use crate::mechanics::player::messages::Messages;
+// use crate::mechanics::world::openable::Openable;
+use crate::mechanics::server::chat::Chat;
+use crate::mechanics::server::tablist::Tablist;
 use crate::module::Module;
 use pumpkin_plugin_api::{Context, Plugin, PluginMetadata};
 use std::time::Instant;
@@ -81,7 +112,6 @@ use tracing::info;
 
 pub const PLUGIN_ID: &str = env!("CARGO_PKG_NAME");
 
-/// PumpkinPlus plugin implementation.
 pub struct PumpkinPlus {}
 
 impl Plugin for PumpkinPlus {
@@ -109,16 +139,33 @@ impl Plugin for PumpkinPlus {
     fn on_load(&mut self, context: Context) -> pumpkin_plugin_api::Result<()> {
         let mut manager = ConfigManager::empty();
 
-        manager.register::<PlayerConfig>();
+        // manager.register::<BatConfig>();
+        // manager.register::<GriefingConfig>();
+        // manager.register::<EnderchestConfig>();
+        // manager.register::<LocatorConfig>();
+        manager.register::<MessagesConfig>();
+        manager.register::<ChatConfig>();
         manager.register::<TablistConfig>();
-        manager.register::<LocatorConfig>();
+        // manager.register::<OpenableConfig>();
 
         manager.finalize(&context);
 
-        let player = Player {};
+        // let bat = Bat;
+        // let griefing = Griefing;
+        // let enderchest = Enderchest;
+        // let locator = Locator;
+        let messages = Messages;
+        let chat = Chat;
         let tablist = Tablist;
-        let locator = Locator;
-        let modules: Vec<&dyn Module> = vec![&player, &tablist, &locator];
+        // let openable = Openable;
+        let modules: Vec<&dyn Module> = vec![
+            // &bat,
+            // &griefing,
+            // &enderchest,
+            // &locator,
+            &messages, &chat, &tablist,
+            // &openable,
+        ];
         let enabled_count = modules.iter().filter(|m| m.enabled()).count();
 
         let mut total_ms = 0u128;

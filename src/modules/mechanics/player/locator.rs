@@ -29,7 +29,7 @@ pub struct Locator;
 impl Module for Locator {
     fn enabled(&self) -> bool {
         ConfigManager::get()
-            .map(|cm| cm.get_config::<Config>().enabled)
+            .map(|cm| cm.get_config::<LocatorConfig>().enabled)
             .unwrap_or(true)
     }
 
@@ -65,10 +65,8 @@ impl CommandHandler for LocatorExecutor {
 }
 
 /// Configuration for the locator mechanics module.
-pub type LocatorConfig = Config;
-
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
-pub struct Config {
+pub struct LocatorConfig {
     /// Whether this module is active.
     pub enabled: bool,
 }

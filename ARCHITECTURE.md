@@ -9,11 +9,11 @@ PumpkinPlus is a Pumpkin Minecraft plugin that enhances base gameplay. Built wit
 ## Build & Run Commands
 
 ```bash
-# Build the WASM plugin (debug)
-cargo build --target wasm32-wasip2
+# Build the WASM plugin (debug) and copy to .server/plugins/
+powershell -ExecutionPolicy Bypass -File build.ps1
 
-# Build the WASM plugin (release, with LTO + strip)
-cargo build --release --target wasm32-wasip2
+# Build the WASM plugin (release)
+powershell -ExecutionPolicy Bypass -File build.ps1 -Release
 ```
 
 Testing is done via integration testing: build the WASM plugin and load it in a Pumpkin server.
@@ -23,7 +23,7 @@ Testing is done via integration testing: build the WASM plugin and load it in a 
 ### Entry Point
 
 - **`PumpkinPlus`** — implements `Plugin` from `pumpkin_plugin_api`. Registered via `register_plugin!(PumpkinPlus)`.
-    - `on_load`: initializes `ConfigManager` (loads or creates `config.toml`), then registers all modules via `Module::register`.
+    - `on_load`: initializes `ConfigManager` (loads or creates `config.json`), then registers all modules via `Module::register`.
     - `on_unload`: logs a farewell message.
 
 ### Module System
@@ -40,31 +40,32 @@ Modules are plain structs (not singletons) instantiated with `Default::default()
 
 ### Configuration
 
-**`ConfigManager`** (`src/config.rs`) is a single TOML-backed struct that aggregates all module configs. On `on_load`:
+**`ConfigManager`** (`src/config.rs`) is a single JSON-backed struct that aggregates all module configs. On `on_load`:
 
-- If `config.toml` exists in the plugin data folder, it is deserialized and returned.
+- If `config.json` exists in the plugin data folder, it is deserialized and merged with defaults.
 - If not found, the default config is written to disk and returned.
-- Any other I/O error is surfaced as a plugin load error.
-
-Each module owns a nested **`Config`** struct (derived `Serialize`/`Deserialize`) with an `enabled: bool` field and any module-specific fields. `ConfigManager` holds one field per module config.
+- Each module owns a nested **`Config`** struct (derived `Serialize`/`Deserialize`) with an `enabled: bool` field and any module-specific fields. `ConfigManager` holds one field per module config.
 
 ### Modules
 
 | Module    | File                               | Status | Description                                                                                                                      |
 |-----------|------------------------------------|--------|----------------------------------------------------------------------------------------------------------------------------------|
-| `Player`  | `src/modules/mechanics/player.rs`  | Active | Custom join/leave/kick messages. Handles `PlayerJoinEvent`, `PlayerLeaveEvent`, `PlayerLoginEvent`. Uses `{player}` placeholder. |
+| `Messages` | `src/modules/mechanics/player/messages.rs` | Active | Custom join/leave/kick messages. Handles `PlayerJoinEvent`, `PlayerLeaveEvent`, `PlayerLoginEvent`. Uses `{player}` placeholder. |
+| `Chat`     | `src/modules/mechanics/server/chat.rs`     | Active | Chat formatting and word filtering. Handles `PlayerChatEvent`. Uses `{player}` and `{message}` placeholders. |
 | `Motd`    | `src/modules/mechanics/motd.rs`    | Stub   | Custom server list MOTD. API not yet available in `pumpkin-plugin-api`.                                                          |
-| `Tablist` | `src/modules/mechanics/tablist.rs` | Stub   | Custom tab-list header/footer. No events or commands yet.                                                                        |
-| `Locator` | `src/modules/mechanics/locator.rs` | Stub   | Locator bar personalisation. Registers `/locator` (`/lc`) with `color`, `hex`, `reset` subcommands. Implementation pending API.  |
+| `Tablist` | `src/modules/mechanics/server/tablist.rs` | Active | Dynamic tab list header/footer with `{player}`, `{online}`, `{tps}`, `{mspt}` placeholders. |
+| `Openable`| `src/modules/mechanics/world/openable.rs` | Active | Double door synchronization. Handles `PlayerInteractEvent`. |
 
 ### Package Structure
 
 | Path                     | Contents                                                |
 |--------------------------|---------------------------------------------------------|
 | `src/lib.rs`             | `PumpkinPlus` plugin struct, entry point                |
-| `src/config.rs`          | `ConfigManager` — TOML config load/save                 |
+| `src/config.rs`          | `ConfigManager` — JSON config load/save/merge            |
 | `src/modules/module.rs`  | `Module` trait definition                               |
-| `src/modules/mechanics/` | Feature modules: `player`, `motd`, `tablist`, `locator` |
+| `src/modules/mechanics/player/` | Player features: messages, enderchest, locator   |
+| `src/modules/mechanics/server/` | Server features: chat, tablist                   |
+| `src/modules/mechanics/world/`  | World features: openable (double doors)          |
 
 ### Key Conventions
 

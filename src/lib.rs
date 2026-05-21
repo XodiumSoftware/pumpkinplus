@@ -54,7 +54,13 @@
 //! | `{message}` | The original chat message  |
 
 mod config;
-mod mirror_types;
+mod mirror_types {
+    pub mod gamemode;
+    pub mod interaction;
+}
+
+pub use mirror_types::gamemode::GameMode;
+pub use mirror_types::interaction::InteractionAction;
 
 mod modules {
     pub mod module;

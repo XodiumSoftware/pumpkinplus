@@ -12,8 +12,8 @@
 //! | `actions`   | `["RightClickAir"]`     | Actions that trigger the sync |
 
 use crate::config::ConfigManager;
-use crate::mirror_types::{GameMode, InteractionAction};
 use crate::module::Module;
+use crate::{GameMode, InteractionAction};
 use pumpkin_plugin_api::events::{EventData, EventHandler, EventPriority, PlayerInteractEvent};
 use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};

@@ -62,6 +62,7 @@ mod modules {
             pub mod openable;
         }
         pub mod player {
+            pub mod enderchest;
             pub mod locator;
             pub mod player;
         }
@@ -74,11 +75,12 @@ mod modules {
 pub use config::*;
 pub use modules::*;
 
-pub use modules::mechanics::player::locator::LocatorConfig;
+pub use modules::mechanics::player::enderchest::EnderchestConfig;
 pub use modules::mechanics::player::player::PlayerConfig;
 pub use modules::mechanics::server::tablist::TablistConfig;
 pub use modules::mechanics::world::openable::OpenableConfig;
 
+use crate::mechanics::player::enderchest::Enderchest;
 use crate::mechanics::server::tablist::Tablist;
 use crate::mechanics::{player::player::Player, world::openable::Openable};
 use crate::module::Module;
@@ -118,6 +120,7 @@ impl Plugin for PumpkinPlus {
 
         manager.register::<PlayerConfig>();
         manager.register::<TablistConfig>();
+        manager.register::<EnderchestConfig>();
         manager.register::<OpenableConfig>();
         //manager.register::<LocatorConfig>();
 
@@ -127,7 +130,8 @@ impl Plugin for PumpkinPlus {
         let tablist = Tablist;
         //let locator = Locator;
         let openable = Openable;
-        let modules: Vec<&dyn Module> = vec![&player, &tablist, &openable];
+        let enderchest = Enderchest;
+        let modules: Vec<&dyn Module> = vec![&player, &tablist, &enderchest, &openable];
         let enabled_count = modules.iter().filter(|m| m.enabled()).count();
 
         let mut total_ms = 0u128;

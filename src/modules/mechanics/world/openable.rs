@@ -5,9 +5,10 @@
 //!
 //! ## Configuration
 //!
-//! | Field     | Default | Description                   |
-//! |-----------|---------|-------------------------------|
-//! | `enabled` | `false` | Whether this module is active |
+//! | Field     | Default               | Description                   |
+//! |-----------|-----------------------|-------------------------------|
+//! | `enabled` | `false`               | Whether this module is active |
+//! | `actions` | `["RightClickAir"]` | Actions that trigger the sync |
 
 use crate::config::ConfigManager;
 use crate::module::Module;
@@ -44,9 +45,15 @@ impl EventHandler<PlayerInteractEvent> for Openable {
             return event;
         }
 
-        // NOTE: InteractAction is not re-exported, its being investigated.
-        if event.action != InteractAction.RIGHT_CLICKED {
-            return event;
+        let config: OpenableConfig = ConfigManager::get()
+            .map(|cm| cm.get_config())
+            .unwrap_or_default();
+
+        if !config.actions.is_empty() {
+            let action = format!("{:?}", event.action);
+            if !config.actions.contains(&action) {
+                return event;
+            }
         }
 
         if !event.block.ends_with("_door") {
@@ -185,8 +192,19 @@ fn find_toggled_door_state(state_id: u16) -> Option<u16> {
 }
 
 /// Configuration for the openable mechanics module.
-#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OpenableConfig {
     /// Whether this module is active.
     pub enabled: bool,
+    /// List of interaction actions that trigger the mechanic. Use variant names like "RightClickBlock", "RightClickAir", etc. Leave empty to allow all.
+    pub actions: Vec<String>,
+}
+
+impl Default for OpenableConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            actions: vec!["RightClickAir".to_string()],
+        }
+    }
 }

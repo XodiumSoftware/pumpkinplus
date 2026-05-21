@@ -72,6 +72,7 @@ mod modules {
             pub mod griefing;
             pub mod husk;
             pub mod spawn_egg;
+            pub mod tameable;
         }
         pub mod world {
             pub mod openable;
@@ -95,6 +96,7 @@ pub use modules::mechanics::entity::bat::BatConfig;
 pub use modules::mechanics::entity::griefing::GriefingConfig;
 pub use modules::mechanics::entity::husk::HuskConfig;
 pub use modules::mechanics::entity::spawn_egg::SpawnEggConfig;
+pub use modules::mechanics::entity::tameable::TameableConfig;
 pub use modules::mechanics::player::enderchest::EnderchestConfig;
 pub use modules::mechanics::player::messages::MessagesConfig;
 pub use modules::mechanics::server::chat::ChatConfig;
@@ -147,6 +149,7 @@ impl Plugin for PumpkinPlus {
         // manager.register::<GriefingConfig>();
         // manager.register::<HuskConfig>();
         // manager.register::<SpawnEggConfig>();
+        // manager.register::<TameableConfig>();
         // manager.register::<EnderchestConfig>();
         // manager.register::<LocatorConfig>();
         manager.register::<MessagesConfig>();
@@ -160,6 +163,7 @@ impl Plugin for PumpkinPlus {
         // let griefing = Griefing;
         // let husk = Husk;
         // let spawn_egg = SpawnEgg;
+        // let tameable = Tameable;
         // let enderchest = Enderchest;
         // let locator = Locator;
         let messages = Messages;
@@ -171,6 +175,7 @@ impl Plugin for PumpkinPlus {
             // &griefing,
             // &husk,
             // &spawn_egg,
+            // &tameable,
             // &enderchest,
             // &locator,
             &messages, &chat, &tablist,

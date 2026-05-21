@@ -5,10 +5,11 @@
 //!
 //! ## Configuration
 //!
-//! | Field     | Default               | Description                   |
-//! |-----------|-----------------------|-------------------------------|
-//! | `enabled` | `false`               | Whether this module is active |
-//! | `actions` | `["RightClickAir"]` | Actions that trigger the sync |
+//! | Field       | Default                 | Description                   |
+//! |-------------|-------------------------|-------------------------------|
+//! | `enabled`   | `false`                 | Whether this module is active |
+//! | `gamemodes` | `["Survival"]`          | Gamemodes that trigger sync   |
+//! | `actions`   | `["RightClickAir"]`     | Actions that trigger the sync |
 
 use crate::config::ConfigManager;
 use crate::module::Module;
@@ -52,6 +53,13 @@ impl EventHandler<PlayerInteractEvent> for Openable {
         if !config.actions.is_empty() {
             let action = format!("{:?}", event.action);
             if !config.actions.contains(&action) {
+                return event;
+            }
+        }
+
+        if !config.gamemodes.is_empty() {
+            let gamemode = format!("{:?}", event.player.get_gamemode());
+            if !config.gamemodes.contains(&gamemode) {
                 return event;
             }
         }
@@ -196,6 +204,8 @@ fn find_toggled_door_state(state_id: u16) -> Option<u16> {
 pub struct OpenableConfig {
     /// Whether this module is active.
     pub enabled: bool,
+    /// List of gamemodes allowed to trigger the mechanic. Use variant names like "Survival", "Creative", etc. Leave empty to allow all.
+    pub gamemodes: Vec<String>,
     /// List of interaction actions that trigger the mechanic. Use variant names like "RightClickBlock", "RightClickAir", etc. Leave empty to allow all.
     pub actions: Vec<String>,
 }
@@ -204,7 +214,8 @@ impl Default for OpenableConfig {
     fn default() -> Self {
         Self {
             enabled: false,
-            actions: vec!["RightClickAir".to_string()],
+            gamemodes: vec!["Survival".to_string()],
+            actions: vec!["RightClickBlock".to_string()],
         }
     }
 }

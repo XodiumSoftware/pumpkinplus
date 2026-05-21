@@ -110,6 +110,7 @@ pub use modules::mechanics::world::openable::OpenableConfig;
 // use crate::mechanics::entity::bat::Bat;
 // use crate::mechanics::entity::griefing::Griefing;
 // use crate::mechanics::player::enderchest::Enderchest;
+use crate::mechanics::player::nickname::Nickname;
 // use crate::mechanics::player::locator::Locator;
 use crate::mechanics::player::messages::Messages;
 // use crate::mechanics::world::openable::Openable;
@@ -156,7 +157,7 @@ impl Plugin for PumpkinPlus {
         // manager.register::<TameableConfig>();
         // manager.register::<EnderchestConfig>();
         // manager.register::<HeadConfig>();
-        // manager.register::<NicknameConfig>();
+        manager.register::<NicknameConfig>();
         // manager.register::<LocatorConfig>();
         manager.register::<MessagesConfig>();
         manager.register::<ChatConfig>();
@@ -172,7 +173,7 @@ impl Plugin for PumpkinPlus {
         // let tameable = Tameable;
         // let enderchest = Enderchest;
         // let head = Head;
-        // let nickname = Nickname;
+        let nickname = Nickname;
         // let locator = Locator;
         let messages = Messages;
         let chat = Chat;
@@ -186,8 +187,7 @@ impl Plugin for PumpkinPlus {
             // &tameable,
             // &enderchest,
             // &head,
-            // &nickname,
-            // &locator,
+            &nickname, // &locator,
             &messages, &chat, &tablist,
             // &openable,
         ];

@@ -60,7 +60,7 @@ Modules are plain structs (not singletons) instantiated with `Default::default()
 | `SpawnEgg`| `src/modules/mechanics/entity/spawn_egg.rs` | Stub   | Rare spawn egg drops on entity death. Awaiting `EntityDeathEvent` in Pumpkin API. |
 | `Tameable`| `src/modules/mechanics/entity/tameable.rs`  | Stub   | Transfer tameable entity ownership via lead right-click. Awaiting `PlayerInteractEntityEvent`, leash/tameable APIs in Pumpkin API. |
 | `Head`    | `src/modules/mechanics/player/head.rs`      | Stub   | Player head drops on death with skin profile. Awaiting `PlayerDeathEvent`, item data component APIs in Pumpkin API. |
-| `Nickname`| `src/modules/mechanics/player/nickname.rs`  | Stub   | Set/remove player nicknames with command. Awaiting persistent player data (PDC) API in Pumpkin API. |
+| `Nickname`| `src/modules/mechanics/player/nickname.rs`  | Active | Set/remove player nicknames with `/nickname`. Persists to `nicknames.json`. Applies on join. |
 
 ### Package Structure
 

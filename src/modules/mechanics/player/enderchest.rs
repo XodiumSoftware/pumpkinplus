@@ -9,6 +9,7 @@
 //! | `actions`   | `["RightClickAir"]`        | Interaction actions that trigger the GUI  |
 
 use crate::config::ConfigManager;
+use crate::mirror_types::{GameMode, InteractionAction};
 use crate::module::Module;
 use pumpkin_plugin_api::events::{EventData, EventHandler, EventPriority, PlayerInteractEvent};
 use pumpkin_plugin_api::{Context, Server};
@@ -50,22 +51,18 @@ impl EventHandler<PlayerInteractEvent> for Enderchest {
             .map(|cm| cm.get_config())
             .unwrap_or_default();
 
-        if !config.actions.is_empty() {
-            let action = format!("{:?}", event.action);
-            if !config.actions.contains(&action) {
-                return event;
-            }
+        let action = InteractionAction::from_debug(&event.action);
+        if !action.matches_config(&config.actions) {
+            return event;
         }
 
         if event.block != "minecraft:ender_chest" {
             return event;
         }
 
-        if !config.gamemodes.is_empty() {
-            let gamemode = format!("{:?}", event.player.get_gamemode());
-            if !config.gamemodes.contains(&gamemode) {
-                return event;
-            }
+        let gamemode = GameMode::from(event.player.get_gamemode());
+        if !gamemode.matches_config(&config.gamemodes) {
+            return event;
         }
 
         //TODO: notify api-maintainers to add enderchest support.
@@ -80,17 +77,17 @@ pub struct EnderchestConfig {
     /// Whether this module is active.
     pub enabled: bool,
     /// List of gamemodes allowed to use enderchests. Use variant names like "Survival", "Creative", etc. Leave empty to allow all.
-    pub gamemodes: Vec<String>,
+    pub gamemodes: Vec<GameMode>,
     /// List of interaction actions that trigger opening the enderchest. Use variant names like "RightClickBlock", "RightClickAir", etc. Leave empty to allow all.
-    pub actions: Vec<String>,
+    pub actions: Vec<InteractionAction>,
 }
 
 impl Default for EnderchestConfig {
     fn default() -> Self {
         Self {
             enabled: false,
-            gamemodes: vec!["Survival".to_string(), "Adventure".to_string()],
-            actions: vec!["RightClickAir".to_string()],
+            gamemodes: vec![GameMode::Survival, GameMode::Adventure],
+            actions: vec![InteractionAction::RightClickAir],
         }
     }
 }

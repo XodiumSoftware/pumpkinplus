@@ -54,6 +54,7 @@
 //! | `{message}` | The original chat message  |
 
 mod config;
+mod mirror_types;
 
 mod modules {
     pub mod module;
@@ -80,7 +81,6 @@ pub use modules::mechanics::player::player::PlayerConfig;
 pub use modules::mechanics::server::tablist::TablistConfig;
 pub use modules::mechanics::world::openable::OpenableConfig;
 
-use crate::mechanics::player::enderchest::Enderchest;
 use crate::mechanics::server::tablist::Tablist;
 use crate::mechanics::{player::player::Player, world::openable::Openable};
 use crate::module::Module;
@@ -120,7 +120,7 @@ impl Plugin for PumpkinPlus {
 
         manager.register::<PlayerConfig>();
         manager.register::<TablistConfig>();
-        manager.register::<EnderchestConfig>();
+        //manager.register::<EnderchestConfig>();
         manager.register::<OpenableConfig>();
         //manager.register::<LocatorConfig>();
 
@@ -130,8 +130,8 @@ impl Plugin for PumpkinPlus {
         let tablist = Tablist;
         //let locator = Locator;
         let openable = Openable;
-        let enderchest = Enderchest;
-        let modules: Vec<&dyn Module> = vec![&player, &tablist, &enderchest, &openable];
+        //let enderchest = Enderchest;
+        let modules: Vec<&dyn Module> = vec![&player, &tablist, &openable];
         let enabled_count = modules.iter().filter(|m| m.enabled()).count();
 
         let mut total_ms = 0u128;

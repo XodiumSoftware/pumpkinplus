@@ -79,6 +79,7 @@ mod modules {
         }
         pub mod player {
             pub mod enderchest;
+            pub mod head;
             pub mod locator;
             pub mod messages;
         }
@@ -98,6 +99,7 @@ pub use modules::mechanics::entity::husk::HuskConfig;
 pub use modules::mechanics::entity::spawn_egg::SpawnEggConfig;
 pub use modules::mechanics::entity::tameable::TameableConfig;
 pub use modules::mechanics::player::enderchest::EnderchestConfig;
+pub use modules::mechanics::player::head::HeadConfig;
 pub use modules::mechanics::player::messages::MessagesConfig;
 pub use modules::mechanics::server::chat::ChatConfig;
 pub use modules::mechanics::server::tablist::TablistConfig;
@@ -151,6 +153,7 @@ impl Plugin for PumpkinPlus {
         // manager.register::<SpawnEggConfig>();
         // manager.register::<TameableConfig>();
         // manager.register::<EnderchestConfig>();
+        // manager.register::<HeadConfig>();
         // manager.register::<LocatorConfig>();
         manager.register::<MessagesConfig>();
         manager.register::<ChatConfig>();
@@ -165,6 +168,7 @@ impl Plugin for PumpkinPlus {
         // let spawn_egg = SpawnEgg;
         // let tameable = Tameable;
         // let enderchest = Enderchest;
+        // let head = Head;
         // let locator = Locator;
         let messages = Messages;
         let chat = Chat;
@@ -177,6 +181,7 @@ impl Plugin for PumpkinPlus {
             // &spawn_egg,
             // &tameable,
             // &enderchest,
+            // &head,
             // &locator,
             &messages, &chat, &tablist,
             // &openable,

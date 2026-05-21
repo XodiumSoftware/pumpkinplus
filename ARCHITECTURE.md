@@ -59,6 +59,7 @@ Modules are plain structs (not singletons) instantiated with `Default::default()
 | `Husk`    | `src/modules/mechanics/entity/husk.rs`      | Stub   | Custom husk sand drops with camel rider bonus. Awaiting `EntityDeathEvent` in Pumpkin API. |
 | `SpawnEgg`| `src/modules/mechanics/entity/spawn_egg.rs` | Stub   | Rare spawn egg drops on entity death. Awaiting `EntityDeathEvent` in Pumpkin API. |
 | `Tameable`| `src/modules/mechanics/entity/tameable.rs`  | Stub   | Transfer tameable entity ownership via lead right-click. Awaiting `PlayerInteractEntityEvent`, leash/tameable APIs in Pumpkin API. |
+| `Head`    | `src/modules/mechanics/player/head.rs`      | Stub   | Player head drops on death with skin profile. Awaiting `PlayerDeathEvent`, item data component APIs in Pumpkin API. |
 
 ### Package Structure
 

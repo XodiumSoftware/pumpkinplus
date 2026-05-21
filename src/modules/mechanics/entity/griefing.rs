@@ -13,7 +13,9 @@
 //! `EntityChangeBlockEvent` or `EntityExplodeEvent` (or equivalents), so mob
 //! griefing prevention cannot be hooked until upstream support is added.
 
-use crate::{config::ConfigManager, module::Module};
+use crate::EntityType;
+use crate::config::ConfigManager;
+use crate::module::Module;
 use pumpkin_plugin_api::Context;
 use serde::{Deserialize, Serialize};
 
@@ -48,9 +50,8 @@ pub struct GriefingConfig {
     /// Whether this module is active.
     pub enabled: bool,
     /// Entity types whose griefing actions (block changes and explosions) are blocked.
-    /// Use Pumpkin API entity type names such as `"Blaze"`, `"Creeper"`, `"EnderDragon"`, etc.
     /// Leave empty to disable entity filtering.
-    pub cancelled_entities: Vec<String>,
+    pub cancelled_entities: Vec<EntityType>,
 }
 
 impl Default for GriefingConfig {
@@ -58,13 +59,13 @@ impl Default for GriefingConfig {
         Self {
             enabled: false,
             cancelled_entities: vec![
-                "Blaze".to_string(),
-                "Creeper".to_string(),
-                "EnderDragon".to_string(),
-                "Enderman".to_string(),
-                "Fireball".to_string(),
-                "SmallFireball".to_string(),
-                "Wither".to_string(),
+                EntityType::Blaze,
+                EntityType::Creeper,
+                EntityType::EnderDragon,
+                EntityType::Enderman,
+                EntityType::Fireball,
+                EntityType::SmallFireball,
+                EntityType::Wither,
             ],
         }
     }

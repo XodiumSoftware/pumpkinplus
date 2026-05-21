@@ -65,9 +65,10 @@ mod modules {
         pub mod player {
             pub mod enderchest;
             pub mod locator;
-            pub mod player;
+            pub mod messages;
         }
         pub mod server {
+            pub mod chat;
             pub mod tablist;
         }
     }
@@ -77,12 +78,15 @@ pub use config::*;
 pub use modules::*;
 
 pub use modules::mechanics::player::enderchest::EnderchestConfig;
-pub use modules::mechanics::player::player::PlayerConfig;
+pub use modules::mechanics::player::messages::MessagesConfig;
+pub use modules::mechanics::server::chat::ChatConfig;
 pub use modules::mechanics::server::tablist::TablistConfig;
 pub use modules::mechanics::world::openable::OpenableConfig;
 
+use crate::mechanics::player::messages::Messages;
+use crate::mechanics::server::chat::Chat;
 use crate::mechanics::server::tablist::Tablist;
-use crate::mechanics::{player::player::Player, world::openable::Openable};
+use crate::mechanics::world::openable::Openable;
 use crate::module::Module;
 use pumpkin_plugin_api::{Context, Plugin, PluginMetadata};
 use std::time::Instant;
@@ -90,7 +94,6 @@ use tracing::info;
 
 pub const PLUGIN_ID: &str = env!("CARGO_PKG_NAME");
 
-/// PumpkinPlus plugin implementation.
 pub struct PumpkinPlus {}
 
 impl Plugin for PumpkinPlus {
@@ -118,20 +121,18 @@ impl Plugin for PumpkinPlus {
     fn on_load(&mut self, context: Context) -> pumpkin_plugin_api::Result<()> {
         let mut manager = ConfigManager::empty();
 
-        manager.register::<PlayerConfig>();
+        manager.register::<MessagesConfig>();
+        manager.register::<ChatConfig>();
         manager.register::<TablistConfig>();
-        //manager.register::<EnderchestConfig>();
         manager.register::<OpenableConfig>();
-        //manager.register::<LocatorConfig>();
 
         manager.finalize(&context);
 
-        let player = Player {};
+        let messages = Messages {};
+        let chat = Chat {};
         let tablist = Tablist;
-        //let locator = Locator;
         let openable = Openable;
-        //let enderchest = Enderchest;
-        let modules: Vec<&dyn Module> = vec![&player, &tablist, &openable];
+        let modules: Vec<&dyn Module> = vec![&messages, &chat, &tablist, &openable];
         let enabled_count = modules.iter().filter(|m| m.enabled()).count();
 
         let mut total_ms = 0u128;

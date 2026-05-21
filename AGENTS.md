@@ -17,8 +17,8 @@
 | **Core API**      | [pumpkin-plugin-api](https://github.com/Pumpkin-MC/Pumpkin) | Minecraft server plugin API      |
 | **Language**      | Rust 2024                                                   | Systems language                 |
 | **Build Tool**    | Cargo                                                       | Build automation                 |
-| **Serialization** | serde + toml                                                | Config serialization             |
-| **Config**        | figment                                                     | TOML config with merge semantics |
+| **Serialization** | serde + json                                                | Config serialization             |
+| **Config**        | figment                                                     | JSON config with merge semantics |
 | **Logging**       | tracing                                                     | Structured logging               |
 | **Docs**          | rustdoc (via `cargo doc`)                                   | API documentation                |
 
@@ -38,11 +38,11 @@
 ## Quick Commands
 
 ```bash
-# Build the WASM plugin (debug)
-cargo build --target wasm32-wasip2
+# Build the WASM plugin (debug) and copy to .server/plugins/
+powershell -ExecutionPolicy Bypass -File build.ps1
 
-# Build the WASM plugin (release, optimized)
-cargo build --release --target wasm32-wasip2
+# Build the WASM plugin (release)
+powershell -ExecutionPolicy Bypass -File build.ps1 -Release
 
 # Generate documentation
 cargo doc --no-deps --target wasm32-wasip2
@@ -56,7 +56,7 @@ cargo doc --no-deps --target wasm32-wasip2
 
 1. **Registration**: Via `register_plugin!(PumpkinPlus)` macro
 2. **`on_load`**:
-    - Initializes `ConfigManager` (loads/creates `config.toml`)
+    - Initializes `ConfigManager` (loads/creates `config.json`)
     - Registers all module configs
     - Calls `Module::register` for each enabled module
 3. **`on_unload`**: Logs farewell message
@@ -79,7 +79,7 @@ Modules are plain structs (not singletons) instantiated with `Default::default()
 
 **`ConfigManager`** (`src/config.rs`) — JSON-backed config with merge semantics:
 
-- Config located at `{data_folder}/config.toml`
+- Config located at `{data_folder}/config.json`
 - On first load: creates file with all registered defaults
 - On subsequent loads: merges user values with defaults (preserves extra fields)
 - Each module owns a nested `Config` struct with `enabled: bool` field
@@ -90,7 +90,8 @@ Config key derived from type name automatically (e.g., `PlayerConfig` → `"play
 
 | Module    | File                               | Description                                                                   |
 |-----------|------------------------------------|-------------------------------------------------------------------------------|
-| `Player`  | `src/modules/mechanics/player.rs`  | Custom join/leave/kick messages, chat format/filter                           |
+| `Messages`| `src/modules/mechanics/player/messages.rs` | Custom join/leave/kick messages                                    |
+| `Chat`    | `src/modules/mechanics/server/chat.rs`   | Chat format/filter                                                 |
 | `Tablist` | `src/modules/mechanics/tablist.rs` | Dynamic tab list header/footer with `{player}`, `{online}`, `{tps}`, `{mspt}` |
 | `Locator` | `src/modules/mechanics/locator.rs` | Locator bar personalization (`/locator` command, stub)                        |
 
@@ -113,9 +114,15 @@ src/
 └── modules/
     ├── module.rs             # `Module` trait definition
     └── mechanics/
-        ├── player.rs         # Join/leave/kick messages, chat
-        ├── tablist.rs        # Tab list header/footer
-        └── locator.rs        # Locator bar commands
+        ├── player/
+        │   ├── messages.rs   # Join/leave/kick messages
+        │   ├── enderchest.rs # Enderchest sharing
+        │   └── locator.rs    # Locator bar commands
+        ├── server/
+        │   ├── chat.rs       # Chat format/filter
+        │   └── tablist.rs    # Tab list header/footer
+        └── world/
+            └── openable.rs   # Double door sync
 ```
 
 ### Key Conventions

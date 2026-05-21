@@ -214,7 +214,7 @@ impl Default for OpenableConfig {
     fn default() -> Self {
         Self {
             enabled: false,
-            gamemodes: vec!["Survival".to_string()],
+            gamemodes: vec!["Survival".to_string(), "Adventure".to_string()],
             actions: vec!["RightClickBlock".to_string()],
         }
     }

@@ -17,7 +17,7 @@ use crate::module::Module;
 use pumpkin_plugin_api::events::{EventData, EventHandler, EventPriority, PlayerInteractEvent};
 use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};
-use tracing::debug;
+use tracing::{debug, info};
 
 /// Handles openable block synchronization (e.g. double doors).
 #[derive(Default)]
@@ -43,7 +43,10 @@ impl EventHandler<PlayerInteractEvent> for Openable {
         _server: Server,
         mut event: EventData<PlayerInteractEvent>,
     ) -> EventData<PlayerInteractEvent> {
+        info!("[Openable] handle triggered");
+
         if !self.enabled() {
+            info!("[Openable] module disabled, returning early");
             return event;
         }
 
@@ -52,44 +55,68 @@ impl EventHandler<PlayerInteractEvent> for Openable {
             .unwrap_or_default();
 
         let action = InteractionAction::from_debug(&event.action);
+        info!(
+            "[Openable] raw action debug = {:?}, parsed action = {:?}, config.actions = {:?}",
+            event.action, action, config.actions
+        );
         if !action.matches_config(&config.actions) {
+            info!("[Openable] action does not match config, returning early");
             return event;
         }
 
         let gamemode = GameMode::from(event.player.get_gamemode());
+        info!(
+            "[Openable] gamemode = {:?}, config.gamemodes = {:?}",
+            gamemode, config.gamemodes
+        );
         if !gamemode.matches_config(&config.gamemodes) {
+            info!("[Openable] gamemode does not match config, returning early");
             return event;
         }
 
+        info!("[Openable] block = {}", event.block);
         if !event.block.ends_with("_door") {
+            info!("[Openable] block is not a door, returning early");
             return event;
         }
 
         let Some(clicked_pos) = event.clicked_pos else {
+            info!("[Openable] no clicked_pos, returning early");
             return event;
         };
+        info!("[Openable] clicked_pos = {:?}", clicked_pos);
 
         let world = event.player.get_world();
 
         let clicked_state_id = world.get_block_state_id(clicked_pos);
+        info!("[Openable] clicked_state_id = {}", clicked_state_id);
 
         let adjacent_pos = find_adjacent_door(&world, clicked_pos, &event.block);
 
         let Some(adjacent_pos) = adjacent_pos else {
+            info!("[Openable] no adjacent door found, returning early");
             return event;
         };
+        info!("[Openable] adjacent_pos = {:?}", adjacent_pos);
 
         let adjacent_state_id = world.get_block_state_id(adjacent_pos);
+        info!("[Openable] adjacent_state_id = {}", adjacent_state_id);
 
         if clicked_state_id == adjacent_state_id {
+            info!("[Openable] clicked_state_id == adjacent_state_id, returning early");
             return event;
         }
 
         let toggled_clicked_id = find_toggled_door_state(clicked_state_id);
         let toggled_adjacent_id = find_toggled_door_state(adjacent_state_id);
+        info!(
+            "[Openable] toggled_clicked_id = {:?}, toggled_adjacent_id = {:?}",
+            toggled_clicked_id, toggled_adjacent_id
+        );
 
         if let (Some(new_clicked), Some(new_adjacent)) = (toggled_clicked_id, toggled_adjacent_id) {
             event.cancelled = true;
+            info!("[Openable] event cancelled, syncing door states");
 
             let flags = pumpkin_plugin_api::world::BlockFlags::empty()
                 .union(pumpkin_plugin_api::world::BlockFlags::NOTIFY_NEIGHBORS)
@@ -168,9 +195,16 @@ fn get_block_registry_key(
     pos: pumpkin_plugin_api::world::BlockPos,
 ) -> Option<String> {
     let state = world.get_block_state(pos);
+    info!(
+        "[Openable] get_block_registry_key at {:?}: is_air={}, is_liquid={}",
+        pos, state.is_air, state.is_liquid
+    );
     if state.is_air || state.is_liquid {
         return None;
     }
+    // FIXME: Plugin API does not expose the actual registry key yet.
+    // We return a placeholder here, which breaks find_adjacent_door's type matching.
+    info!("[Openable] returning placeholder unknown_door");
     Some("unknown_door".to_string())
 }
 

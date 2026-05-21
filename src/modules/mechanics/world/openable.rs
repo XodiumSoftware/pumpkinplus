@@ -1,4 +1,4 @@
-//! Double Doors module - synchronizes double door opening/closing.
+//! Openable module - synchronizes multi-block openable structures like double doors.
 //!
 //! When a player right-clicks a door that is part of a double door setup,
 //! the adjacent door is toggled to match, so both open and close together.
@@ -16,29 +16,25 @@ use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};
 use tracing::debug;
 
-/// Handles double door synchronization.
+/// Handles openable block synchronization (e.g. double doors).
 #[derive(Default)]
-pub struct DoubleDoors;
+pub struct Openable;
 
-impl Module for DoubleDoors {
+impl Module for Openable {
     fn enabled(&self) -> bool {
         ConfigManager::get()
-            .map(|cm| cm.get_config::<DoubleDoorsConfig>().enabled)
+            .map(|cm| cm.get_config::<OpenableConfig>().enabled)
             .unwrap_or(true)
     }
 
     fn events(&self, context: &Context) {
         context
-            .register_event_handler::<PlayerInteractEvent, _>(
-                DoubleDoors,
-                EventPriority::Normal,
-                true,
-            )
-            .expect("failed to register double doors event handler");
+            .register_event_handler::<PlayerInteractEvent, _>(Openable, EventPriority::Normal, true)
+            .expect("failed to register openable event handler");
     }
 }
 
-impl EventHandler<PlayerInteractEvent> for DoubleDoors {
+impl EventHandler<PlayerInteractEvent> for Openable {
     fn handle(
         &self,
         _server: Server,
@@ -188,9 +184,9 @@ fn find_toggled_door_state(state_id: u16) -> Option<u16> {
     Some(candidates[0])
 }
 
-/// Configuration for the double doors mechanics module.
+/// Configuration for the openable mechanics module.
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
-pub struct DoubleDoorsConfig {
+pub struct OpenableConfig {
     /// Whether this module is active.
     pub enabled: bool,
 }

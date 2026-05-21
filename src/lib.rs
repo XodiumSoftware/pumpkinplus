@@ -58,23 +58,29 @@ mod config;
 mod modules {
     pub mod module;
     pub mod mechanics {
-        pub mod double_doors;
-        pub mod locator;
-        pub mod player;
-        pub mod tablist;
+        pub mod world {
+            pub mod openable;
+        }
+        pub mod player {
+            pub mod locator;
+            pub mod player;
+        }
+        pub mod server {
+            pub mod tablist;
+        }
     }
 }
 
 pub use config::*;
 pub use modules::*;
 
-pub use modules::mechanics::double_doors::DoubleDoorsConfig;
-pub use modules::mechanics::locator::LocatorConfig;
-pub use modules::mechanics::player::PlayerConfig;
-pub use modules::mechanics::tablist::TablistConfig;
+pub use modules::mechanics::player::locator::LocatorConfig;
+pub use modules::mechanics::player::player::PlayerConfig;
+pub use modules::mechanics::server::tablist::TablistConfig;
+pub use modules::mechanics::world::openable::OpenableConfig;
 
-use crate::mechanics::tablist::Tablist;
-use crate::mechanics::{double_doors::DoubleDoors, player::Player};
+use crate::mechanics::server::tablist::Tablist;
+use crate::mechanics::{player::player::Player, world::openable::Openable};
 use crate::module::Module;
 use pumpkin_plugin_api::{Context, Plugin, PluginMetadata};
 use std::time::Instant;
@@ -112,7 +118,7 @@ impl Plugin for PumpkinPlus {
 
         manager.register::<PlayerConfig>();
         manager.register::<TablistConfig>();
-        manager.register::<DoubleDoorsConfig>();
+        manager.register::<OpenableConfig>();
         //manager.register::<LocatorConfig>();
 
         manager.finalize(&context);
@@ -120,8 +126,8 @@ impl Plugin for PumpkinPlus {
         let player = Player {};
         let tablist = Tablist;
         //let locator = Locator;
-        let double_doors = DoubleDoors;
-        let modules: Vec<&dyn Module> = vec![&player, &tablist, &double_doors];
+        let openable = Openable;
+        let modules: Vec<&dyn Module> = vec![&player, &tablist, &openable];
         let enabled_count = modules.iter().filter(|m| m.enabled()).count();
 
         let mut total_ms = 0u128;

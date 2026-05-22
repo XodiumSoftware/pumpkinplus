@@ -62,7 +62,7 @@ mod mirror_types {
 
 pub use mirror_types::entity_type::EntityType;
 pub use mirror_types::gamemode::GameMode;
-pub use mirror_types::interaction::InteractionAction;
+pub use mirror_types::interaction::InteractAction;
 
 mod modules {
     pub mod recipes {

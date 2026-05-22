@@ -13,7 +13,7 @@
 
 use crate::config::ConfigManager;
 use crate::mechanics::mechanic::Mechanic;
-use crate::{GameMode, InteractionAction};
+use crate::{GameMode, InteractAction};
 use pumpkin_plugin_api::events::{EventData, EventHandler, EventPriority, PlayerInteractEvent};
 use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};
@@ -54,7 +54,7 @@ impl EventHandler<PlayerInteractEvent> for Openable {
             .map(|cm| cm.get_config())
             .unwrap_or_default();
 
-        let action = InteractionAction::from_debug(&event.action);
+        let action = InteractAction::from(event.action);
         info!(
             "[Openable] raw action debug = {:?}, parsed action = {:?}, config.actions = {:?}",
             event.action, action, config.actions
@@ -213,7 +213,7 @@ pub struct OpenableConfig {
     /// List of gamemodes allowed to trigger the mechanic. Use variant names like "Survival", "Creative", etc. Leave empty to allow all.
     pub gamemodes: Vec<GameMode>,
     /// List of interaction actions that trigger the mechanic. Use variant names like "RightClickBlock", "RightClickAir", etc. Leave empty to allow all.
-    pub actions: Vec<InteractionAction>,
+    pub actions: Vec<InteractAction>,
 }
 
 impl Default for OpenableConfig {
@@ -221,7 +221,7 @@ impl Default for OpenableConfig {
         Self {
             enabled: false,
             gamemodes: vec![GameMode::Survival, GameMode::Adventure],
-            actions: vec![InteractionAction::RightClickBlock],
+            actions: vec![InteractAction::RightClickBlock],
         }
     }
 }

@@ -10,7 +10,7 @@
 
 use crate::config::ConfigManager;
 use crate::mechanics::mechanic::Mechanic;
-use crate::{GameMode, InteractionAction};
+use crate::{GameMode, InteractAction};
 use pumpkin_plugin_api::events::{EventData, EventHandler, EventPriority, PlayerInteractEvent};
 use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};
@@ -51,7 +51,7 @@ impl EventHandler<PlayerInteractEvent> for Enderchest {
             .map(|cm| cm.get_config())
             .unwrap_or_default();
 
-        let action = InteractionAction::from_debug(&event.action);
+        let action = InteractAction::from(event.action);
         if !action.matches_config(&config.actions) {
             return event;
         }
@@ -79,7 +79,7 @@ pub struct EnderchestConfig {
     /// List of gamemodes allowed to use enderchests. Use variant names like "Survival", "Creative", etc. Leave empty to allow all.
     pub gamemodes: Vec<GameMode>,
     /// List of interaction actions that trigger opening the enderchest. Use variant names like "RightClickBlock", "RightClickAir", etc. Leave empty to allow all.
-    pub actions: Vec<InteractionAction>,
+    pub actions: Vec<InteractAction>,
 }
 
 impl Default for EnderchestConfig {
@@ -87,7 +87,7 @@ impl Default for EnderchestConfig {
         Self {
             enabled: false,
             gamemodes: vec![GameMode::Survival, GameMode::Adventure],
-            actions: vec![InteractionAction::RightClickAir],
+            actions: vec![InteractAction::RightClickAir],
         }
     }
 }

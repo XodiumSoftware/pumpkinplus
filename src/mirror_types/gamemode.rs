@@ -18,7 +18,7 @@ pub enum GameMode {
 }
 
 impl GameMode {
-    /// Returns true if the given list is empty (allow-all) or contains this gamemode.
+    /// Returns true if the given list is empty (allow-all) or contains this GameMode.
     pub fn matches_config(&self, allowed: &[Self]) -> bool {
         allowed.is_empty() || allowed.contains(self)
     }

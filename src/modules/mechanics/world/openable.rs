@@ -15,6 +15,7 @@ use crate::config::ConfigManager;
 use crate::mechanics::mechanic::Mechanic;
 use crate::{GameMode, InteractAction};
 use pumpkin_plugin_api::events::{EventData, EventHandler, EventPriority, PlayerInteractEvent};
+use pumpkin_plugin_api::world::{BlockFlags, BlockPos, World};
 use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};
 use tracing::{debug, info};
@@ -118,9 +119,7 @@ impl EventHandler<PlayerInteractEvent> for Openable {
             event.cancelled = true;
             info!("[Openable] event cancelled, syncing door states");
 
-            let flags = pumpkin_plugin_api::world::BlockFlags::empty()
-                .union(pumpkin_plugin_api::world::BlockFlags::NOTIFY_NEIGHBORS)
-                .union(pumpkin_plugin_api::world::BlockFlags::NOTIFY_LISTENERS);
+            let flags = BlockFlags::NOTIFY_NEIGHBORS | BlockFlags::NOTIFY_LISTENERS;
 
             world.set_block_state(clicked_pos, new_clicked, flags);
             world.set_block_state(adjacent_pos, new_adjacent, flags);
@@ -146,27 +145,24 @@ impl EventHandler<PlayerInteractEvent> for Openable {
 /// neighbor that is not air or liquid. In a valid double-door setup this
 /// will be the paired door, since the two door halves are the only blocks
 /// occupying those adjacent positions at the same Y level.
-fn find_adjacent_door(
-    world: &pumpkin_plugin_api::world::World,
-    pos: pumpkin_plugin_api::world::BlockPos,
-) -> Option<pumpkin_plugin_api::world::BlockPos> {
+fn find_adjacent_door(world: &World, pos: BlockPos) -> Option<BlockPos> {
     let neighbors = [
-        pumpkin_plugin_api::world::BlockPos {
+        BlockPos {
             x: pos.x + 1,
             y: pos.y,
             z: pos.z,
         },
-        pumpkin_plugin_api::world::BlockPos {
+        BlockPos {
             x: pos.x - 1,
             y: pos.y,
             z: pos.z,
         },
-        pumpkin_plugin_api::world::BlockPos {
+        BlockPos {
             x: pos.x,
             y: pos.y,
             z: pos.z + 1,
         },
-        pumpkin_plugin_api::world::BlockPos {
+        BlockPos {
             x: pos.x,
             y: pos.y,
             z: pos.z - 1,

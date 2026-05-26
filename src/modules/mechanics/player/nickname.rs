@@ -27,6 +27,7 @@ use pumpkin_plugin_api::{
     command_wit::{ArgumentType, StringType},
     commands::CommandHandler,
     events::{EventData, EventHandler, EventPriority, PlayerJoinEvent},
+    player::Player,
     text::TextComponent,
 };
 use serde::{Deserialize, Serialize};
@@ -206,7 +207,7 @@ impl EventHandler<PlayerJoinEvent> for Nickname {
 }
 
 /// Applies a nickname to a player's display name and tab list name.
-fn update_player(player: &pumpkin_plugin_api::player::Player, nickname: Option<&str>) {
+fn update_player(player: &Player, nickname: Option<&str>) {
     let display = match nickname {
         Some(name) => TextComponent::text(name),
         None => TextComponent::text(&player.get_name()),

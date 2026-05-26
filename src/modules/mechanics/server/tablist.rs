@@ -22,6 +22,7 @@ use crate::mechanics::mechanic::Mechanic;
 use pumpkin_plugin_api::events::{
     EventData, EventHandler, EventPriority, PlayerJoinEvent, PlayerLeaveEvent,
 };
+use pumpkin_plugin_api::player::Player;
 use pumpkin_plugin_api::text::TextComponent;
 use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};
@@ -50,11 +51,7 @@ impl Mechanic for Tablist {
 impl Tablist {
     /// Replaces `{player}`, `{online}`, `{tps}`, and `{mspt}` placeholders in
     /// a string with live server and player data.
-    fn replace_placeholders(
-        text: &str,
-        server: &Server,
-        player: &pumpkin_plugin_api::player::Player,
-    ) -> String {
+    fn replace_placeholders(text: &str, server: &Server, player: &Player) -> String {
         let player_name = player.get_display_name().get_text();
         let online = server.get_player_count();
         let tps = server.get_tps();
@@ -68,11 +65,7 @@ impl Tablist {
 
     /// Applies the configured header and footer to a single player,
     /// resolving placeholders for that player.
-    fn update_tablist_for_player(
-        config: &TablistConfig,
-        server: &Server,
-        player: &pumpkin_plugin_api::player::Player,
-    ) {
+    fn update_tablist_for_player(config: &TablistConfig, server: &Server, player: &Player) {
         let header = Self::replace_placeholders(&config.header, server, player);
         let footer = Self::replace_placeholders(&config.footer, server, player);
         player

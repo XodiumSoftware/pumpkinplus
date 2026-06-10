@@ -58,6 +58,7 @@ mod mirror_types {
     pub mod entity_type;
     pub mod gamemode;
     pub mod interaction;
+    mod macros;
 }
 
 pub use mirror_types::entity_type::EntityType;

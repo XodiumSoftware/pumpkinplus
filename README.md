@@ -3,7 +3,7 @@
 <h1 align="center">
   <br />
     <a href="https://xodium.org/">
-      <img src="https://gist.githubusercontent.com/illyrius666/a38f03b4fbe9b43faa2c5623137c1250/raw/3a1410e77807097bcfbcf963822b41fadd495d9f/xodium.svg" alt="Xodium Logo" width="200">
+        <img src="logo.svg" alt="IllyriaBridge Logo" width="200">
     </a>
   <br /><br />
   Pumpkin+

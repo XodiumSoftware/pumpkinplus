@@ -23,7 +23,6 @@
 
 ## Table of Contents
 
-- [Architecture](ARCHITECTURE.md)
 - [Guide](GUIDE.md)
 - [Built With](#built-with)
 - [Code of Conduct][code_of_conduct_url]

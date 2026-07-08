@@ -197,13 +197,7 @@ src/
 
 **Always update documentation when code changes:**
 
-1. **ARCHITECTURE.md** — Update if you:
-    - Add/remove modules
-    - Change the module system
-    - Modify configuration patterns
-    - Change project structure
-
-2. **rustdoc comments** — Add/update if you:
+1. **rustdoc comments** — Add/update if you:
     - Add new modules or public APIs
     - Change config fields or placeholders
     - Add commands or events
@@ -239,8 +233,7 @@ To add a new module, follow these steps:
     - Add `pub use` for config type
     - Register config in `on_load`: `manager.register::<{Module}Config>();`
     - Instantiate and register module in modules vec
-9. Update `ARCHITECTURE.md` module table
-10. Run `cargo build --target wasm32-wasip2` to verify
+9. Run `cargo build --target wasm32-wasip2` to verify
 
 ## Memory System
 

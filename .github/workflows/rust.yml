@@ -198,11 +198,13 @@ jobs:
           rm -rf target/wasm32-wasip2/doc/pumpkinplus
 
       - id: upload_artifact
+        if: github.ref_name == 'main'
         name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v5
         with:
           path: target/wasm32-wasip2/doc/
 
       - id: deployment
+        if: github.ref_name == 'main'
         name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v5

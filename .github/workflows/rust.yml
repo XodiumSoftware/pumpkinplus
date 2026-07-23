@@ -48,7 +48,7 @@ jobs:
       - id: run_lint
         name: Run Lint
         run: |
-          cargo clippy --all-targets --all-features -- -D warnings
+          cargo clippy --all-targets --all-features --target wasm32-wasip2 -- -W clippy::pedantic -D warnings
           cargo fmt --all -- --check
         shell: bash
 

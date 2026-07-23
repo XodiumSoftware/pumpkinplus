@@ -100,9 +100,7 @@ pub struct Nickname;
 
 impl Mechanic for Nickname {
     fn enabled(&self) -> bool {
-        ConfigManager::get()
-            .map(|cm| cm.get_config::<NicknameConfig>().enabled)
-            .unwrap_or(false)
+        ConfigManager::get().is_some_and(|cm| cm.get_config::<NicknameConfig>().enabled)
     }
 
     fn cmds(&self) -> Vec<Command> {
@@ -121,12 +119,12 @@ impl Mechanic for Nickname {
     }
 
     fn perms(&self) -> HashSet<String> {
-        HashSet::from([format!("{}:command.nickname", PLUGIN_ID)])
+        HashSet::from([format!("{PLUGIN_ID}:command.nickname")])
     }
 
     fn events(&self, context: &Context) {
         DATA_FOLDER.with(|f| {
-            *f.borrow_mut() = Some(context.get_data_folder().to_string());
+            *f.borrow_mut() = Some(context.get_data_folder().clone());
         });
 
         context
@@ -152,14 +150,11 @@ impl CommandHandler for NicknameExecutor {
 
         // Try to get the "name" argument; if missing, treat as clear
         let arg = args.get_value("name");
-        let nickname = match arg {
-            pumpkin_plugin_api::command_wit::Arg::Simple(name) => name,
-            _ => {
-                store.set(&data_folder, &uuid, String::new());
-                update_player(&player, None);
-                sender.send_message(TextComponent::text("Nickname cleared."));
-                return Ok(0);
-            }
+        let pumpkin_plugin_api::command_wit::Arg::Simple(nickname) = arg else {
+            store.set(&data_folder, &uuid, String::new());
+            update_player(&player, None);
+            sender.send_message(TextComponent::text("Nickname cleared."));
+            return Ok(0);
         };
 
         let trimmed = nickname.trim();
@@ -171,8 +166,7 @@ impl CommandHandler for NicknameExecutor {
             store.set(&data_folder, &uuid, trimmed.to_string());
             update_player(&player, Some(trimmed));
             sender.send_message(TextComponent::text(&format!(
-                "Nickname updated to: {}",
-                trimmed
+                "Nickname updated to: {trimmed}"
             )));
         }
 

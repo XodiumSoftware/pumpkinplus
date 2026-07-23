@@ -26,9 +26,7 @@ pub struct Bat;
 
 impl Mechanic for Bat {
     fn enabled(&self) -> bool {
-        ConfigManager::get()
-            .map(|cm| cm.get_config::<BatConfig>().enabled)
-            .unwrap_or(false)
+        ConfigManager::get().is_some_and(|cm| cm.get_config::<BatConfig>().enabled)
     }
 
     fn events(&self, _context: &Context) {

@@ -1,7 +1,7 @@
 //! Configuration management system.
 //!
 //! Uses a registry pattern where modules register their configs by name,
-//! and ConfigManager handles loading from disk with merge semantics.
+//! and `ConfigManager` handles loading from disk with merge semantics.
 //!
 //! ## Config Location
 //!
@@ -27,7 +27,7 @@ thread_local! {
 /// Extracts a config key from a type's full name.
 ///
 /// This helper inspects the fully-qualified type name at compile time and
-/// derives a short, snake_case key suitable for a config object name.
+/// derives a short, `snake_case` key suitable for a config object name.
 ///
 /// # Examples
 ///
@@ -43,14 +43,14 @@ fn config_key<T>() -> String {
         parts[parts.len() - 2].to_string()
     } else if let Some(&last) = parts.last() {
         last.strip_suffix("Config")
-            .map_or_else(|| last.to_string(), |s| s.to_string())
+            .map_or_else(|| last.to_string(), std::string::ToString::to_string)
     } else {
         full_name.to_string()
     }
 }
 
 /// Manages plugin configuration using a registry pattern.
-/// Modules register their configs by name, and ConfigManager handles
+/// Modules register their configs by name, and `ConfigManager` handles
 /// loading from disk with merge semantics for missing fields.
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct ConfigManager {
@@ -59,7 +59,7 @@ pub struct ConfigManager {
 }
 
 impl ConfigManager {
-    /// Creates an empty ConfigManager ready for registration.
+    /// Creates an empty `ConfigManager` ready for registration.
     pub fn empty() -> Self {
         Self::default()
     }

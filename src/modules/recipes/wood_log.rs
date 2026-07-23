@@ -91,9 +91,9 @@ impl Recipe for WoodLog {
         pairs
             .into_iter()
             .map(|(wood, log)| {
-                let name = log.rsplit_once(':').map(|(_, s)| s).unwrap_or(log);
+                let name = log.rsplit_once(':').map_or(log, |(_, s)| s);
                 ShapelessRecipe {
-                    id: format!("pumpkinplus:{}_from_wood", name),
+                    id: format!("pumpkinplus:{name}_from_wood"),
                     ingredients: vec![Ingredient::Item { id: wood.into() }],
                     result: ItemStack {
                         id: log.into(),

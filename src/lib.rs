@@ -1,5 +1,6 @@
-//! PumpkinPlus is a [Pumpkin](https://github.com/Pumpkin-MC/Pumpkin) Minecraft plugin written in Rust
+//! `PumpkinPlus` is a [Pumpkin](https://github.com/Pumpkin-MC/Pumpkin) Minecraft plugin written in Rust
 //! that enhances the vanilla gameplay without replacing it.
+#![allow(clippy::must_use_candidate)]
 //!
 //! Every feature is modular and toggled via a JSON config file.
 //!

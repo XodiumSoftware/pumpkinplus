@@ -26,9 +26,7 @@ pub struct Openable;
 
 impl Mechanic for Openable {
     fn enabled(&self) -> bool {
-        ConfigManager::get()
-            .map(|cm| cm.get_config::<OpenableConfig>().enabled)
-            .unwrap_or(true)
+        ConfigManager::get().is_none_or(|cm| cm.get_config::<OpenableConfig>().enabled)
     }
 
     fn events(&self, context: &Context) {
@@ -108,32 +106,30 @@ impl EventHandler<PlayerInteractEvent> for Openable {
             return event;
         }
 
-        let toggled_clicked_id = find_toggled_door_state(clicked_state_id);
-        let toggled_adjacent_id = find_toggled_door_state(adjacent_state_id);
+        let new_clicked = find_toggled_door_state(clicked_state_id);
+        let new_adjacent = find_toggled_door_state(adjacent_state_id);
         info!(
-            "[Openable] toggled_clicked_id = {:?}, toggled_adjacent_id = {:?}",
-            toggled_clicked_id, toggled_adjacent_id
+            "[Openable] new_clicked = {}, new_adjacent = {}",
+            new_clicked, new_adjacent
         );
 
-        if let (Some(new_clicked), Some(new_adjacent)) = (toggled_clicked_id, toggled_adjacent_id) {
-            event.cancelled = true;
-            info!("[Openable] event cancelled, syncing door states");
+        event.cancelled = true;
+        info!("[Openable] event cancelled, syncing door states");
 
-            let flags = BlockFlags::NOTIFY_NEIGHBORS | BlockFlags::NOTIFY_LISTENERS;
+        let flags = BlockFlags::NOTIFY_NEIGHBORS | BlockFlags::NOTIFY_LISTENERS;
 
-            world.set_block_state(clicked_pos, new_clicked, flags);
-            world.set_block_state(adjacent_pos, new_adjacent, flags);
+        world.set_block_state(clicked_pos, new_clicked, flags);
+        world.set_block_state(adjacent_pos, new_adjacent, flags);
 
-            debug!(
-                "Synced double doors at {:?} and {:?} (states {} -> {}, {} -> {})",
-                clicked_pos,
-                adjacent_pos,
-                clicked_state_id,
-                new_clicked,
-                adjacent_state_id,
-                new_adjacent
-            );
-        }
+        debug!(
+            "Synced double doors at {:?} and {:?} (states {} -> {}, {} -> {})",
+            clicked_pos,
+            adjacent_pos,
+            clicked_state_id,
+            new_clicked,
+            adjacent_state_id,
+            new_adjacent
+        );
 
         event
     }
@@ -189,7 +185,7 @@ fn find_adjacent_door(world: &World, pos: BlockPos) -> Option<BlockPos> {
 /// Since we don't have direct property access in the plugin API, we try a
 /// small set of nearby state IDs and pick the one that is most likely the
 /// toggled counterpart. The most common offset in vanilla is ±1 or ±2.
-fn find_toggled_door_state(state_id: u16) -> Option<u16> {
+fn find_toggled_door_state(state_id: u16) -> u16 {
     let candidates = [
         state_id.wrapping_add(1),
         state_id.wrapping_sub(1),
@@ -198,7 +194,7 @@ fn find_toggled_door_state(state_id: u16) -> Option<u16> {
         state_id.wrapping_add(4),
         state_id.wrapping_sub(4),
     ];
-    Some(candidates[0])
+    candidates[0]
 }
 
 /// Configuration for the openable mechanics module.
@@ -208,7 +204,7 @@ pub struct OpenableConfig {
     pub enabled: bool,
     /// List of gamemodes allowed to trigger the mechanic. Use variant names like "Survival", "Creative", etc. Leave empty to allow all.
     pub gamemodes: Vec<GameMode>,
-    /// List of interaction actions that trigger the mechanic. Use variant names like "RightClickBlock", "RightClickAir", etc. Leave empty to allow all.
+    /// List of interaction actions that trigger the mechanic. Use variant names like `RightClickBlock`, `RightClickAir`, etc. Leave empty to allow all.
     pub actions: Vec<InteractAction>,
 }
 

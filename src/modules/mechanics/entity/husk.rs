@@ -29,9 +29,7 @@ pub struct Husk;
 
 impl Mechanic for Husk {
     fn enabled(&self) -> bool {
-        ConfigManager::get()
-            .map(|cm| cm.get_config::<HuskConfig>().enabled)
-            .unwrap_or(false)
+        ConfigManager::get().is_some_and(|cm| cm.get_config::<HuskConfig>().enabled)
     }
 
     fn events(&self, _context: &Context) {

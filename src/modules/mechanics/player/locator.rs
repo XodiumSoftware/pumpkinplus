@@ -28,9 +28,7 @@ pub struct Locator;
 
 impl Mechanic for Locator {
     fn enabled(&self) -> bool {
-        ConfigManager::get()
-            .map(|cm| cm.get_config::<LocatorConfig>().enabled)
-            .unwrap_or(true)
+        ConfigManager::get().is_none_or(|cm| cm.get_config::<LocatorConfig>().enabled)
     }
 
     fn cmds(&self) -> Vec<Command> {
@@ -45,7 +43,7 @@ impl Mechanic for Locator {
     }
 
     fn perms(&self) -> HashSet<String> {
-        HashSet::from([format!("{}:command.locator", PLUGIN_ID)])
+        HashSet::from([format!("{PLUGIN_ID}:command.locator")])
     }
 }
 

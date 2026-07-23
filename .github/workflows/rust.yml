@@ -172,6 +172,7 @@ jobs:
 
   docs:
     name: Documentation
+    if: github.event_name != 'pull_request' && github.ref_name == 'main'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

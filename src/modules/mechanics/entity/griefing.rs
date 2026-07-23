@@ -25,9 +25,7 @@ pub struct Griefing;
 
 impl Mechanic for Griefing {
     fn enabled(&self) -> bool {
-        ConfigManager::get()
-            .map(|cm| cm.get_config::<GriefingConfig>().enabled)
-            .unwrap_or(false)
+        ConfigManager::get().is_some_and(|cm| cm.get_config::<GriefingConfig>().enabled)
     }
 
     fn events(&self, _context: &Context) {

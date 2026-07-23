@@ -1,4 +1,4 @@
-//! Mechanic system for PumpkinPlus.
+//! Mechanic system for `PumpkinPlus`.
 //!
 //! Each gameplay feature is implemented as a module implementing the [`Mechanic`] trait.
 //! Mechanics can register event handlers, commands, and permission nodes.

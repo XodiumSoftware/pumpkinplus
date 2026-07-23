@@ -1,4 +1,4 @@
-/// Generates a mirror enum with serde, Display, matches_config, and From impls.
+/// Generates a mirror enum with serde, `Display`, `matches_config`, and `From` impls.
 ///
 /// # Usage
 /// ```

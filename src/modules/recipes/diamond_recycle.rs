@@ -44,7 +44,7 @@ impl Recipe for DiamondRecycle {
             .map(|id| CookingRecipe {
                 id: format!(
                     "pumpkinplus:diamond_recycle_{}",
-                    id.rsplit_once(':').map(|(_, s)| s).unwrap_or(id)
+                    id.rsplit_once(':').map_or(id, |(_, s)| s)
                 ),
                 ingredient: Ingredient::Item { id: id.into() },
                 result: ItemStack {

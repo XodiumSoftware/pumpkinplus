@@ -33,9 +33,7 @@ pub struct Tablist;
 
 impl Mechanic for Tablist {
     fn enabled(&self) -> bool {
-        ConfigManager::get()
-            .map(|cm| cm.get_config::<TablistConfig>().enabled)
-            .unwrap_or(true)
+        ConfigManager::get().is_none_or(|cm| cm.get_config::<TablistConfig>().enabled)
     }
 
     fn events(&self, context: &Context) {
@@ -59,8 +57,8 @@ impl Tablist {
 
         text.replace("{player}", &player_name)
             .replace("{online}", &online.to_string())
-            .replace("{tps}", &format!("{:.1}", tps))
-            .replace("{mspt}", &format!("{:.1}", mspt))
+            .replace("{tps}", &format!("{tps:.1}"))
+            .replace("{mspt}", &format!("{mspt:.1}"))
     }
 
     /// Applies the configured header and footer to a single player,

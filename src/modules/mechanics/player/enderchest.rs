@@ -21,9 +21,7 @@ pub struct Enderchest;
 
 impl Mechanic for Enderchest {
     fn enabled(&self) -> bool {
-        ConfigManager::get()
-            .map(|cm| cm.get_config::<EnderchestConfig>().enabled)
-            .unwrap_or(true)
+        ConfigManager::get().is_none_or(|cm| cm.get_config::<EnderchestConfig>().enabled)
     }
 
     fn events(&self, context: &Context) {
@@ -78,7 +76,7 @@ pub struct EnderchestConfig {
     pub enabled: bool,
     /// List of gamemodes allowed to use enderchests. Use variant names like "Survival", "Creative", etc. Leave empty to allow all.
     pub gamemodes: Vec<GameMode>,
-    /// List of interaction actions that trigger opening the enderchest. Use variant names like "RightClickBlock", "RightClickAir", etc. Leave empty to allow all.
+    /// List of interaction actions that trigger opening the enderchest. Use variant names like `RightClickBlock`, `RightClickAir`, etc. Leave empty to allow all.
     pub actions: Vec<InteractAction>,
 }
 

@@ -1,4 +1,4 @@
-//! Recipe system for PumpkinPlus.
+//! Recipe system for `PumpkinPlus`.
 //!
 //! Each recipe category is implemented as a module implementing the [`Recipe`] trait.
 //! Recipes are registered with the server in bulk via [`Recipe::register`].

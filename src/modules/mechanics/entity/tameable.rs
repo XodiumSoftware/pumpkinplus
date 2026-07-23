@@ -35,9 +35,7 @@ pub struct Tameable;
 
 impl Mechanic for Tameable {
     fn enabled(&self) -> bool {
-        ConfigManager::get()
-            .map(|cm| cm.get_config::<TameableConfig>().enabled)
-            .unwrap_or(false)
+        ConfigManager::get().is_some_and(|cm| cm.get_config::<TameableConfig>().enabled)
     }
 
     fn events(&self, _context: &Context) {

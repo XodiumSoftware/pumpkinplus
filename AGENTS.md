@@ -46,6 +46,9 @@ powershell -ExecutionPolicy Bypass -File build.ps1 -Release
 
 # Generate documentation
 cargo doc --no-deps --target wasm32-wasip2
+
+# Lint with pedantic lints enabled; every warning is treated as an error.
+cargo clippy --all-targets --all-features --target wasm32-wasip2 -- -W clippy::pedantic -D warnings
 ```
 
 ## Architecture Overview
@@ -128,7 +131,7 @@ src/
 ### Key Conventions
 
 - `unsafe_code` forbidden project-wide (`[lints.rust] unsafe_code = "forbid"`)
-- All Clippy warnings enabled (`[lints.clippy] all = "warn"`)
+- All Clippy warnings enabled; run with `-W clippy::pedantic -D warnings` to catch pedantic lints as errors. (`[lints.clippy] all = "warn"`)
 - Config structs: `Debug`, `Clone`, `Default`, `Serialize`, `Deserialize`
 - Config fields documented with `///` comments
 - Permission pattern: `{PLUGIN_ID}:command.{name}` (e.g., `pumpkinplus:command.locator`)

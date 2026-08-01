@@ -31,7 +31,7 @@ pub struct Head;
 
 impl Mechanic for Head {
     fn enabled(&self) -> bool {
-        ConfigManager::get().is_some_and(|cm| cm.get_config::<HeadConfig>().enabled)
+        ConfigManager::get().is_some_and(|cm| cm.head.enabled)
     }
 
     fn events(&self, _context: &Context) {

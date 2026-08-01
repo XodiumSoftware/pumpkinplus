@@ -21,7 +21,7 @@ pub struct Enderchest;
 
 impl Mechanic for Enderchest {
     fn enabled(&self) -> bool {
-        ConfigManager::get().is_none_or(|cm| cm.get_config::<EnderchestConfig>().enabled)
+        ConfigManager::get().is_none_or(|cm| cm.enderchest.enabled)
     }
 
     fn events(&self, context: &Context) {
@@ -46,7 +46,7 @@ impl EventHandler<PlayerInteractEvent> for Enderchest {
         }
 
         let config: EnderchestConfig = ConfigManager::get()
-            .map(|cm| cm.get_config())
+            .map(|cm| cm.enderchest)
             .unwrap_or_default();
 
         let action = InteractAction::from(event.action);

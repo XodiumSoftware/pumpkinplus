@@ -18,7 +18,7 @@
 | **Language**      | Rust 2024                                                   | Systems language                 |
 | **Build Tool**    | Cargo                                                       | Build automation                 |
 | **Serialization** | serde + json                                                | Config serialization             |
-| **Config**        | figment                                                     | JSON config with merge semantics |
+| **Config**        | config                                                     | JSON config with merge semantics |
 | **Logging**       | tracing                                                     | Structured logging               |
 | **Docs**          | rustdoc (via `cargo doc`)                                   | API documentation                |
 
@@ -66,7 +66,7 @@ cargo clippy --all-targets --all-features --target wasm32-wasip2 -- -W clippy::p
 
 ### Module System
 
-Every feature implements the **`Module`** trait (`src/modules/module.rs`):
+Every feature implements the **`Mechanic`** trait (`src/modules/mechanics/mechanic.rs`):
 
 | Method       | Purpose                                          | Default     |
 |--------------|--------------------------------------------------|-------------|
@@ -80,14 +80,12 @@ Modules are plain structs (not singletons) instantiated with `Default::default()
 
 ### Configuration
 
-**`ConfigManager`** (`src/config.rs`) — JSON-backed config with merge semantics:
+**`ConfigManager`** (`src/config.rs`) — JSON-backed config using the [`config`](https://crates.io/crates/config) crate:
 
 - Config located at `{data_folder}/config.json`
-- On first load: creates file with all registered defaults
-- On subsequent loads: merges user values with defaults (preserves extra fields)
-- Each module owns a nested `Config` struct with `enabled: bool` field
-
-Config key derived from type name automatically (e.g., `PlayerConfig` → `"player"`).
+- On first load: creates file with all module defaults
+- On subsequent loads: merges user values with defaults and preserves extra fields
+- All module configs live in a single `PluginConfig` struct; modules access their section via `ConfigManager::get().map(|cm| cm.section)`
 
 ### Active Modules
 
@@ -225,18 +223,19 @@ To add a new module, follow these steps:
 3. Define `{Module}Config` struct with `enabled: bool` + module fields
 4. Implement `Default` for config with sensible defaults
 5. Create `{Module}` struct deriving `Default`
-6. Implement `Module` trait:
-    - `enabled()` — check config
+6. Implement `Mechanic` trait:
+    - `enabled()` — check config via `ConfigManager::get().is_none_or(|cm| cm.{section}.enabled)`
     - `events()` — register event handlers (if needed)
     - `cmds()` — return commands (if needed)
     - `perms()` — return permission nodes (if commands)
 7. Implement `EventHandler<T>` for each event (if needed)
-8. In `src/lib.rs`:
+8. In `src/config.rs`:
+    - Add `pub use crate::modules::mechanics::{module}::{Module}Config;`
+    - Add a `pub {section}: {Module}Config` field to `PluginConfig`
+9. In `src/lib.rs`:
     - Add `pub mod {module}` in `modules::mechanics`
-    - Add `pub use` for config type
-    - Register config in `on_load`: `manager.register::<{Module}Config>();`
     - Instantiate and register module in modules vec
-9. Run `cargo build --target wasm32-wasip2` to verify
+10. Run `cargo build --target wasm32-wasip2` to verify
 
 ## Memory System
 

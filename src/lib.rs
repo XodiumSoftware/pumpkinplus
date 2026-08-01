@@ -111,6 +111,7 @@ pub use modules::mechanics::entity::spawn_egg::SpawnEggConfig;
 pub use modules::mechanics::entity::tameable::TameableConfig;
 pub use modules::mechanics::player::enderchest::EnderchestConfig;
 pub use modules::mechanics::player::head::HeadConfig;
+pub use modules::mechanics::player::locator::LocatorConfig;
 pub use modules::mechanics::player::messages::MessagesConfig;
 pub use modules::mechanics::player::nickname::NicknameConfig;
 pub use modules::mechanics::server::chat::ChatConfig;
@@ -164,23 +165,7 @@ impl Plugin for PumpkinPlus {
     }
 
     fn on_load(&mut self, context: Context) -> pumpkin_plugin_api::Result<()> {
-        let mut manager = ConfigManager::empty();
-
-        // manager.register::<BatConfig>();
-        // manager.register::<GriefingConfig>();
-        // manager.register::<HuskConfig>();
-        // manager.register::<SpawnEggConfig>();
-        // manager.register::<TameableConfig>();
-        // manager.register::<EnderchestConfig>();
-        // manager.register::<HeadConfig>();
-        manager.register::<NicknameConfig>();
-        // manager.register::<LocatorConfig>();
-        manager.register::<MessagesConfig>();
-        manager.register::<ChatConfig>();
-        manager.register::<TablistConfig>();
-        // manager.register::<OpenableConfig>();
-
-        manager.finalize(&context);
+        ConfigManager::load(&context);
 
         // let bat = Bat;
         // let griefing = Griefing;

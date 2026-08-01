@@ -100,7 +100,7 @@ pub struct Nickname;
 
 impl Mechanic for Nickname {
     fn enabled(&self) -> bool {
-        ConfigManager::get().is_some_and(|cm| cm.get_config::<NicknameConfig>().enabled)
+        ConfigManager::get().is_some_and(|cm| cm.nickname.enabled)
     }
 
     fn cmds(&self) -> Vec<Command> {

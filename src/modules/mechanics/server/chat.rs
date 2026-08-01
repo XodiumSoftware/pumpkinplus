@@ -27,7 +27,7 @@ pub struct Chat;
 
 impl Mechanic for Chat {
     fn enabled(&self) -> bool {
-        ConfigManager::get().is_none_or(|cm| cm.get_config::<ChatConfig>().enabled)
+        ConfigManager::get().is_none_or(|cm| cm.chat.enabled)
     }
 
     fn events(&self, context: &Context) {
@@ -43,9 +43,7 @@ impl EventHandler<PlayerChatEvent> for Chat {
         _server: Server,
         mut event: EventData<PlayerChatEvent>,
     ) -> EventData<PlayerChatEvent> {
-        let config: ChatConfig = ConfigManager::get()
-            .map(|cm| cm.get_config())
-            .unwrap_or_default();
+        let config: ChatConfig = ConfigManager::get().map(|cm| cm.chat).unwrap_or_default();
 
         if !config.chat_filter.is_empty() {
             let lower = event.message.to_lowercase();

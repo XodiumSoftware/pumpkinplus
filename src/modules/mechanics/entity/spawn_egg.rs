@@ -24,7 +24,7 @@ pub struct SpawnEgg;
 
 impl Mechanic for SpawnEgg {
     fn enabled(&self) -> bool {
-        ConfigManager::get().is_some_and(|cm| cm.get_config::<SpawnEggConfig>().enabled)
+        ConfigManager::get().is_some_and(|cm| cm.spawn_egg.enabled)
     }
 
     fn events(&self, _context: &Context) {

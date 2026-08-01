@@ -33,7 +33,7 @@ pub struct Tablist;
 
 impl Mechanic for Tablist {
     fn enabled(&self) -> bool {
-        ConfigManager::get().is_none_or(|cm| cm.get_config::<TablistConfig>().enabled)
+        ConfigManager::get().is_none_or(|cm| cm.tablist.enabled)
     }
 
     fn events(&self, context: &Context) {
@@ -73,7 +73,7 @@ impl Tablist {
     /// Refreshes the tab list header and footer for every online player.
     fn update_tablist_for_all_players(server: &Server) {
         let config: TablistConfig = ConfigManager::get()
-            .map(|cm| cm.get_config())
+            .map(|cm| cm.tablist)
             .unwrap_or_default();
 
         if !config.enabled {
@@ -93,7 +93,7 @@ impl EventHandler<PlayerJoinEvent> for Tablist {
         event: EventData<PlayerJoinEvent>,
     ) -> EventData<PlayerJoinEvent> {
         let config: TablistConfig = ConfigManager::get()
-            .map(|cm| cm.get_config())
+            .map(|cm| cm.tablist)
             .unwrap_or_default();
 
         if !self.enabled() {

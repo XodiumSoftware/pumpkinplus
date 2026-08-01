@@ -29,7 +29,7 @@ pub struct Messages;
 
 impl Mechanic for Messages {
     fn enabled(&self) -> bool {
-        ConfigManager::get().is_none_or(|cm| cm.get_config::<MessagesConfig>().enabled)
+        ConfigManager::get().is_none_or(|cm| cm.messages.enabled)
     }
 
     fn events(&self, context: &Context) {
@@ -52,7 +52,7 @@ impl EventHandler<PlayerJoinEvent> for Messages {
         mut event: EventData<PlayerJoinEvent>,
     ) -> EventData<PlayerJoinEvent> {
         let config: MessagesConfig = ConfigManager::get()
-            .map(|cm| cm.get_config())
+            .map(|cm| cm.messages)
             .unwrap_or_default();
         if config.join_msg.is_empty() {
             return event;
@@ -71,7 +71,7 @@ impl EventHandler<PlayerLeaveEvent> for Messages {
         mut event: EventData<PlayerLeaveEvent>,
     ) -> EventData<PlayerLeaveEvent> {
         let config: MessagesConfig = ConfigManager::get()
-            .map(|cm| cm.get_config())
+            .map(|cm| cm.messages)
             .unwrap_or_default();
         if config.leave_msg.is_empty() {
             return event;
@@ -90,7 +90,7 @@ impl EventHandler<PlayerLoginEvent> for Messages {
         mut event: EventData<PlayerLoginEvent>,
     ) -> EventData<PlayerLoginEvent> {
         let config: MessagesConfig = ConfigManager::get()
-            .map(|cm| cm.get_config())
+            .map(|cm| cm.messages)
             .unwrap_or_default();
         if config.kick_msg.is_empty() {
             return event;

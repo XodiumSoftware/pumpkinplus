@@ -14,9 +14,7 @@ use std::fs;
 use std::path::PathBuf;
 use tracing::error;
 
-pub use crate::modules::mechanics::entity::bat::BatConfig;
 pub use crate::modules::mechanics::entity::griefing::GriefingConfig;
-pub use crate::modules::mechanics::entity::husk::HuskConfig;
 pub use crate::modules::mechanics::entity::spawn_egg::SpawnEggConfig;
 pub use crate::modules::mechanics::entity::tameable::TameableConfig;
 pub use crate::modules::mechanics::player::enderchest::EnderchestConfig;
@@ -39,12 +37,8 @@ thread_local! {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct PluginConfig {
-    /// Bat drop mechanics.
-    pub bat: BatConfig,
     /// Mob griefing prevention.
     pub griefing: GriefingConfig,
-    /// Husk drop mechanics.
-    pub husk: HuskConfig,
     /// Spawn egg drop mechanics.
     pub spawn_egg: SpawnEggConfig,
     /// Tameable ownership transfer.

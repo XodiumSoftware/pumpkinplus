@@ -78,9 +78,7 @@ mod modules {
     pub mod mechanics {
         pub mod mechanic;
         pub mod entity {
-            pub mod bat;
             pub mod griefing;
-            pub mod husk;
             pub mod spawn_egg;
             pub mod tameable;
         }
@@ -104,9 +102,7 @@ mod modules {
 pub use config::*;
 pub use modules::*;
 
-pub use modules::mechanics::entity::bat::BatConfig;
 pub use modules::mechanics::entity::griefing::GriefingConfig;
-pub use modules::mechanics::entity::husk::HuskConfig;
 pub use modules::mechanics::entity::spawn_egg::SpawnEggConfig;
 pub use modules::mechanics::entity::tameable::TameableConfig;
 pub use modules::mechanics::player::enderchest::EnderchestConfig;
@@ -118,7 +114,6 @@ pub use modules::mechanics::server::chat::ChatConfig;
 pub use modules::mechanics::server::tablist::TablistConfig;
 pub use modules::mechanics::world::openable::OpenableConfig;
 
-// use crate::mechanics::entity::bat::Bat;
 // use crate::mechanics::entity::griefing::Griefing;
 // use crate::mechanics::player::enderchest::Enderchest;
 use crate::mechanics::player::nickname::Nickname;
@@ -167,9 +162,7 @@ impl Plugin for PumpkinPlus {
     fn on_load(&mut self, context: Context) -> pumpkin_plugin_api::Result<()> {
         ConfigManager::load(&context);
 
-        // let bat = Bat;
         // let griefing = Griefing;
-        // let husk = Husk;
         // let spawn_egg = SpawnEgg;
         // let tameable = Tameable;
         // let enderchest = Enderchest;
@@ -181,9 +174,7 @@ impl Plugin for PumpkinPlus {
         let tablist = Tablist;
         // let openable = Openable;
         let modules: Vec<&dyn Mechanic> = vec![
-            // &bat,
             // &griefing,
-            // &husk,
             // &spawn_egg,
             // &tameable,
             // &enderchest,

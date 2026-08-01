@@ -136,6 +136,7 @@ src/
 - Module configs accessed via `ConfigManager::get().unwrap_or_default()`
 - Event handlers return `EventData<T>` (may modify event)
 - Release profile: LTO + strip for minimal WASM size
+- **Before checking API availability, run `cargo update` to fetch the latest `pumpkin-plugin-api` revision.** The API is git-tracked and may have added new events or types since the last local checkout.
 
 ### Code Style
 

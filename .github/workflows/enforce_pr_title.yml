@@ -1,4 +1,4 @@
-name: Xodium CI/CD - Enforce PR Title
+name: Enforce PR Title CI/CD
 
 on:
   pull_request_target:

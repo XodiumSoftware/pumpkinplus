@@ -30,6 +30,7 @@ impl Mechanic for SpawnEgg {
     fn events(&self, _context: &Context) {
         // TODO: Implement when EntityDeathEvent (or equivalent) is available
         // in the Pumpkin plugin API. The intended logic is:
+        // see head.rs
         //
         // 1. Listen for entity death events.
         // 2. Roll `spawn_egg_drop_chance`.

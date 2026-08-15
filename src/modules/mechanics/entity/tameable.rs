@@ -16,13 +16,25 @@
 //!
 //! ## Notes
 //!
-//! This module is currently a stub. The Pumpkin plugin API does not yet expose:
-//! - `PlayerInteractEntityEvent` (or equivalent) for right-clicking entities
-//! - Methods to query a player's leashed entity
-//! - Methods to check or modify entity tameable state / ownership
-//! - Methods to set an entity's leash holder
+//! This module is currently a stub. The following events are now available in
+//! the Pumpkin plugin API:
 //!
-//! Until these APIs are available, ownership transfer cannot be implemented.
+//! - `PlayerInteractEntityEvent`
+//! - `PlayerInteractAtEntityEvent`
+//! - `PlayerLeashEntityEvent` / `PlayerUnleashEntityEvent`
+//! - `EntityTameEvent`
+//!
+//! However, the entity manipulation APIs required for ownership transfer are
+//! still missing:
+//!
+//! 1. **Querying a player's leashed entity** — there is no way to get the entity
+//!    currently leashed by a player.
+//! 2. **Checking or modifying tameable state / ownership** — there is no API to
+//!    read an entity's owner UUID or tame state, nor to change its owner.
+//! 3. **Setting an entity's leash holder** — there is no API to leash an entity
+//!    to a specific player or entity.
+//!
+//! Until these APIs are available, ownership transfer cannot be fully implemented.
 
 use crate::config::ConfigManager;
 use crate::mechanics::mechanic::Mechanic;
@@ -39,19 +51,25 @@ impl Mechanic for Tameable {
     }
 
     fn events(&self, _context: &Context) {
-        // TODO: Implement when PlayerInteractEntityEvent (or equivalent) and
-        // entity/leash/tameable APIs are available in the Pumpkin plugin API.
+        // TODO: Implement when the Pumpkin plugin API exposes:
         //
-        // The intended logic is:
+        // 1. A way to retrieve the entity currently leashed by a player.
+        // 2. A way to read and write an entity's owner UUID / tameable state.
+        // 3. A way to set or transfer an entity's leash holder to another player.
         //
-        // 1. Listen for player interact entity events.
-        // 2. If the interaction is not a right-click on another player, return.
-        // 3. If the source player is not holding a lead in their main hand, return.
-        // 4. Query the source player's leashed entity.
-        // 5. If the entity is not tamed or the source is not the owner, return.
-        // 6. Transfer ownership to the target player.
-        // 7. Set the target player as the new leash holder.
-        // 8. Cancel the event to prevent default interaction.
+        // The relevant events (`PlayerInteractEntityEvent`, `PlayerLeashEntityEvent`,
+        // `EntityTameEvent`) are already available, but the above entity state APIs
+        // are still missing.
+        //
+        // Intended logic once all pieces are available:
+        // - Listen for `PlayerInteractEntityEvent`.
+        // - If the interaction is not a right-click on another player, return.
+        // - If the source player is not holding a lead in their main hand, return.
+        // - Query the source player's leashed entity.
+        // - If the entity is not tamed or the source is not the owner, return.
+        // - Transfer ownership to the target player.
+        // - Set the target player as the new leash holder.
+        // - Cancel the event to prevent default interaction.
     }
 }
 

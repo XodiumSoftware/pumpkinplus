@@ -66,6 +66,7 @@ pub use modules::mechanics::server::tablist::TablistConfig;
 pub use modules::mechanics::world::openable::OpenableConfig;
 
 // use crate::mechanics::entity::griefing::Griefing;
+use crate::mechanics::entity::griefing::Griefing;
 use crate::mechanics::player::enderchest::Enderchest;
 use crate::mechanics::player::nickname::Nickname;
 // use crate::mechanics::player::locator::Locator;
@@ -113,7 +114,7 @@ impl Plugin for PumpkinPlus {
     fn on_load(&mut self, context: Context) -> pumpkin_plugin_api::Result<()> {
         ConfigManager::load(&context);
 
-        // let griefing = Griefing;
+        let griefing = Griefing;
         // let spawn_egg = SpawnEgg;
         // let tameable = Tameable;
         let enderchest = Enderchest;
@@ -125,7 +126,7 @@ impl Plugin for PumpkinPlus {
         let tablist = Tablist;
         // let openable = Openable;
         let modules: Vec<&dyn Mechanic> = vec![
-            // &griefing,
+            &griefing,
             // &spawn_egg,
             // &tameable,
             &enderchest,

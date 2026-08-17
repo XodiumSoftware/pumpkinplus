@@ -7,16 +7,28 @@
 //! | `enabled`           | `false`                                                                  | Whether this module is active                       |
 //! | `cancelled_entities`| `["Blaze", "Creeper", "EnderDragon", "Enderman", "Fireball", "SmallFireball", "Wither"]` | Entity types whose griefing is blocked              |
 //!
+//! ## Mechanics
+//!
+//! When enabled, this module cancels two kinds of griefing events for configured
+//! entity types:
+//!
+//! - `EntityChangeBlockEvent` — prevents the entity from changing blocks
+//!   (e.g., Endermen picking up blocks, Creepers igniting fire).
+//! - `EntityExplodeEvent` — prevents the entity from exploding
+//!   (e.g., Creeper explosions, Wither projectile explosions).
+//!
 //! ## Notes
 //!
-//! This module is currently a stub. The Pumpkin plugin API does not yet expose
-//! `EntityChangeBlockEvent` or `EntityExplodeEvent` (or equivalents), so mob
-//! griefing prevention cannot be hooked until upstream support is added.
+//! `EntityExplodeEvent` only supports cancelling the whole explosion; the API does
+//! not expose a per-block explode list to selectively remove affected blocks.
 
 use crate::EntityType;
 use crate::config::ConfigManager;
 use crate::mechanics::mechanic::Mechanic;
-use pumpkin_plugin_api::Context;
+use pumpkin_plugin_api::events::{
+    EntityChangeBlockEvent, EntityExplodeEvent, EventData, EventHandler, EventPriority,
+};
+use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};
 
 /// Handles mob griefing prevention.
@@ -28,18 +40,78 @@ impl Mechanic for Griefing {
         ConfigManager::get().is_some_and(|cm| cm.griefing.enabled)
     }
 
-    fn events(&self, _context: &Context) {
-        // TODO: Implement when EntityChangeBlockEvent and EntityExplodeEvent
-        // (or equivalents) are available in the Pumpkin plugin API.
-        //
-        // The intended logic is:
-        //
-        // 1. Listen for entity change block events.
-        //    - If the entity type is in `config.cancelled_entities`, cancel the event.
-        //
-        // 2. Listen for entity explode events.
-        //    - If the entity type is in `config.cancelled_entities`, clear the block list.
+    fn events(&self, context: &Context) {
+        context
+            .register_event_handler::<EntityChangeBlockEvent, _>(
+                Griefing,
+                EventPriority::Normal,
+                true,
+            )
+            .expect("failed to register entity change block event handler");
+        context
+            .register_event_handler::<EntityExplodeEvent, _>(Griefing, EventPriority::Normal, true)
+            .expect("failed to register entity explode event handler");
     }
+}
+
+impl EventHandler<EntityChangeBlockEvent> for Griefing {
+    fn handle(
+        &self,
+        server: Server,
+        mut event: EventData<EntityChangeBlockEvent>,
+    ) -> EventData<EntityChangeBlockEvent> {
+        if let Some(entity_type) = entity_type_by_id(
+            &server,
+            event
+                .entity_id
+                .try_into()
+                .expect("entity id should fit in u32"),
+        ) {
+            let config: GriefingConfig = ConfigManager::get()
+                .map(|cm| cm.griefing)
+                .unwrap_or_default();
+            if config.cancelled_entities.contains(&entity_type) {
+                event.cancelled = true;
+            }
+        }
+        event
+    }
+}
+
+impl EventHandler<EntityExplodeEvent> for Griefing {
+    fn handle(
+        &self,
+        server: Server,
+        mut event: EventData<EntityExplodeEvent>,
+    ) -> EventData<EntityExplodeEvent> {
+        if let Some(entity_type) = entity_type_by_id(
+            &server,
+            event
+                .entity_id
+                .try_into()
+                .expect("entity id should fit in u32"),
+        ) {
+            let config: GriefingConfig = ConfigManager::get()
+                .map(|cm| cm.griefing)
+                .unwrap_or_default();
+            if config.cancelled_entities.contains(&entity_type) {
+                event.cancelled = true;
+            }
+        }
+        event
+    }
+}
+
+/// Looks up an entity's type by ID across all loaded worlds.
+fn entity_type_by_id(server: &Server, id: u32) -> Option<EntityType> {
+    for world in server.get_all_worlds() {
+        for entity in world.get_entities() {
+            if entity.get_id() == id {
+                return Some(EntityType::from(entity.get_type()));
+            }
+        }
+    }
+    None
 }
 
 /// Configuration for the griefing mechanics module.

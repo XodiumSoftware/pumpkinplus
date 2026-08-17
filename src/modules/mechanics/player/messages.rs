@@ -29,7 +29,7 @@ pub struct Messages;
 
 impl Mechanic for Messages {
     fn enabled(&self) -> bool {
-        ConfigManager::get().is_none_or(|cm| cm.messages.enabled)
+        ConfigManager::get().is_some_and(|cm| cm.messages.enabled)
     }
 
     fn events(&self, context: &Context) {

@@ -27,7 +27,7 @@ pub struct Chat;
 
 impl Mechanic for Chat {
     fn enabled(&self) -> bool {
-        ConfigManager::get().is_none_or(|cm| cm.chat.enabled)
+        ConfigManager::get().is_some_and(|cm| cm.chat.enabled)
     }
 
     fn events(&self, context: &Context) {

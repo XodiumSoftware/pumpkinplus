@@ -33,7 +33,7 @@ pub struct Tablist;
 
 impl Mechanic for Tablist {
     fn enabled(&self) -> bool {
-        ConfigManager::get().is_none_or(|cm| cm.tablist.enabled)
+        ConfigManager::get().is_some_and(|cm| cm.tablist.enabled)
     }
 
     fn events(&self, context: &Context) {

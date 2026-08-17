@@ -28,7 +28,7 @@ pub struct Locator;
 
 impl Mechanic for Locator {
     fn enabled(&self) -> bool {
-        ConfigManager::get().is_none_or(|cm| cm.locator.enabled)
+        ConfigManager::get().is_some_and(|cm| cm.locator.enabled)
     }
 
     fn cmds(&self) -> Vec<Command> {

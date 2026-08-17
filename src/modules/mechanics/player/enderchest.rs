@@ -31,7 +31,7 @@ pub struct Enderchest;
 
 impl Mechanic for Enderchest {
     fn enabled(&self) -> bool {
-        ConfigManager::get().is_none_or(|cm| cm.enderchest.enabled)
+        ConfigManager::get().is_some_and(|cm| cm.enderchest.enabled)
     }
 
     fn events(&self, context: &Context) {

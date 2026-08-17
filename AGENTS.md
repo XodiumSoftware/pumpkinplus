@@ -225,7 +225,7 @@ To add a new module, follow these steps:
 4. Implement `Default` for config with sensible defaults
 5. Create `{Module}` struct deriving `Default`
 6. Implement `Mechanic` trait:
-    - `enabled()` — check config via `ConfigManager::get().is_none_or(|cm| cm.{section}.enabled)`
+    - `enabled()` — check config via `ConfigManager::get().is_some_and(|cm| cm.{section}.enabled)`
     - `events()` — register event handlers (if needed)
     - `cmds()` — return commands (if needed)
     - `perms()` — return permission nodes (if commands)

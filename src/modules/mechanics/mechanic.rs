@@ -5,7 +5,7 @@
 
 use pumpkin_plugin_api::Context;
 use pumpkin_plugin_api::command::Command;
-use std::collections::HashSet;
+use pumpkin_plugin_api::permission::Permission;
 
 /// A trait representing a plugin mechanic that can be enabled or disabled.
 ///
@@ -28,8 +28,8 @@ pub trait Mechanic {
     /// Permissions are paired with commands by index when registering. If there
     /// are fewer permissions than commands, remaining commands are registered
     /// without a permission requirement. Returns an empty set by default.
-    fn perms(&self) -> HashSet<String> {
-        HashSet::new()
+    fn perms(&self) -> Vec<Permission> {
+        Vec::new()
     }
 
     /// Registers event handlers for this mechanic.
@@ -48,9 +48,14 @@ pub trait Mechanic {
             return;
         }
         self.events(context);
-        let perms: Vec<String> = self.perms().into_iter().collect();
+        let perms = self.perms();
+        for perm in &perms {
+            let _ = context.register_permission(perm);
+        }
+
+        let perm_nodes: Vec<String> = perms.into_iter().map(|p| p.node).collect();
         for (i, cmd) in self.cmds().into_iter().enumerate() {
-            let perm = perms.get(i).cloned().unwrap_or_default();
+            let perm = perm_nodes.get(i).cloned().unwrap_or_default();
             context.register_command(cmd, &perm);
         }
     }

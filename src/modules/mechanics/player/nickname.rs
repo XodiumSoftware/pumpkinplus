@@ -24,15 +24,15 @@ use crate::{PLUGIN_ID, config::ConfigManager, mechanics::mechanic::Mechanic};
 use pumpkin_plugin_api::{
     Context, Server,
     command::{Command, CommandError, CommandNode, CommandSender, ConsumedArgs},
-    command_wit::{ArgumentType, StringType},
+    command_wit::{Arg, ArgumentType, StringType},
     commands::CommandHandler,
     events::{EventData, EventHandler, EventPriority, PlayerJoinEvent},
+    permission::{Permission, PermissionDefault},
     player::Player,
-    text::TextComponent,
+    text::{NamedColor, TextComponent},
 };
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::collections::HashSet;
 use std::fs;
 use std::path::PathBuf;
 use tracing::error;
@@ -118,8 +118,13 @@ impl Mechanic for Nickname {
         vec![command]
     }
 
-    fn perms(&self) -> HashSet<String> {
-        HashSet::from([format!("{PLUGIN_ID}:command.nickname")])
+    fn perms(&self) -> Vec<Permission> {
+        vec![Permission {
+            node: format!("{PLUGIN_ID}:command.nickname"),
+            description: "Allows using the /nickname and /nick commands.".to_string(),
+            default: PermissionDefault::Allow,
+            children: vec![],
+        }]
     }
 
     fn events(&self, context: &Context) {
@@ -148,9 +153,7 @@ impl CommandHandler for NicknameExecutor {
         let data_folder = DATA_FOLDER.with(|f| f.borrow().clone().unwrap_or_default());
         let mut store = NicknamesStore::load(&data_folder);
 
-        // Try to get the "name" argument; if missing, treat as clear
-        let arg = args.get_value("name");
-        let pumpkin_plugin_api::command_wit::Arg::Simple(nickname) = arg else {
+        let (Arg::Simple(nickname) | Arg::Msg(nickname)) = args.get_value("name") else {
             store.set(&data_folder, &uuid, String::new());
             update_player(&player, None);
             sender.send_message(TextComponent::text("Nickname cleared."));
@@ -200,15 +203,117 @@ impl EventHandler<PlayerJoinEvent> for Nickname {
     }
 }
 
+/// Parses a string containing legacy `&` color/formatting codes and returns a
+/// `TextComponent` with styled children. A plain text component is returned if
+/// no codes are present.
+///
+/// Supported codes match the standard Minecraft color/formatting codes:
+/// `0-9`, `a-f` for colors; `k` obfuscated, `l` bold, `m` strikethrough,
+/// `n` underlined, `o` italic, `r` reset.
+fn parse_legacy_text(input: &str) -> TextComponent {
+    let root = TextComponent::text("");
+    let mut current_text = String::new();
+    let mut current = TextComponent::text("");
+    let mut chars = input.chars().peekable();
+
+    while let Some(ch) = chars.next() {
+        if ch == '&' {
+            // Flush accumulated text before applying the new code.
+            if !current_text.is_empty() {
+                current.add_text(&current_text);
+                current_text.clear();
+                root.add_child(current);
+                current = TextComponent::text("");
+            }
+
+            let Some(code) = chars.next() else {
+                break;
+            };
+
+            let code_lower = code.to_ascii_lowercase();
+            match code_lower {
+                'r' => {
+                    current = TextComponent::text("");
+                }
+                'k' => {
+                    current.obfuscated(true);
+                }
+                'l' => {
+                    current.bold(true);
+                }
+                'm' => {
+                    current.strikethrough(true);
+                }
+                'n' => {
+                    current.underlined(true);
+                }
+                'o' => {
+                    current.italic(true);
+                }
+                _ => {
+                    if let Some(color) = color_from_code(code_lower) {
+                        current = TextComponent::text("");
+                        current.color_named(color);
+                    }
+                    // Unknown codes are ignored.
+                }
+            }
+        } else {
+            current_text.push(ch);
+        }
+    }
+
+    if !current_text.is_empty() {
+        current.add_text(&current_text);
+    }
+    // Only add the final child if it has text or styling.
+    if !current.get_text().is_empty() || has_style(&current) {
+        root.add_child(current);
+    }
+
+    root
+}
+
+/// Maps a legacy formatting code character to a `NamedColor`.
+fn color_from_code(code: char) -> Option<NamedColor> {
+    Some(match code {
+        '0' => NamedColor::Black,
+        '1' => NamedColor::DarkBlue,
+        '2' => NamedColor::DarkGreen,
+        '3' => NamedColor::DarkAqua,
+        '4' => NamedColor::DarkRed,
+        '5' => NamedColor::DarkPurple,
+        '6' => NamedColor::Gold,
+        '7' => NamedColor::Gray,
+        '8' => NamedColor::DarkGray,
+        '9' => NamedColor::Blue,
+        'a' => NamedColor::Green,
+        'b' => NamedColor::Aqua,
+        'c' => NamedColor::Red,
+        'd' => NamedColor::LightPurple,
+        'e' => NamedColor::Yellow,
+        'f' => NamedColor::White,
+        _ => return None,
+    })
+}
+
+/// Returns true if the text component has any style applied.
+fn has_style(component: &TextComponent) -> bool {
+    // TextComponent doesn't expose style getters, so we infer it from the
+    // encoded NBT length. This is a heuristic; a better API would expose style
+    // flags directly.
+    component.encode().len() > 1
+}
+
 /// Applies a nickname to a player's display name and tab list name.
 fn update_player(player: &Player, nickname: Option<&str>) {
     let display = match nickname {
-        Some(name) => TextComponent::text(name),
+        Some(name) => parse_legacy_text(name),
         None => TextComponent::text(&player.get_name()),
     };
 
     let tab_list = match nickname {
-        Some(name) => TextComponent::text(name),
+        Some(name) => parse_legacy_text(name),
         None => TextComponent::text(&player.get_name()),
     };
 

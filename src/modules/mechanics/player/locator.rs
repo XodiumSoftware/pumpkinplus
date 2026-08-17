@@ -17,10 +17,10 @@ use pumpkin_plugin_api::{
     Server,
     command::{Command, CommandError, CommandNode, CommandSender, ConsumedArgs},
     commands::CommandHandler,
+    permission::{Permission, PermissionDefault},
     text::TextComponent,
 };
 use serde::{Deserialize, Serialize};
-use std::collections::HashSet;
 
 /// Handles locator bar mechanics.
 #[derive(Default)]
@@ -42,8 +42,13 @@ impl Mechanic for Locator {
         vec![command]
     }
 
-    fn perms(&self) -> HashSet<String> {
-        HashSet::from([format!("{PLUGIN_ID}:command.locator")])
+    fn perms(&self) -> Vec<Permission> {
+        vec![Permission {
+            node: format!("{PLUGIN_ID}:command.locator"),
+            description: "Allows using the /locator and /lc commands.".to_string(),
+            default: PermissionDefault::Allow,
+            children: vec![],
+        }]
     }
 }
 

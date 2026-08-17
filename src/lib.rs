@@ -78,11 +78,11 @@ use crate::mechanics::entity::griefing::Griefing;
 use crate::mechanics::player::enderchest::Enderchest;
 use crate::mechanics::player::nickname::Nickname;
 // use crate::mechanics::player::locator::Locator;
-use crate::mechanics::player::messages::Messages;
-// use crate::mechanics::world::openable::Openable;
 use crate::mechanics::mechanic::Mechanic;
+use crate::mechanics::player::messages::Messages;
 use crate::mechanics::server::chat::Chat;
 use crate::mechanics::server::tablist::Tablist;
+use crate::mechanics::world::openable::Openable;
 use crate::modules::recipes::chainmail::Chainmail;
 use crate::modules::recipes::diamond_recycle::DiamondRecycle;
 use crate::modules::recipes::painting::Painting;
@@ -132,7 +132,7 @@ impl Plugin for PumpkinPlus {
         let messages = Messages;
         let chat = Chat;
         let tablist = Tablist;
-        // let openable = Openable;
+        let openable = Openable;
         let modules: Vec<&dyn Mechanic> = vec![
             &griefing,
             // &spawn_egg,
@@ -143,7 +143,7 @@ impl Plugin for PumpkinPlus {
             &messages,
             &chat,
             &tablist,
-            // &openable,
+            &openable,
         ];
         let enabled_count = modules.iter().filter(|m| m.enabled()).count();
 

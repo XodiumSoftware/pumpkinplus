@@ -99,8 +99,8 @@ impl Plugin for PumpkinPlus {
             name: PLUGIN_ID.into(),
             version: env!("CARGO_PKG_VERSION").into(),
             authors: env!("CARGO_PKG_AUTHORS")
-                .split(",")
-                .map(|v| v.to_string())
+                .split(',')
+                .map(std::string::ToString::to_string)
                 .collect(),
             description: env!("CARGO_PKG_DESCRIPTION").into(),
             dependencies: vec![],

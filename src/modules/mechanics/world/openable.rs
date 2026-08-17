@@ -13,11 +13,10 @@
 
 use crate::config::ConfigManager;
 use crate::mechanics::mechanic::Mechanic;
+use crate::utils::block::toggle_open_property;
 use crate::{GameMode, InteractAction};
 use pumpkin_plugin_api::events::{EventData, EventHandler, EventPriority, PlayerInteractEvent};
-use pumpkin_plugin_api::world::{
-    BlockFlags, BlockPos, BlockStateInfo, World, block_state_to_info, resolve_block_state,
-};
+use pumpkin_plugin_api::world::{BlockFlags, BlockPos, World, block_state_to_info};
 use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};
 
@@ -89,10 +88,10 @@ impl EventHandler<PlayerInteractEvent> for Openable {
             return event;
         }
 
-        let Some(new_clicked_id) = toggle_open(&clicked_info) else {
+        let Some(new_clicked_id) = toggle_open_property(&clicked_info) else {
             return event;
         };
-        let Some(new_adjacent_id) = toggle_open(&adjacent_info) else {
+        let Some(new_adjacent_id) = toggle_open_property(&adjacent_info) else {
             return event;
         };
 
@@ -140,23 +139,6 @@ fn find_adjacent_door(world: &World, pos: BlockPos) -> Option<BlockPos> {
     }
 
     None
-}
-
-/// Returns the state ID of the same door with the `open` property flipped.
-fn toggle_open(info: &BlockStateInfo) -> Option<u16> {
-    let mut properties = info.properties.clone();
-    for (key, value) in &mut properties {
-        if key == "open" {
-            *value = if value == "true" {
-                "false".into()
-            } else {
-                "true".into()
-            };
-            break;
-        }
-    }
-
-    resolve_block_state(&info.name, &properties)
 }
 
 /// Configuration for the openable mechanics module.

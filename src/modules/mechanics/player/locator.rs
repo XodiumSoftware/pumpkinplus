@@ -12,12 +12,13 @@
 //! |-----------|---------|-------------------------------|
 //! | `enabled` | `false` | Whether this module is active |
 
+use crate::utils::command::default_permission;
 use crate::{PLUGIN_ID, config::ConfigManager, mechanics::mechanic::Mechanic};
 use pumpkin_plugin_api::{
     Server,
     command::{Command, CommandError, CommandNode, CommandSender, ConsumedArgs},
     commands::CommandHandler,
-    permission::{Permission, PermissionDefault},
+    permission::Permission,
     text::TextComponent,
 };
 use serde::{Deserialize, Serialize};
@@ -43,12 +44,11 @@ impl Mechanic for Locator {
     }
 
     fn perms(&self) -> Vec<Permission> {
-        vec![Permission {
-            node: format!("{PLUGIN_ID}:command.locator"),
-            description: "Allows using the /locator and /lc commands.".to_string(),
-            default: PermissionDefault::Allow,
-            children: vec![],
-        }]
+        vec![default_permission(
+            PLUGIN_ID,
+            "locator",
+            "Allows using the /locator and /lc commands.",
+        )]
     }
 }
 

@@ -17,6 +17,7 @@
 
 use crate::config::ConfigManager;
 use crate::mechanics::mechanic::Mechanic;
+use crate::utils::placeholders::replace_placeholders;
 use pumpkin_plugin_api::events::{EventData, EventHandler, EventPriority, PlayerChatEvent};
 use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};
@@ -60,10 +61,10 @@ impl EventHandler<PlayerChatEvent> for Chat {
         if !config.chat_format.is_empty() {
             let name = event.player.get_display_name().get_text();
             let original = event.message.clone();
-            event.message = config
-                .chat_format
-                .replace("{player}", &name)
-                .replace("{message}", &original);
+            event.message = replace_placeholders(
+                &config.chat_format,
+                &[("{player}", name.as_str()), ("{message}", &original)],
+            );
         }
 
         event

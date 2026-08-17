@@ -17,6 +17,7 @@
 
 use crate::config::ConfigManager;
 use crate::mechanics::mechanic::Mechanic;
+use crate::utils::placeholders::replace_player_placeholders;
 use pumpkin_plugin_api::events::{
     EventData, EventHandler, EventPriority, PlayerJoinEvent, PlayerLeaveEvent, PlayerLoginEvent,
 };
@@ -57,9 +58,9 @@ impl EventHandler<PlayerJoinEvent> for Messages {
         if config.join_msg.is_empty() {
             return event;
         }
-        let name = event.player.get_display_name().get_text();
-        event.join_message =
-            TextComponent::text(config.join_msg.replace("{player}", &name).as_str());
+        event.join_message = TextComponent::text(
+            replace_player_placeholders(&config.join_msg, &event.player).as_str(),
+        );
         event
     }
 }
@@ -76,9 +77,9 @@ impl EventHandler<PlayerLeaveEvent> for Messages {
         if config.leave_msg.is_empty() {
             return event;
         }
-        let name = event.player.get_display_name().get_text();
-        event.leave_message =
-            TextComponent::text(config.leave_msg.replace("{player}", &name).as_str());
+        event.leave_message = TextComponent::text(
+            replace_player_placeholders(&config.leave_msg, &event.player).as_str(),
+        );
         event
     }
 }
@@ -95,9 +96,9 @@ impl EventHandler<PlayerLoginEvent> for Messages {
         if config.kick_msg.is_empty() {
             return event;
         }
-        let name = event.player.get_display_name().get_text();
-        event.kick_message =
-            TextComponent::text(config.kick_msg.replace("{player}", &name).as_str());
+        event.kick_message = TextComponent::text(
+            replace_player_placeholders(&config.kick_msg, &event.player).as_str(),
+        );
         event
     }
 }

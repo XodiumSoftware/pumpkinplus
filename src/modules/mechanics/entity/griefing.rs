@@ -25,6 +25,7 @@
 use crate::EntityType;
 use crate::config::ConfigManager;
 use crate::mechanics::mechanic::Mechanic;
+use crate::utils::entity::entity_type_by_id;
 use pumpkin_plugin_api::events::{
     EntityChangeBlockEvent, EntityExplodeEvent, EventData, EventHandler, EventPriority,
 };
@@ -100,18 +101,6 @@ impl EventHandler<EntityExplodeEvent> for Griefing {
         }
         event
     }
-}
-
-/// Looks up an entity's type by ID across all loaded worlds.
-fn entity_type_by_id(server: &Server, id: u32) -> Option<EntityType> {
-    for world in server.get_all_worlds() {
-        for entity in world.get_entities() {
-            if entity.get_id() == id {
-                return Some(EntityType::from(entity.get_type()));
-            }
-        }
-    }
-    None
 }
 
 /// Configuration for the griefing mechanics module.

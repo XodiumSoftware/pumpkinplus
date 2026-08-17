@@ -6,6 +6,15 @@
 #![allow(clippy::must_use_candidate)]
 
 mod config;
+mod utils {
+    pub mod block;
+    pub mod command;
+    pub mod entity;
+    pub mod placeholders;
+    pub mod player;
+    pub mod text;
+}
+
 mod mirror_types {
     pub mod entity_type;
     pub mod gamemode;

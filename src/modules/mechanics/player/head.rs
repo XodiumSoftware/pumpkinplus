@@ -15,22 +15,32 @@
 //! ## Notes
 //!
 //! This module is currently a stub. `PlayerDeathEvent` is now available in the
-//! Pumpkin plugin API, but two capabilities are still missing:
+//! Pumpkin plugin API and is registered below, but two capabilities are still
+//! missing before a physical head item can actually be dropped:
 //!
-//! 1. **Dropping an item at a specific location** — there is no API to spawn or
-//!    drop an `ItemStack` at the player's death position. `World::spawn-entity`
-//!    can create an `item` entity, but there is no way to set its carried stack.
-//! 2. **Applying a skin profile to a player head** — the `profile` data component
-//!    is exposed, but `ItemStack::set-component` requires raw serialized component
-//!    bytes and no helper is available to build a player profile component.
+//! 1. **Spawning an item entity with a specific `ItemStack`** — `World::spawn-entity`
+//!    can create an `item` entity, but the returned `entity` handle has no method
+//!    to set the stack it carries (e.g. `set_item_stack` or similar).
+//! 2. **Applying a player skin profile to a player head** — the `profile` data
+//!    component is exposed in `pumpkin:plugin/data-components`, and
+//!    `ItemStack::set-component` accepts raw serialized bytes, but there is no
+//!    helper to serialize a `minecraft:profile` component from a `PlayerSkin` or
+//!    username.
 //!
-//! Once upstream adds helpers for dropping an `ItemStack` and setting a player
-//! profile component, the TODO below can be implemented.
+//! Once upstream adds those two helpers, replace the debug logging below with:
+//!
+//! - Roll `skull_drop_chance`; abort if it fails.
+//! - Create `ItemStack("minecraft:player_head", 1)`.
+//! - Set the `minecraft:profile` component using the dying player's skin.
+//! - Spawn or drop the item at the player's death location.
 
 use crate::config::ConfigManager;
 use crate::mechanics::mechanic::Mechanic;
 use pumpkin_plugin_api::Context;
+use pumpkin_plugin_api::Server;
+use pumpkin_plugin_api::events::{EventData, EventHandler, EventPriority, PlayerDeathEvent};
 use serde::{Deserialize, Serialize};
+use tracing::info;
 
 /// Handles player head drops on death.
 #[derive(Default)]
@@ -41,21 +51,43 @@ impl Mechanic for Head {
         ConfigManager::get().is_some_and(|cm| cm.head.enabled)
     }
 
-    fn events(&self, _context: &Context) {
-        // TODO: Implement when the Pumpkin plugin API exposes:
+    fn events(&self, context: &Context) {
+        context
+            .register_event_handler::<PlayerDeathEvent, _>(Head, EventPriority::Normal, true)
+            .expect("failed to register player death event handler");
+    }
+}
+
+impl EventHandler<PlayerDeathEvent> for Head {
+    fn handle(
+        &self,
+        _server: Server,
+        event: EventData<PlayerDeathEvent>,
+    ) -> EventData<PlayerDeathEvent> {
+        let config = ConfigManager::get().map(|cm| cm.head).unwrap_or_default();
+        let name = event.player.get_name();
+
+        info!(
+            "PlayerDeathEvent fired for {name}; skull_drop_chance is {}. \
+             Head drop is not yet implemented because the API lacks \
+             (1) a way to set an item entity's carried ItemStack and \
+             (2) a helper to build the minecraft:profile data component.",
+            config.skull_drop_chance
+        );
+
+        // TODO: Implement item drop once the Pumpkin plugin API exposes:
         //
-        // 1. A way to drop or spawn an ItemStack at a specific world position.
-        //    `World::spawn-entity` can spawn an `item` entity, but there is no
-        //    method to set the item it carries.
-        // 2. A helper to set the `minecraft:profile` data component on a player
-        //    head ItemStack from a player/skin handle.
+        // 1. A method on spawned `item` entities to set their carried `ItemStack`.
+        // 2. A helper to serialize a `minecraft:profile` component from a
+        //    `PlayerSkin` (event.player.get_skin()) or username.
         //
-        // Intended logic once both are available:
-        // - Register a `PlayerDeathEvent` handler.
-        // - Roll `skull_drop_chance`; abort if it fails.
-        // - Create a player head ItemStack ("minecraft:player_head").
-        // - Apply the dying player's skin profile to the head item.
-        // - Drop the head naturally at the player's death location.
+        // Intended logic:
+        // - Use a random roll against `config.skull_drop_chance`; return early if it fails.
+        // - Create `ItemStack::new("minecraft:player_head", 1)`.
+        // - Apply the dying player's profile/skin via `ItemStack::set_component`.
+        // - Spawn or drop the item at `event.player.get_position()` in `event.player.get_world()`.
+
+        event
     }
 }
 

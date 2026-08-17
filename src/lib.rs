@@ -65,7 +65,6 @@ pub use modules::mechanics::server::chat::ChatConfig;
 pub use modules::mechanics::server::tablist::TablistConfig;
 pub use modules::mechanics::world::openable::OpenableConfig;
 
-// use crate::mechanics::entity::griefing::Griefing;
 use crate::mechanics::entity::griefing::Griefing;
 use crate::mechanics::player::enderchest::Enderchest;
 use crate::mechanics::player::nickname::Nickname;

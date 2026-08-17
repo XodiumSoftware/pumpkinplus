@@ -9,7 +9,11 @@ if [[ "${1:-}" == "--release" ]] || [[ "${1:-}" == "-r" ]]; then
     PROFILE="release"
 fi
 
-cargo build --target wasm32-wasip2 ${PROFILE:+--$PROFILE}
+if [[ "$PROFILE" == "release" ]]; then
+    cargo build --target wasm32-wasip2 --release
+else
+    cargo build --target wasm32-wasip2
+fi
 
 if [ "$PROFILE" == "debug" ]; then
     SRC="target/wasm32-wasip2/debug/pumpkinplus.wasm"

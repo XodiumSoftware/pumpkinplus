@@ -66,7 +66,7 @@ pub use modules::mechanics::server::tablist::TablistConfig;
 pub use modules::mechanics::world::openable::OpenableConfig;
 
 // use crate::mechanics::entity::griefing::Griefing;
-// use crate::mechanics::player::enderchest::Enderchest;
+use crate::mechanics::player::enderchest::Enderchest;
 use crate::mechanics::player::nickname::Nickname;
 // use crate::mechanics::player::locator::Locator;
 use crate::mechanics::player::messages::Messages;
@@ -116,7 +116,7 @@ impl Plugin for PumpkinPlus {
         // let griefing = Griefing;
         // let spawn_egg = SpawnEgg;
         // let tameable = Tameable;
-        // let enderchest = Enderchest;
+        let enderchest = Enderchest;
         // let head = Head;
         let nickname = Nickname;
         // let locator = Locator;
@@ -128,10 +128,12 @@ impl Plugin for PumpkinPlus {
             // &griefing,
             // &spawn_egg,
             // &tameable,
-            // &enderchest,
+            &enderchest,
             // &head,
             &nickname, // &locator,
-            &messages, &chat, &tablist,
+            &messages,
+            &chat,
+            &tablist,
             // &openable,
         ];
         let enabled_count = modules.iter().filter(|m| m.enabled()).count();

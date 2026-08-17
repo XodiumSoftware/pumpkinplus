@@ -1,19 +1,29 @@
-//! Enderchest module - per-player enderchest sharing and management.
+//! Enderchest module - portable per-player enderchest access.
 //!
 //! ## Configuration
 //!
-//! | Field       | Default                | Description                               |
-//! |-------------|------------------------|-------------------------------------------|
-//! | `enabled`   | `false`                | Whether this module is active             |
+//! | Field       | Default                     | Description                               |
+//! |-------------|-----------------------------|-------------------------------------------|
+//! | `enabled`   | `false`                     | Whether this module is active             |
 //! | `gamemodes` | `["Survival", "Adventure"]` | Gamemodes allowed to use enderchests      |
-//! | `actions`   | `["RightClickAir"]`        | Interaction actions that trigger the GUI  |
+//! | `actions`   | `["RightClickAir"]`         | Interaction actions that trigger the GUI  |
+//!
+//! ## Mechanics
+//!
+//! When a player right-clicks in the air while holding an ender chest item,
+//! their personal ender chest inventory screen is opened. This makes the ender
+//! chest portable.
 
 use crate::config::ConfigManager;
 use crate::mechanics::mechanic::Mechanic;
 use crate::{GameMode, InteractAction};
+use pumpkin_plugin_api::common::Hand;
 use pumpkin_plugin_api::events::{EventData, EventHandler, EventPriority, PlayerInteractEvent};
 use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};
+
+/// Registry key for the ender chest item.
+const ENDER_CHEST_ITEM: &str = "ender_chest";
 
 /// Handles enderchest mechanics.
 #[derive(Default)]
@@ -39,7 +49,7 @@ impl EventHandler<PlayerInteractEvent> for Enderchest {
     fn handle(
         &self,
         _server: Server,
-        event: EventData<PlayerInteractEvent>,
+        mut event: EventData<PlayerInteractEvent>,
     ) -> EventData<PlayerInteractEvent> {
         if !self.enabled() {
             return event;
@@ -54,7 +64,11 @@ impl EventHandler<PlayerInteractEvent> for Enderchest {
             return event;
         }
 
-        if event.block != "minecraft:ender_chest" {
+        let Some(item) = event.player.get_item_in_hand(Hand::Right) else {
+            return event;
+        };
+
+        if item.get_registry_key() != ENDER_CHEST_ITEM {
             return event;
         }
 
@@ -63,7 +77,8 @@ impl EventHandler<PlayerInteractEvent> for Enderchest {
             return event;
         }
 
-        //TODO: notify api-maintainers to add enderchest support.
+        event.player.open_ender_chest();
+        event.cancelled = true;
 
         event
     }

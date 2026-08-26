@@ -6,6 +6,7 @@
 use pumpkin_plugin_api::Context;
 use pumpkin_plugin_api::command::Command;
 use pumpkin_plugin_api::permission::Permission;
+use tracing::error;
 
 /// A trait representing a plugin mechanic that can be enabled or disabled.
 ///
@@ -50,7 +51,9 @@ pub trait Mechanic {
         self.events(context);
         let perms = self.perms();
         for perm in &perms {
-            let _ = context.register_permission(perm);
+            if let Err(e) = context.register_permission(perm) {
+                error!("Failed to register permission '{}': {e}", perm.node);
+            }
         }
 
         let perm_nodes: Vec<String> = perms.into_iter().map(|p| p.node).collect();

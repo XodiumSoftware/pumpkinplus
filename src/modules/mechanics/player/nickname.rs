@@ -158,7 +158,7 @@ impl CommandHandler for NicknameExecutor {
             store.set(&data_folder, &uuid, String::new());
             update_player(&player, None);
             sender.send_message(TextComponent::text("Nickname cleared."));
-            return Ok(0);
+            return Ok(1);
         };
 
         let trimmed = nickname.trim();
@@ -174,7 +174,7 @@ impl CommandHandler for NicknameExecutor {
             )));
         }
 
-        Ok(0)
+        Ok(1)
     }
 }
 

@@ -9,14 +9,11 @@
 //! ## Door knock
 //!
 //! When a player left-clicks a door while sneaking with an empty main hand,
-//! a knocking sound is played at the door. The event is cancelled so the door
-//! is not damaged.
+//! the interaction is cancelled so the door is not damaged.
 //!
-//! > **Note:** Pumpkin's current WASM host has a bug in `world.play-sound`
-//! > sound-name conversion (it lowercases the enum variant and replaces
-//! > underscores with dots, but the variants are PascalCase without underscores,
-//! > so no sound is actually emitted). The knock code is in place and will work
-//! > once upstream fixes the conversion.
+//! > **Note:** `world.play_sound()` relies on a `Sound` enum that is not currently
+//! > exported by `pumpkin-plugin-api`, so the knock sound is disabled until the
+//! > API exposes it.
 //!
 //! ## Configuration
 //!
@@ -25,7 +22,7 @@
 //! | `enabled`              | `false`                       | Whether this module is active                          |
 //! | `gamemodes`            | `["Survival", "Adventure"]`   | Gamemodes that trigger door sync                       |
 //! | `actions`              | `["RightClickBlock"]`         | Actions that trigger door sync                         |
-//! | `knock_enabled`        | `true`                        | Whether sneaking left-click door knocking is enabled   |
+//! | `knock_enabled`        | `false`                       | Whether sneaking left-click door knocking is enabled   |
 //! | `knock_gamemodes`      | `["Survival", "Adventure"]`   | Gamemodes allowed to knock                             |
 //! | `knock_sneaking_required` | `true`                     | Whether the player must be sneaking to knock           |
 
@@ -217,17 +214,8 @@ fn handle_knock(
         return event;
     }
 
-    info!("[Openable] playing knock sound at {:?}", clicked_pos);
-    world.play_sound(
-        pumpkin_plugin_api::world::Sound::EntityZombieAttackWoodenDoor,
-        pumpkin_plugin_api::world::SoundCategory::Master,
-        block_center(clicked_pos),
-        1.0,
-        1.0,
-    );
-
-    event.cancelled = true;
     info!("[Openable] knock handled and event cancelled");
+    event.cancelled = true;
     event
 }
 
@@ -267,6 +255,7 @@ fn find_adjacent_door(world: &World, pos: BlockPos) -> Option<BlockPos> {
 }
 
 /// Returns the center of a block position as a world position.
+#[expect(dead_code)]
 fn block_center(pos: BlockPos) -> (f64, f64, f64) {
     (
         f64::from(pos.x) + 0.5,
@@ -286,8 +275,8 @@ pub struct OpenableConfig {
     pub actions: Vec<InteractAction>,
     /// Whether sneaking left-click door knocking is enabled.
     ///
-    /// Note: sound playback is currently broken in Pumpkin's WASM host
-    /// (see module-level docs). Disable or leave disabled until fixed.
+    /// Note: sound playback is currently disabled because `pumpkin-plugin-api`
+    /// does not export the `Sound` enum required by `world.play_sound()`.
     pub knock_enabled: bool,
     /// List of gamemodes allowed to knock on doors. Leave empty to allow all.
     pub knock_gamemodes: Vec<GameMode>,

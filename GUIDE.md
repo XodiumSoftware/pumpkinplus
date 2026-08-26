@@ -190,7 +190,7 @@ When enabled, players can use `/nickname <name>` or `/nick <name>` to set a nick
 When enabled:
 
 - Right-clicking one door of a double-door pair toggles both doors together.
-- Sneaking and left-clicking a door with an empty main hand knocks on it (sound playback depends on upstream Pumpkin support).
+- Sneaking and left-clicking a door with an empty main hand cancels the interaction so the door is not damaged. (A knock sound is planned but disabled until the Pumpkin API exports the `Sound` enum.)
 
 ### Tablist Module
 

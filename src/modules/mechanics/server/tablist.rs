@@ -24,9 +24,14 @@ use pumpkin_plugin_api::events::{
     EventData, EventHandler, EventPriority, PlayerJoinEvent, PlayerLeaveEvent,
 };
 use pumpkin_plugin_api::player::Player;
+use pumpkin_plugin_api::scheduler::SchedulerExt;
 use pumpkin_plugin_api::text::TextComponent;
 use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};
+
+/// Refresh interval for live tab-list placeholders such as `{tps}` and `{mspt}`.
+/// 40 ticks = 2 seconds.
+const REFRESH_TICKS: u64 = 40;
 
 /// Handles tab-list mechanics, including custom messages.
 #[derive(Default)]
@@ -44,6 +49,11 @@ impl Mechanic for Tablist {
         context
             .register_event_handler::<PlayerLeaveEvent, _>(Tablist, EventPriority::Normal, true)
             .expect("failed to register tablist leave event handler");
+
+        // Keep live placeholders (TPS/MSPT) current for all online players.
+        context.schedule_repeating_task(REFRESH_TICKS, REFRESH_TICKS, |server| {
+            Self::update_tablist_for_all_players(&server);
+        });
     }
 }
 

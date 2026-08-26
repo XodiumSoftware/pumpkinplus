@@ -62,7 +62,7 @@ Build the plugin yourself using Rust.
 
 The plugin uses a JSON configuration file (`config.json`) that is automatically created on first run.
 
-> **Note:** All gameplay mechanics and recipe packs are disabled by default. Enable the modules you want in `config.json` and restart the server.
+> **Note:** All gameplay mechanics, recipe packs, and enchantment overrides are disabled by default. Enable the modules you want in `config.json` and restart the server.
 
 ### Default Config Structure
 
@@ -121,6 +121,11 @@ The plugin uses a JSON configuration file (`config.json`) that is automatically 
     "wood_log": false,
     "wool_to_string": false
   },
+  "enchantments": {
+    "feather_falling": false,
+    "fortune": false,
+    "silk_touch": false
+  },
   "tablist": {
     "enabled": false,
     "header": "",
@@ -140,6 +145,14 @@ The plugin uses a JSON configuration file (`config.json`) that is automatically 
 | `nickname` | Set a persistent nickname via `/nickname` or `/nick` | Disabled |
 | `openable` | Synchronize double doors and sneaky door-knocking | Disabled |
 | `tablist` | Custom tab-list header/footer with live placeholders | Disabled |
+
+### Enchantment Overrides
+
+| Config Field | Description | Default |
+|--------------|-------------|---------|
+| `enchantments.feather_falling` | Cancel farmland trampling when wearing Feather Falling boots | Disabled |
+| `enchantments.fortune` | Auto-replant mature crops when broken with a Fortune hoe | Disabled |
+| `enchantments.silk_touch` | Drop spawners and budding amethyst when broken with Silk Touch pickaxes | Disabled |
 
 ### Recipe Packs
 
@@ -224,6 +237,18 @@ Each recipe pack can be enabled independently in the `recipes` section of `confi
 | RottenFlesh | `rotten_flesh` | Cook rotten flesh into leather via furnace, smoker, and campfire |
 | WoodLog | `wood_log` | Convert wood/hyphae blocks back into 4 logs/stems |
 | WoolToString | `wool_to_string` | Convert any wool block into 4 string |
+
+### Enchantments
+
+Each enchantment behavior override can be enabled independently in the `enchantments`
+section of `config.json`. These overrides do **not** add new enchantments; they change
+how existing vanilla enchantments behave.
+
+| Override | Config Field | Description |
+|----------|--------------|-------------|
+| FeatherFalling | `feather_falling` | Cancel farmland trampling when wearing Feather Falling boots |
+| Fortune | `fortune` | Auto-replant mature crops when broken with a hoe carrying at least Fortune II |
+| SilkTouch | `silk_touch` | Drop spawners and budding amethyst when broken with a Silk Touch pickaxe |
 
 ## Commands & Permissions
 

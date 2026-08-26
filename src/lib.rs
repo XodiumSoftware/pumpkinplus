@@ -26,6 +26,20 @@ pub use mirror_types::gamemode::GameMode;
 pub use mirror_types::interaction::InteractAction;
 
 mod modules {
+    pub mod enchantments {
+        pub mod enchantment;
+        pub mod utility {
+            pub mod embertread;
+            pub mod nimbus;
+            pub mod tether;
+            pub mod vinemine;
+        }
+        pub mod vanilla {
+            pub mod feather_falling;
+            pub mod fortune;
+            pub mod silk_touch;
+        }
+    }
     pub mod recipes {
         pub mod recipe;
         pub mod vanilla {
@@ -62,6 +76,7 @@ mod modules {
 pub use config::*;
 pub use modules::*;
 
+pub use modules::enchantments::enchantment::EnchantmentsConfig;
 pub use modules::mechanics::entity::griefing::GriefingConfig;
 pub use modules::mechanics::player::enderchest::EnderchestConfig;
 pub use modules::mechanics::player::messages::MessagesConfig;
@@ -79,6 +94,8 @@ use crate::mechanics::player::nickname::Nickname;
 use crate::mechanics::server::chat::Chat;
 use crate::mechanics::server::tablist::Tablist;
 use crate::mechanics::world::openable::Openable;
+use crate::modules::enchantments::enchantment::Enchantment;
+use crate::modules::enchantments::vanilla::fortune::Fortune;
 use crate::modules::recipes::recipe::Recipe;
 use crate::modules::recipes::vanilla::chainmail::Chainmail;
 use crate::modules::recipes::vanilla::diamond_recycle::DiamondRecycle;
@@ -180,6 +197,22 @@ impl Plugin for PumpkinPlus {
             "Registered: {registered_count} recipe(s) ({} enabled pack(s)) | Took {recipe_total_ms}ms",
             enabled_recipes
         );
+
+        // Enchantment behavior overrides (no new enchantments registered)
+        let enchantments: Vec<&dyn Enchantment> = vec![&Fortune];
+
+        let enabled_enchantments = enchantments.iter().filter(|e| e.enabled()).count();
+        let mut enchantment_total_ms = 0u128;
+        for enchantment in enchantments {
+            let start = Instant::now();
+            enchantment.register(&context);
+            enchantment_total_ms += start.elapsed().as_millis();
+        }
+        info!(
+            "Registered: {} enchantment override(s) | Took {}ms",
+            enabled_enchantments, enchantment_total_ms
+        );
+
         info!("Pumpkin+ loaded. NICE TO CYA!");
         Ok(())
     }

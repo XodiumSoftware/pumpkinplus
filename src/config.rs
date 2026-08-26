@@ -14,6 +14,7 @@ use std::fs;
 use std::path::PathBuf;
 use tracing::error;
 
+pub use crate::modules::enchantments::enchantment::EnchantmentsConfig;
 pub use crate::modules::mechanics::entity::griefing::GriefingConfig;
 pub use crate::modules::mechanics::player::enderchest::EnderchestConfig;
 pub use crate::modules::mechanics::player::messages::MessagesConfig;
@@ -50,6 +51,8 @@ pub struct PluginConfig {
     pub openable: OpenableConfig,
     /// Custom recipe pack toggles.
     pub recipes: RecipesConfig,
+    /// Vanilla enchantment behavior override toggles.
+    pub enchantments: EnchantmentsConfig,
 }
 
 /// Loads and provides access to the plugin configuration.

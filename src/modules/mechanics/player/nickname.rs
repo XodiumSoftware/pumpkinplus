@@ -1,4 +1,4 @@
-//! Nickname module — set or remove player nicknames with JSON persistence.
+//! Nickname module — set or remove player nicknames.
 //!
 //! ## Commands
 //!
@@ -16,16 +16,14 @@
 //!
 //! - `/nickname` — clears the player's nickname.
 //! - `/nickname <name>` — sets the player's nickname.
-//! - Nicknames are persisted in `{data_folder}/nicknames.json`.
+//! - Nicknames are persisted on the player's entity via `PersistentDataHolder`.
 //! - On join, the stored nickname is applied to the player's display name and tab list name.
-//! - A confirmation message is sent via the action bar.
 
 use crate::utils::command::default_permission;
-use crate::utils::player::uuid_string;
 use crate::utils::text::parse_legacy_text;
 use crate::{PLUGIN_ID, config::ConfigManager, mechanics::mechanic::Mechanic};
 use pumpkin_plugin_api::{
-    Context, Server,
+    Context, PersistentDataHolder, Server,
     command::{Command, CommandError, CommandNode, CommandSender, ConsumedArgs},
     command_wit::{Arg, ArgumentType, StringType},
     commands::CommandHandler,
@@ -35,66 +33,11 @@ use pumpkin_plugin_api::{
     text::TextComponent,
 };
 use serde::{Deserialize, Serialize};
-use std::cell::RefCell;
-use std::collections::HashMap;
-use std::fs;
-use std::path::PathBuf;
-use tracing::error;
 
-thread_local! {
-    static DATA_FOLDER: RefCell<Option<String>> = const { RefCell::new(None) };
-}
-
-/// Stores and retrieves player nicknames from `{data_folder}/nicknames.json`.
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
-struct NicknamesStore {
-    nicknames: HashMap<String, String>,
-}
-
-impl NicknamesStore {
-    /// Builds the file path for `nicknames.json` inside the given data folder.
-    fn path(data_folder: &str) -> PathBuf {
-        PathBuf::from(data_folder.trim_start_matches("./")).join("nicknames.json")
-    }
-
-    fn load(data_folder: &str) -> Self {
-        let path = Self::path(data_folder);
-        if path.exists() {
-            fs::read_to_string(&path)
-                .ok()
-                .and_then(|s| serde_json::from_str(&s).ok())
-                .unwrap_or_default()
-        } else {
-            Self::default()
-        }
-    }
-
-    fn save(&self, data_folder: &str) {
-        let path = Self::path(data_folder);
-        if let Some(parent) = path.parent() {
-            fs::create_dir_all(parent).ok();
-        }
-        fs::write(
-            &path,
-            serde_json::to_string_pretty(self).unwrap_or_default(),
-        )
-        .inspect_err(|e| error!("Failed to write nicknames.json: {}", e))
-        .ok();
-    }
-
-    fn get(&self, uuid: &str) -> Option<&String> {
-        self.nicknames.get(uuid)
-    }
-
-    fn set(&mut self, data_folder: &str, uuid: &str, nickname: String) {
-        if nickname.is_empty() {
-            self.nicknames.remove(uuid);
-        } else {
-            self.nicknames.insert(uuid.to_string(), nickname);
-        }
-        self.save(data_folder);
-    }
-}
+/// Plugin namespace for persistent data keys.
+const DATA_NAMESPACE: &str = "pumpkinplus";
+/// Persistent data key storing a player's nickname.
+const NICKNAME_KEY: &str = "nickname";
 
 /// Handles player nicknames.
 #[derive(Default)]
@@ -129,10 +72,6 @@ impl Mechanic for Nickname {
     }
 
     fn events(&self, context: &Context) {
-        DATA_FOLDER.with(|f| {
-            *f.borrow_mut() = Some(context.get_data_folder().clone());
-        });
-
         context
             .register_event_handler::<PlayerJoinEvent, _>(Nickname, EventPriority::Normal, true)
             .expect("failed to register nickname join event handler");
@@ -149,13 +88,9 @@ impl CommandHandler for NicknameExecutor {
         args: ConsumedArgs,
     ) -> Result<i32, CommandError> {
         let player = sender.as_player().ok_or(CommandError::PermissionDenied)?;
-        let uuid = uuid_string(&player);
-
-        let data_folder = DATA_FOLDER.with(|f| f.borrow().clone().unwrap_or_default());
-        let mut store = NicknamesStore::load(&data_folder);
 
         let (Arg::Simple(nickname) | Arg::Msg(nickname)) = args.get_value("name") else {
-            store.set(&data_folder, &uuid, String::new());
+            player.remove_custom_data(DATA_NAMESPACE, NICKNAME_KEY);
             update_player(&player, None);
             sender.send_message(TextComponent::text("Nickname cleared."));
             return Ok(1);
@@ -163,11 +98,11 @@ impl CommandHandler for NicknameExecutor {
 
         let trimmed = nickname.trim();
         if trimmed.is_empty() {
-            store.set(&data_folder, &uuid, String::new());
+            player.remove_custom_data(DATA_NAMESPACE, NICKNAME_KEY);
             update_player(&player, None);
             sender.send_message(TextComponent::text("Nickname cleared."));
         } else {
-            store.set(&data_folder, &uuid, trimmed.to_string());
+            player.set_string(DATA_NAMESPACE, NICKNAME_KEY, trimmed);
             update_player(&player, Some(trimmed));
             sender.send_message(TextComponent::text(&format!(
                 "Nickname updated to: {trimmed}"
@@ -188,12 +123,8 @@ impl EventHandler<PlayerJoinEvent> for Nickname {
             return event;
         }
 
-        let data_folder = DATA_FOLDER.with(|f| f.borrow().clone().unwrap_or_default());
-        let store = NicknamesStore::load(&data_folder);
-        let uuid = uuid_string(&event.player);
-
-        if let Some(nickname) = store.get(&uuid) {
-            update_player(&event.player, Some(nickname));
+        if let Some(nickname) = event.player.get_string(DATA_NAMESPACE, NICKNAME_KEY) {
+            update_player(&event.player, Some(&nickname));
         }
 
         event

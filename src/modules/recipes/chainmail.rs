@@ -12,6 +12,7 @@
 //! | Chainmail Leggings  | `AAA`, `A A`, `A A`    | `A` = iron bars |
 //! | Chainmail Boots     | `A A`, `A A`           | `A` = iron bars |
 
+use crate::config::ConfigManager;
 use crate::modules::recipes::recipe::{Ingredient, Recipe, RecipeItemStack, ShapedRecipe};
 
 /// Handles chainmail armor recipe registration.
@@ -19,6 +20,10 @@ use crate::modules::recipes::recipe::{Ingredient, Recipe, RecipeItemStack, Shape
 pub struct Chainmail;
 
 impl Recipe for Chainmail {
+    fn enabled(&self) -> bool {
+        ConfigManager::get().is_some_and(|cm| cm.recipes.chainmail)
+    }
+
     fn shaped(&self) -> Vec<ShapedRecipe> {
         vec![
             // Chainmail Helmet

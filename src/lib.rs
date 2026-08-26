@@ -64,6 +64,7 @@ pub use modules::mechanics::player::nickname::NicknameConfig;
 pub use modules::mechanics::server::chat::ChatConfig;
 pub use modules::mechanics::server::tablist::TablistConfig;
 pub use modules::mechanics::world::openable::OpenableConfig;
+pub use modules::recipes::recipe::RecipesConfig;
 
 use crate::mechanics::entity::griefing::Griefing;
 use crate::mechanics::mechanic::Mechanic;
@@ -142,7 +143,6 @@ impl Plugin for PumpkinPlus {
             enabled_count, total_ms
         );
 
-        // TODO: Recipe registration (no config toggles yet — always on)
         let recipes: Vec<&dyn Recipe> = vec![
             &Chainmail,
             &DiamondRecycle,
@@ -151,9 +151,13 @@ impl Plugin for PumpkinPlus {
             &WoodLog,
         ];
 
+        let enabled_recipes = recipes.iter().filter(|r| r.enabled()).count();
         let mut registered_count = 0u32;
         let mut recipe_total_ms = 0u128;
         for recipe in recipes {
+            if !recipe.enabled() {
+                continue;
+            }
             let start = Instant::now();
             match recipe.register(&context) {
                 Ok(()) => registered_count += recipe.count(),
@@ -161,7 +165,10 @@ impl Plugin for PumpkinPlus {
             }
             recipe_total_ms += start.elapsed().as_millis();
         }
-        info!("Registered: {registered_count} recipe(s) | Took {recipe_total_ms}ms");
+        info!(
+            "Registered: {registered_count} recipe(s) ({} enabled pack(s)) | Took {recipe_total_ms}ms",
+            enabled_recipes
+        );
         info!("Pumpkin+ loaded. NICE TO CYA!");
         Ok(())
     }

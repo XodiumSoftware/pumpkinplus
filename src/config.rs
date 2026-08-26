@@ -21,6 +21,7 @@ pub use crate::modules::mechanics::player::nickname::NicknameConfig;
 pub use crate::modules::mechanics::server::chat::ChatConfig;
 pub use crate::modules::mechanics::server::tablist::TablistConfig;
 pub use crate::modules::mechanics::world::openable::OpenableConfig;
+pub use crate::modules::recipes::recipe::RecipesConfig;
 
 thread_local! {
     static CONFIG: RefCell<Option<PluginConfig>> = const { RefCell::new(None) };
@@ -47,6 +48,8 @@ pub struct PluginConfig {
     pub tablist: TablistConfig,
     /// Double-door synchronization.
     pub openable: OpenableConfig,
+    /// Custom recipe pack toggles.
+    pub recipes: RecipesConfig,
 }
 
 /// Loads and provides access to the plugin configuration.

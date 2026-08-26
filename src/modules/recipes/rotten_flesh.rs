@@ -10,6 +10,7 @@
 //! | Smoker   | 1× Leather | 0.1  | 100          |
 //! | Campfire | 1× Leather | 0.05 | 600          |
 
+use crate::config::ConfigManager;
 use crate::modules::recipes::recipe::{
     CookingKind, CookingRecipe, Ingredient, Recipe, RecipeItemStack,
 };
@@ -19,6 +20,10 @@ use crate::modules::recipes::recipe::{
 pub struct RottenFlesh;
 
 impl Recipe for RottenFlesh {
+    fn enabled(&self) -> bool {
+        ConfigManager::get().is_some_and(|cm| cm.recipes.rotten_flesh)
+    }
+
     fn cooking(&self) -> Vec<CookingRecipe> {
         vec![
             // Furnace

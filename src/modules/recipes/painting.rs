@@ -18,6 +18,7 @@
 //! > recipes, so these are stored as shapeless placeholders. They will need
 //! > upstream support to function identically.
 
+use crate::config::ConfigManager;
 use crate::modules::recipes::recipe::{Ingredient, Recipe, RecipeItemStack, ShapelessRecipe};
 
 /// Handles painting variant recipes.
@@ -28,6 +29,10 @@ use crate::modules::recipes::recipe::{Ingredient, Recipe, RecipeItemStack, Shape
 pub struct Painting;
 
 impl Recipe for Painting {
+    fn enabled(&self) -> bool {
+        ConfigManager::get().is_some_and(|cm| cm.recipes.painting)
+    }
+
     fn shapeless(&self) -> Vec<ShapelessRecipe> {
         // Vanilla painting variants as of Minecraft 1.21.4
         let variants: Vec<&str> = vec![

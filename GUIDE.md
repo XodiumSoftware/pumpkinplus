@@ -62,7 +62,7 @@ Build the plugin yourself using Rust.
 
 The plugin uses a JSON configuration file (`config.json`) that is automatically created on first run.
 
-> **Note:** All gameplay mechanics are disabled by default. Enable the modules you want in `config.json` and restart the server. Recipes are always registered and do not have config toggles.
+> **Note:** All gameplay mechanics and recipe packs are disabled by default. Enable the modules you want in `config.json` and restart the server.
 
 ### Default Config Structure
 
@@ -111,6 +111,13 @@ The plugin uses a JSON configuration file (`config.json`) that is automatically 
     "knock_gamemodes": ["Survival", "Adventure"],
     "knock_sneaking_required": true
   },
+  "recipes": {
+    "chainmail": false,
+    "diamond_recycle": false,
+    "painting": false,
+    "rotten_flesh": false,
+    "wood_log": false
+  },
   "tablist": {
     "enabled": false,
     "header": "",
@@ -130,6 +137,16 @@ The plugin uses a JSON configuration file (`config.json`) that is automatically 
 | `nickname` | Set a persistent nickname via `/nickname` or `/nick` | Disabled |
 | `openable` | Synchronize double doors and sneaky door-knocking | Disabled |
 | `tablist` | Custom tab-list header/footer with live placeholders | Disabled |
+
+### Recipe Packs
+
+| Config Field | Description | Default |
+|--------------|-------------|---------|
+| `recipes.chainmail` | Craft chainmail armor pieces using iron bars | Disabled |
+| `recipes.diamond_recycle` | Smelt diamond tools/armor back into diamonds | Disabled |
+| `recipes.painting` | Placeholder shapeless recipes for painting variants (requires upstream stonecutter / data-component support to match vanilla behavior) | Disabled |
+| `recipes.rotten_flesh` | Cook rotten flesh into leather via furnace, smoker, and campfire | Disabled |
+| `recipes.wood_log` | Convert wood/hyphae blocks back into 4 logs/stems | Disabled |
 
 ### Placeholders
 
@@ -189,15 +206,15 @@ When enabled, sets a custom header and footer for every player's tab list. The h
 
 ### Recipes
 
-The following recipe packs are always registered (no config toggle):
+Each recipe pack can be enabled independently in the `recipes` section of `config.json`:
 
-| Recipe Pack | Description |
-|-------------|-------------|
-| Chainmail | Craft chainmail armor pieces using iron bars |
-| DiamondRecycle | Smelt diamond tools/armor back into diamonds |
-| Painting | Placeholder shapeless recipes for painting variants (requires upstream stonecutter / data-component support to match vanilla behavior) |
-| RottenFlesh | Cook rotten flesh into leather via furnace, smoker, and campfire |
-| WoodLog | Convert wood/hyphae blocks back into 4 logs/stems |
+| Recipe Pack | Config Field | Description |
+|-------------|--------------|-------------|
+| Chainmail | `chainmail` | Craft chainmail armor pieces using iron bars |
+| DiamondRecycle | `diamond_recycle` | Smelt diamond tools/armor back into diamonds |
+| Painting | `painting` | Placeholder shapeless recipes for painting variants (requires upstream stonecutter / data-component support to match vanilla behavior) |
+| RottenFlesh | `rotten_flesh` | Cook rotten flesh into leather via furnace, smoker, and campfire |
+| WoodLog | `wood_log` | Convert wood/hyphae blocks back into 4 logs/stems |
 
 ## Commands & Permissions
 

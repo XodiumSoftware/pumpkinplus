@@ -23,6 +23,7 @@
 //! | `stripped_spruce_wood`| `stripped_spruce_log`|
 //! | ... (all stripped)    | ...                  |
 
+use crate::config::ConfigManager;
 use crate::modules::recipes::recipe::{Ingredient, Recipe, RecipeItemStack, ShapelessRecipe};
 
 /// Handles wood-to-log shapeless conversion recipes.
@@ -30,6 +31,10 @@ use crate::modules::recipes::recipe::{Ingredient, Recipe, RecipeItemStack, Shape
 pub struct WoodLog;
 
 impl Recipe for WoodLog {
+    fn enabled(&self) -> bool {
+        ConfigManager::get().is_some_and(|cm| cm.recipes.wood_log)
+    }
+
     fn shapeless(&self) -> Vec<ShapelessRecipe> {
         let pairs: Vec<(&str, &str)> = vec![
             // Regular

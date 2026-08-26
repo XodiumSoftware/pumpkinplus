@@ -4,6 +4,9 @@
 //! Recipes are registered with the server via [`Recipe::register`] using the upstream
 //! Pumpkin recipe builders.
 //!
+//! Recipe packs can be toggled individually via the `recipes` section of `config.json`;
+//! each pack is disabled by default.
+//!
 //! ## Supported Recipe Types
 //!
 //! | Type        | Pumpkin API Status | Description                          |
@@ -20,6 +23,7 @@ use pumpkin_plugin_api::{
         ShapelessRecipeBuilder,
     },
 };
+use serde::{Deserialize, Serialize};
 use std::time::Instant;
 use tracing::info;
 
@@ -34,6 +38,10 @@ use tracing::info;
 /// pub struct MyRecipes;
 ///
 /// impl Recipe for MyRecipes {
+///     fn enabled(&self) -> bool {
+///         ConfigManager::get().is_some_and(|cm| cm.recipes.my_recipes.enabled)
+///     }
+///
 ///     fn shaped(&self) -> Vec<ShapedRecipe> {
 ///         vec![ShapedRecipe {
 ///             id: "pumpkinplus:example".into(),
@@ -47,6 +55,14 @@ use tracing::info;
 /// }
 /// ```
 pub trait Recipe {
+    /// Returns `true` if this recipe pack is enabled in the configuration.
+    ///
+    /// Defaults to `true` so that recipe packs without a dedicated toggle
+    /// remain registered. Packs that have a config field should override this
+    /// to check `ConfigManager`.
+    fn enabled(&self) -> bool {
+        true
+    }
     /// Returns the shaped crafting recipes to be registered.
     ///
     /// Each entry describes a recipe with a fixed grid pattern. Override this
@@ -87,13 +103,18 @@ pub trait Recipe {
 
     /// Registers all recipes returned by the trait methods with the server.
     ///
-    /// Logs the count and time taken. If no recipes are present this is a
+    /// If the recipe pack is disabled via [`Recipe::enabled`], this is a no-op.
+    /// Otherwise, logs the count and time taken. If no recipes are present this is a
     /// no-op.
     ///
     /// # Errors
     ///
     /// Returns [`RecipeError`] if any upstream recipe registration fails validation.
     fn register(&self, context: &Context) -> Result<(), RecipeError> {
+        if !self.enabled() {
+            return Ok(());
+        }
+
         if !self.has_recipes() {
             return Ok(());
         }
@@ -165,6 +186,26 @@ pub trait Recipe {
 
         Ok(())
     }
+}
+
+/// Top-level configuration for all recipe packs.
+///
+/// Each boolean toggles one recipe pack. All packs are disabled by default
+/// to match the behavior of other gameplay modules.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+#[allow(clippy::struct_excessive_bools)]
+pub struct RecipesConfig {
+    /// Craft chainmail armor pieces using iron bars.
+    pub chainmail: bool,
+    /// Recycle diamond tools and armor back into diamonds.
+    pub diamond_recycle: bool,
+    /// Placeholder recipes for painting variants.
+    pub painting: bool,
+    /// Cook rotten flesh into leather.
+    pub rotten_flesh: bool,
+    /// Convert wood/hyphae blocks back into logs/stems.
+    pub wood_log: bool,
 }
 
 /// A shaped crafting recipe.

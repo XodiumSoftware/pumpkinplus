@@ -16,6 +16,7 @@
 //! `diamond_nautilus_armor`, `diamond_pickaxe`, `diamond_shovel`,
 //! `diamond_spear`, `diamond_sword`
 
+use crate::config::ConfigManager;
 use crate::modules::recipes::recipe::{
     CookingKind, CookingRecipe, Ingredient, Recipe, RecipeItemStack,
 };
@@ -25,6 +26,10 @@ use crate::modules::recipes::recipe::{
 pub struct DiamondRecycle;
 
 impl Recipe for DiamondRecycle {
+    fn enabled(&self) -> bool {
+        ConfigManager::get().is_some_and(|cm| cm.recipes.diamond_recycle)
+    }
+
     fn cooking(&self) -> Vec<CookingRecipe> {
         let inputs: Vec<&str> = vec![
             "minecraft:diamond_axe",

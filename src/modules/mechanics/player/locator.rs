@@ -36,10 +36,10 @@ impl Mechanic for Locator {
         let command = Command::new(
             &["locator".to_string(), "lc".to_string()],
             "Allows players to personalise their locator bar",
-        );
-        command.then(CommandNode::literal("color").execute(LocatorExecutor));
-        command.then(CommandNode::literal("hex").execute(LocatorExecutor));
-        command.then(CommandNode::literal("reset").execute(LocatorExecutor));
+        )
+        .then(CommandNode::literal("color").execute(LocatorExecutor))
+        .then(CommandNode::literal("hex").execute(LocatorExecutor))
+        .then(CommandNode::literal("reset").execute(LocatorExecutor));
         vec![command]
     }
 

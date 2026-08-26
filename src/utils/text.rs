@@ -14,7 +14,7 @@ use pumpkin_plugin_api::text::{NamedColor, TextComponent};
 /// `n` underlined, `o` italic, `r` reset.
 #[must_use]
 pub fn parse_legacy_text(input: &str) -> TextComponent {
-    let root = TextComponent::text("");
+    let mut root = TextComponent::text("");
     let mut current_text = String::new();
     let mut current = TextComponent::text("");
     let mut chars = input.chars().peekable();
@@ -23,9 +23,9 @@ pub fn parse_legacy_text(input: &str) -> TextComponent {
         if ch == '&' {
             // Flush accumulated text before applying the new code.
             if !current_text.is_empty() {
-                current.add_text(&current_text);
+                current = current.add_text(&current_text);
                 current_text.clear();
-                root.add_child(current);
+                root = root.add_child(current);
                 current = TextComponent::text("");
             }
 
@@ -39,24 +39,24 @@ pub fn parse_legacy_text(input: &str) -> TextComponent {
                     current = TextComponent::text("");
                 }
                 'k' => {
-                    current.obfuscated(true);
+                    current = current.obfuscated(true);
                 }
                 'l' => {
-                    current.bold(true);
+                    current = current.bold(true);
                 }
                 'm' => {
-                    current.strikethrough(true);
+                    current = current.strikethrough(true);
                 }
                 'n' => {
-                    current.underlined(true);
+                    current = current.underlined(true);
                 }
                 'o' => {
-                    current.italic(true);
+                    current = current.italic(true);
                 }
                 _ => {
                     if let Some(color) = color_from_code(code_lower) {
                         current = TextComponent::text("");
-                        current.color_named(color);
+                        current = current.color_named(color);
                     }
                     // Unknown codes are ignored.
                 }
@@ -67,11 +67,11 @@ pub fn parse_legacy_text(input: &str) -> TextComponent {
     }
 
     if !current_text.is_empty() {
-        current.add_text(&current_text);
+        current = current.add_text(&current_text);
     }
     // Only add the final child if it has text or styling.
     if !current.get_text().is_empty() || has_style(&current) {
-        root.add_child(current);
+        root = root.add_child(current);
     }
 
     root

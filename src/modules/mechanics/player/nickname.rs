@@ -109,14 +109,14 @@ impl Mechanic for Nickname {
         let command = Command::new(
             &["nickname".to_string(), "nick".to_string()],
             "Set or remove your nickname",
-        );
+        )
         // /nickname <name> — sets nickname
-        command.then(
+        .then(
             CommandNode::argument("name", &ArgumentType::String(StringType::Greedy))
                 .execute(NicknameExecutor),
-        );
+        )
         // /nickname clear — clears nickname
-        command.then(CommandNode::literal("clear").execute(NicknameExecutor));
+        .then(CommandNode::literal("clear").execute(NicknameExecutor));
         vec![command]
     }
 

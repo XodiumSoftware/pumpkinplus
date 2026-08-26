@@ -142,7 +142,7 @@ impl Plugin for PumpkinPlus {
             enabled_count, total_ms
         );
 
-        // Recipe registration (no config toggles yet — always on)
+        // TODO: Recipe registration (no config toggles yet — always on)
         let recipes: Vec<&dyn Recipe> = vec![
             &Chainmail,
             &DiamondRecycle,

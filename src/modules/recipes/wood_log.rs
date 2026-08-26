@@ -23,7 +23,7 @@
 //! | `stripped_spruce_wood`| `stripped_spruce_log`|
 //! | ... (all stripped)    | ...                  |
 
-use crate::modules::recipes::recipe::{Ingredient, ItemStack, Recipe, ShapelessRecipe};
+use crate::modules::recipes::recipe::{Ingredient, RecipeItemStack, Recipe, ShapelessRecipe};
 
 /// Handles wood-to-log shapeless conversion recipes.
 #[derive(Default)]
@@ -95,7 +95,7 @@ impl Recipe for WoodLog {
                 ShapelessRecipe {
                     id: format!("pumpkinplus:{name}_from_wood"),
                     ingredients: vec![Ingredient::Item { id: wood.into() }],
-                    result: ItemStack {
+                    result: RecipeItemStack {
                         id: log.into(),
                         count: 4,
                     },

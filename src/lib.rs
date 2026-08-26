@@ -91,7 +91,7 @@ use crate::modules::recipes::rotten_flesh::RottenFlesh;
 use crate::modules::recipes::wood_log::WoodLog;
 use pumpkin_plugin_api::{Context, Plugin, PluginMetadata};
 use std::time::Instant;
-use tracing::info;
+use tracing::{error, info};
 
 pub const PLUGIN_ID: &str = env!("CARGO_PKG_NAME");
 
@@ -168,12 +168,17 @@ impl Plugin for PumpkinPlus {
             &WoodLog,
         ];
 
-        let mut _recipe_total_ms = 0u128;
+        let mut registered_count = 0u32;
+        let mut recipe_total_ms = 0u128;
         for recipe in recipes {
             let start = Instant::now();
-            recipe.register();
-            _recipe_total_ms += start.elapsed().as_millis();
+            match recipe.register(&context) {
+                Ok(()) => registered_count += recipe.count(),
+                Err(e) => error!("Failed to register recipes: {e}"),
+            }
+            recipe_total_ms += start.elapsed().as_millis();
         }
+        info!("Registered: {registered_count} recipe(s) | Took {recipe_total_ms}ms");
         info!("Pumpkin+ loaded. NICE TO CYA!");
         Ok(())
     }

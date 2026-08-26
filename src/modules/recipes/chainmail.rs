@@ -12,7 +12,7 @@
 //! | Chainmail Leggings  | `AAA`, `A A`, `A A`    | `A` = iron bars |
 //! | Chainmail Boots     | `A A`, `A A`           | `A` = iron bars |
 
-use crate::modules::recipes::recipe::{Ingredient, ItemStack, Recipe, ShapedRecipe};
+use crate::modules::recipes::recipe::{Ingredient, RecipeItemStack, Recipe, ShapedRecipe};
 
 /// Handles chainmail armor recipe registration.
 #[derive(Default)]
@@ -33,7 +33,7 @@ impl Recipe for Chainmail {
                         id: "minecraft:iron_bars".into(),
                     },
                 )],
-                result: ItemStack {
+                result: RecipeItemStack {
                     id: "minecraft:chainmail_helmet".into(),
                     count: 1,
                 },
@@ -50,7 +50,7 @@ impl Recipe for Chainmail {
                         id: "minecraft:iron_bars".into(),
                     },
                 )],
-                result: ItemStack {
+                result: RecipeItemStack {
                     id: "minecraft:chainmail_chestplate".into(),
                     count: 1,
                 },
@@ -67,7 +67,7 @@ impl Recipe for Chainmail {
                         id: "minecraft:iron_bars".into(),
                     },
                 )],
-                result: ItemStack {
+                result: RecipeItemStack {
                     id: "minecraft:chainmail_leggings".into(),
                     count: 1,
                 },
@@ -84,7 +84,7 @@ impl Recipe for Chainmail {
                         id: "minecraft:iron_bars".into(),
                     },
                 )],
-                result: ItemStack {
+                result: RecipeItemStack {
                     id: "minecraft:chainmail_boots".into(),
                     count: 1,
                 },

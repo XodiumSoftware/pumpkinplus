@@ -10,7 +10,7 @@
 //! | Smoker   | 1× Leather | 0.1  | 100          |
 //! | Campfire | 1× Leather | 0.05 | 600          |
 
-use crate::modules::recipes::recipe::{CookingKind, CookingRecipe, Ingredient, ItemStack, Recipe};
+use crate::modules::recipes::recipe::{CookingKind, CookingRecipe, Ingredient, RecipeItemStack, Recipe};
 
 /// Handles rotten-flesh-to-leather conversion recipes.
 #[derive(Default)]
@@ -25,7 +25,7 @@ impl Recipe for RottenFlesh {
                 ingredient: Ingredient::Item {
                     id: "minecraft:rotten_flesh".into(),
                 },
-                result: ItemStack {
+                result: RecipeItemStack {
                     id: "minecraft:leather".into(),
                     count: 1,
                 },
@@ -39,7 +39,7 @@ impl Recipe for RottenFlesh {
                 ingredient: Ingredient::Item {
                     id: "minecraft:rotten_flesh".into(),
                 },
-                result: ItemStack {
+                result: RecipeItemStack {
                     id: "minecraft:leather".into(),
                     count: 1,
                 },
@@ -53,7 +53,7 @@ impl Recipe for RottenFlesh {
                 ingredient: Ingredient::Item {
                     id: "minecraft:rotten_flesh".into(),
                 },
-                result: ItemStack {
+                result: RecipeItemStack {
                     id: "minecraft:leather".into(),
                     count: 1,
                 },

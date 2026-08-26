@@ -18,7 +18,7 @@
 //! > recipes, so these are stored as shapeless placeholders. They will need
 //! > upstream support to function identically.
 
-use crate::modules::recipes::recipe::{Ingredient, ItemStack, Recipe, ShapelessRecipe};
+use crate::modules::recipes::recipe::{Ingredient, RecipeItemStack, Recipe, ShapelessRecipe};
 
 /// Handles painting variant recipes.
 ///
@@ -77,7 +77,7 @@ impl Recipe for Painting {
                 ingredients: vec![Ingredient::Item {
                     id: "minecraft:painting".into(),
                 }],
-                result: ItemStack {
+                result: RecipeItemStack {
                     id: "minecraft:painting".into(),
                     count: 1,
                 },

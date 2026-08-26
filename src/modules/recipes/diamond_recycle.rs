@@ -16,7 +16,7 @@
 //! `diamond_nautilus_armor`, `diamond_pickaxe`, `diamond_shovel`,
 //! `diamond_spear`, `diamond_sword`
 
-use crate::modules::recipes::recipe::{CookingKind, CookingRecipe, Ingredient, ItemStack, Recipe};
+use crate::modules::recipes::recipe::{CookingKind, CookingRecipe, Ingredient, RecipeItemStack, Recipe};
 
 /// Handles diamond gear recycling via blast furnace.
 #[derive(Default)]
@@ -47,7 +47,7 @@ impl Recipe for DiamondRecycle {
                     id.rsplit_once(':').map_or(id, |(_, s)| s)
                 ),
                 ingredient: Ingredient::Item { id: id.into() },
-                result: ItemStack {
+                result: RecipeItemStack {
                     id: "minecraft:diamond".into(),
                     count: 1,
                 },

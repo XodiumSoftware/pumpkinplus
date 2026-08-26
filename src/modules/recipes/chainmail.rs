@@ -12,7 +12,7 @@
 //! | Chainmail Leggings  | `AAA`, `A A`, `A A`    | `A` = iron bars |
 //! | Chainmail Boots     | `A A`, `A A`           | `A` = iron bars |
 
-use crate::modules::recipes::recipe::{Ingredient, RecipeItemStack, Recipe, ShapedRecipe};
+use crate::modules::recipes::recipe::{Ingredient, Recipe, RecipeItemStack, ShapedRecipe};
 
 /// Handles chainmail armor recipe registration.
 #[derive(Default)]

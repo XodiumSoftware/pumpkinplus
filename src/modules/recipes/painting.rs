@@ -18,7 +18,7 @@
 //! > recipes, so these are stored as shapeless placeholders. They will need
 //! > upstream support to function identically.
 
-use crate::modules::recipes::recipe::{Ingredient, RecipeItemStack, Recipe, ShapelessRecipe};
+use crate::modules::recipes::recipe::{Ingredient, Recipe, RecipeItemStack, ShapelessRecipe};
 
 /// Handles painting variant recipes.
 ///

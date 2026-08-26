@@ -16,7 +16,9 @@
 //! `diamond_nautilus_armor`, `diamond_pickaxe`, `diamond_shovel`,
 //! `diamond_spear`, `diamond_sword`
 
-use crate::modules::recipes::recipe::{CookingKind, CookingRecipe, Ingredient, RecipeItemStack, Recipe};
+use crate::modules::recipes::recipe::{
+    CookingKind, CookingRecipe, Ingredient, Recipe, RecipeItemStack,
+};
 
 /// Handles diamond gear recycling via blast furnace.
 #[derive(Default)]

@@ -18,6 +18,7 @@
 /// - `matches_config(&self, allowed: &[Self]) -> bool`
 /// - `Display` via `Debug` representation
 /// - `From<upstream>` with a catch-all fallback to the first variant
+/// - `From<$name>` back to the upstream type
 #[macro_export]
 macro_rules! mirror_enum {
     (
@@ -27,9 +28,9 @@ macro_rules! mirror_enum {
             $($variant:ident),* $(,)?
         }
     ) => {
-        $(#[$meta])*
         #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize, Hash)]
         #[serde(rename_all = "PascalCase")]
+        $(#[$meta])*
         $vis enum $name {
             $first,
             $($variant),*
@@ -55,6 +56,15 @@ macro_rules! mirror_enum {
                     <$upstream>::$first => Self::$first,
                     $(<$upstream>::$variant => Self::$variant,)*
                     _ => Self::$first,
+                }
+            }
+        }
+
+        impl From<$name> for $upstream {
+            fn from(value: $name) -> Self {
+                match value {
+                    $name::$first => <$upstream>::$first,
+                    $($name::$variant => <$upstream>::$variant,)*
                 }
             }
         }

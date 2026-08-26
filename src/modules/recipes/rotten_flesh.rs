@@ -10,7 +10,9 @@
 //! | Smoker   | 1× Leather | 0.1  | 100          |
 //! | Campfire | 1× Leather | 0.05 | 600          |
 
-use crate::modules::recipes::recipe::{CookingKind, CookingRecipe, Ingredient, RecipeItemStack, Recipe};
+use crate::modules::recipes::recipe::{
+    CookingKind, CookingRecipe, Ingredient, Recipe, RecipeItemStack,
+};
 
 /// Handles rotten-flesh-to-leather conversion recipes.
 #[derive(Default)]

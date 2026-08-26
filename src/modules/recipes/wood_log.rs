@@ -23,7 +23,7 @@
 //! | `stripped_spruce_wood`| `stripped_spruce_log`|
 //! | ... (all stripped)    | ...                  |
 
-use crate::modules::recipes::recipe::{Ingredient, RecipeItemStack, Recipe, ShapelessRecipe};
+use crate::modules::recipes::recipe::{Ingredient, Recipe, RecipeItemStack, ShapelessRecipe};
 
 /// Handles wood-to-log shapeless conversion recipes.
 #[derive(Default)]

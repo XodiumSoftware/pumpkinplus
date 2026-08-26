@@ -39,15 +39,12 @@ mod modules {
         pub mod mechanic;
         pub mod entity {
             pub mod griefing;
-            pub mod spawn_egg;
-            pub mod tameable;
         }
         pub mod world {
             pub mod openable;
         }
         pub mod player {
             pub mod enderchest;
-            pub mod head;
             pub mod messages;
             pub mod nickname;
         }
@@ -62,10 +59,7 @@ pub use config::*;
 pub use modules::*;
 
 pub use modules::mechanics::entity::griefing::GriefingConfig;
-pub use modules::mechanics::entity::spawn_egg::SpawnEggConfig;
-pub use modules::mechanics::entity::tameable::TameableConfig;
 pub use modules::mechanics::player::enderchest::EnderchestConfig;
-pub use modules::mechanics::player::head::HeadConfig;
 pub use modules::mechanics::player::messages::MessagesConfig;
 pub use modules::mechanics::player::nickname::NicknameConfig;
 pub use modules::mechanics::server::chat::ChatConfig;
@@ -120,10 +114,7 @@ impl Plugin for PumpkinPlus {
         ConfigManager::load(&context);
 
         let griefing = Griefing;
-        // let spawn_egg = SpawnEgg;
-        // let tameable = Tameable;
         let enderchest = Enderchest;
-        // let head = Head;
         let nickname = Nickname;
         let messages = Messages;
         let chat = Chat;
@@ -131,10 +122,7 @@ impl Plugin for PumpkinPlus {
         let openable = Openable;
         let modules: Vec<&dyn Mechanic> = vec![
             &griefing,
-            // &spawn_egg,
-            // &tameable,
             &enderchest,
-            // &head,
             &nickname,
             &messages,
             &chat,

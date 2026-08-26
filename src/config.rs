@@ -15,10 +15,7 @@ use std::path::PathBuf;
 use tracing::error;
 
 pub use crate::modules::mechanics::entity::griefing::GriefingConfig;
-pub use crate::modules::mechanics::entity::spawn_egg::SpawnEggConfig;
-pub use crate::modules::mechanics::entity::tameable::TameableConfig;
 pub use crate::modules::mechanics::player::enderchest::EnderchestConfig;
-pub use crate::modules::mechanics::player::head::HeadConfig;
 pub use crate::modules::mechanics::player::messages::MessagesConfig;
 pub use crate::modules::mechanics::player::nickname::NicknameConfig;
 pub use crate::modules::mechanics::server::chat::ChatConfig;
@@ -38,14 +35,8 @@ thread_local! {
 pub struct PluginConfig {
     /// Mob griefing prevention.
     pub griefing: GriefingConfig,
-    /// Spawn egg drop mechanics.
-    pub spawn_egg: SpawnEggConfig,
-    /// Tameable ownership transfer.
-    pub tameable: TameableConfig,
     /// Shared enderchest mechanics.
     pub enderchest: EnderchestConfig,
-    /// Player head drop mechanics.
-    pub head: HeadConfig,
     /// Custom join/leave/kick messages.
     pub messages: MessagesConfig,
     /// Player nickname commands.

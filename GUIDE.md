@@ -111,16 +111,10 @@ The plugin uses a JSON configuration file (`config.json`) that is automatically 
     "knock_gamemodes": ["Survival", "Adventure"],
     "knock_sneaking_required": true
   },
-  "spawn_egg": {
-    "enabled": false
-  },
   "tablist": {
     "enabled": false,
     "header": "",
     "footer": ""
-  },
-  "tameable": {
-    "enabled": false
   }
 }
 ```
@@ -132,13 +126,10 @@ The plugin uses a JSON configuration file (`config.json`) that is automatically 
 | `chat` | Chat format and word filtering | Disabled |
 | `enderchest` | Open personal enderchest by right-clicking air with an ender chest | Disabled |
 | `griefing` | Cancel block-change and explosion events from configured mobs | Disabled |
-| `head` | Drop the dying player's head on death (stub — see notes below) | Disabled |
 | `messages` | Custom join/leave/kick messages | Disabled |
 | `nickname` | Set a persistent nickname via `/nickname` or `/nick` | Disabled |
 | `openable` | Synchronize double doors and sneaky door-knocking | Disabled |
-| `spawn_egg` | Make mobs rarely drop their spawn egg on death (not yet enabled) | Disabled |
 | `tablist` | Custom tab-list header/footer with live placeholders | Disabled |
-| `tameable` | Transfer tameable mob ownership on death (not yet enabled) | Disabled |
 
 ### Placeholders
 
@@ -216,14 +207,9 @@ The following recipe packs are always registered (no config toggle):
 
 All command permissions default to `Allow`.
 
-## Notes on Experimental / Stub Modules
+### Notes on Experimental Modules
 
-The following modules exist in the codebase but are not fully functional yet because the required Pumpkin plugin API pieces are still missing:
-
-- **`head`** — Needs a way to set an item entity's carried `ItemStack` and a helper to build the `minecraft:profile` data component from a `PlayerSkin`.
-- **`spawn_egg`** and **`tameable`** — Not wired into the active module list in `lib.rs`.
-
-These modules stay disabled by default and can be ignored unless you want to experiment with them as the Pumpkin API evolves.
+There are currently no experimental modules. All shipped mechanics are fully wired and can be enabled in `config.json`.
 
 ## Troubleshooting
 

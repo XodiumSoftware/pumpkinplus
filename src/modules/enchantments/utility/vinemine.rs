@@ -7,7 +7,7 @@
 //! ## Status
 //!
 //! TODO: Implement once the following Pumpkin APIs are verified:
-//! - Custom enchantment registration via [`EnchantmentBuilder`].
+//! - Custom enchantment registration via `pumpkin_plugin_api::enchantment::EnchantmentBuilder`.
 //! - `BlockBreakEvent` with player and block information.
 //! - Reading/setting item data components (damage/durability).
 //! - Breaking / replacing blocks in a world and reading block registry names.

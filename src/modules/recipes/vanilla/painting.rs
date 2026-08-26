@@ -78,7 +78,7 @@ impl Recipe for Painting {
         variants
             .into_iter()
             .map(|variant| ShapelessRecipe {
-                id: format!("pumpkinplus:painting_{variant}_stonecutting"),
+                id: format!("{}:painting_{variant}_stonecutting", env!("CARGO_PKG_NAME")),
                 ingredients: vec![Ingredient::Item {
                     id: "minecraft:painting".into(),
                 }],

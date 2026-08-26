@@ -95,6 +95,7 @@ use crate::mechanics::server::chat::Chat;
 use crate::mechanics::server::tablist::Tablist;
 use crate::mechanics::world::openable::Openable;
 use crate::modules::enchantments::enchantment::Enchantment;
+use crate::modules::enchantments::utility::embertread::Embertread;
 use crate::modules::enchantments::vanilla::fortune::Fortune;
 use crate::modules::recipes::recipe::Recipe;
 use crate::modules::recipes::vanilla::chainmail::Chainmail;
@@ -110,6 +111,20 @@ use std::time::Instant;
 use tracing::{error, info};
 
 pub const PLUGIN_ID: &str = env!("CARGO_PKG_NAME");
+
+/// Produces a `const` namespaced identifier from the crate name and a suffix.
+///
+/// # Example
+///
+/// ```rust,ignore
+/// const EMBERTREAD_ID: &str = namespaced_id!("embertread");
+/// ```
+#[macro_export]
+macro_rules! namespaced_id {
+    ($suffix:expr) => {
+        concat!(env!("CARGO_PKG_NAME"), ":", $suffix)
+    };
+}
 
 pub struct PumpkinPlus {}
 
@@ -198,8 +213,8 @@ impl Plugin for PumpkinPlus {
             enabled_recipes
         );
 
-        // Enchantment behavior overrides (no new enchantments registered)
-        let enchantments: Vec<&dyn Enchantment> = vec![&Fortune];
+        // Enchantments (custom definitions and/or behavior overrides)
+        let enchantments: Vec<&dyn Enchantment> = vec![&Embertread, &Fortune];
 
         let enabled_enchantments = enchantments.iter().filter(|e| e.enabled()).count();
         let mut enchantment_total_ms = 0u128;
@@ -209,7 +224,7 @@ impl Plugin for PumpkinPlus {
             enchantment_total_ms += start.elapsed().as_millis();
         }
         info!(
-            "Registered: {} enchantment override(s) | Took {}ms",
+            "Registered: {} enchantment(s) | Took {}ms",
             enabled_enchantments, enchantment_total_ms
         );
 

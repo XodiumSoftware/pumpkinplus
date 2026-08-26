@@ -62,7 +62,7 @@ Build the plugin yourself using Rust.
 
 The plugin uses a JSON configuration file (`config.json`) that is automatically created on first run.
 
-> **Note:** All gameplay mechanics, recipe packs, and enchantment overrides are disabled by default. Enable the modules you want in `config.json` and restart the server.
+> **Note:** All gameplay mechanics, recipe packs, and enchantments are disabled by default. Enable the modules you want in `config.json` and restart the server.
 
 ### Default Config Structure
 
@@ -122,6 +122,7 @@ The plugin uses a JSON configuration file (`config.json`) that is automatically 
     "wool_to_string": false
   },
   "enchantments": {
+    "embertread": false,
     "feather_falling": false,
     "fortune": false,
     "silk_touch": false
@@ -146,13 +147,16 @@ The plugin uses a JSON configuration file (`config.json`) that is automatically 
 | `openable` | Synchronize double doors and sneaky door-knocking | Disabled |
 | `tablist` | Custom tab-list header/footer with live placeholders | Disabled |
 
-### Enchantment Overrides
+### Enchantments
 
 | Config Field | Description | Default |
 |--------------|-------------|---------|
+| `enchantments.embertread` | Cancel contact and fire damage when wearing boots with the Embertread custom enchantment | Disabled |
 | `enchantments.feather_falling` | Cancel farmland trampling when wearing Feather Falling boots | Disabled |
 | `enchantments.fortune` | Auto-replant mature crops when broken with a Fortune hoe | Disabled |
 | `enchantments.silk_touch` | Drop spawners and budding amethyst when broken with Silk Touch pickaxes | Disabled |
+
+`embertread` registers a new custom enchantment; the other enchantments change the behavior of existing vanilla enchantments.
 
 ### Recipe Packs
 
@@ -240,15 +244,16 @@ Each recipe pack can be enabled independently in the `recipes` section of `confi
 
 ### Enchantments
 
-Each enchantment behavior override can be enabled independently in the `enchantments`
-section of `config.json`. These overrides do **not** add new enchantments; they change
-how existing vanilla enchantments behave.
+Each enchantment can be enabled independently in the `enchantments` section of
+`config.json`. Some entries register brand new custom enchantments, while others
+change how existing vanilla enchantments behave.
 
-| Override | Config Field | Description |
-|----------|--------------|-------------|
-| FeatherFalling | `feather_falling` | Cancel farmland trampling when wearing Feather Falling boots |
-| Fortune | `fortune` | Auto-replant mature crops when broken with a hoe carrying at least Fortune II |
-| SilkTouch | `silk_touch` | Drop spawners and budding amethyst when broken with a Silk Touch pickaxe |
+| Enchantment | Config Field | Type | Description |
+|-------------|--------------|------|-------------|
+| Embertread | `embertread` | Custom | Cancel contact and fire damage when wearing Embertread boots |
+| FeatherFalling | `feather_falling` | Vanilla override | Cancel farmland trampling when wearing Feather Falling boots |
+| Fortune | `fortune` | Vanilla override | Auto-replant mature crops when broken with a hoe carrying at least Fortune II |
+| SilkTouch | `silk_touch` | Vanilla override | Drop spawners and budding amethyst when broken with a Silk Touch pickaxe |
 
 ## Commands & Permissions
 

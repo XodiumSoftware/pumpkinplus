@@ -6,7 +6,7 @@
 //! ## Status
 //!
 //! TODO: Implement once the following Pumpkin APIs are verified:
-//! - Custom enchantment registration via [`EnchantmentBuilder`] with saddle slot.
+//! - Custom enchantment registration via `pumpkin_plugin_api::enchantment::EnchantmentBuilder` with saddle slot.
 //! - `EntityEquipmentChangedEvent` (or equivalent) for mount equipment changes.
 //! - Happy Ghast entity type and `flying-speed` attribute access.
 //!

@@ -12,6 +12,7 @@
 
 use crate::config::ConfigManager;
 use crate::modules::recipes::recipe::{Ingredient, Recipe, RecipeItemStack, ShapelessRecipe};
+use crate::namespaced_id;
 
 /// Handles ice breakdown shapeless recipes.
 #[derive(Default)]
@@ -25,7 +26,7 @@ impl Recipe for IceBreakdown {
     fn shapeless(&self) -> Vec<ShapelessRecipe> {
         vec![
             ShapelessRecipe {
-                id: "pumpkinplus:blue_ice_breakdown".into(),
+                id: namespaced_id!("blue_ice_breakdown").into(),
                 ingredients: vec![Ingredient::Item {
                     id: "minecraft:blue_ice".into(),
                 }],
@@ -35,7 +36,7 @@ impl Recipe for IceBreakdown {
                 },
             },
             ShapelessRecipe {
-                id: "pumpkinplus:packed_ice_breakdown".into(),
+                id: namespaced_id!("packed_ice_breakdown").into(),
                 ingredients: vec![Ingredient::Item {
                     id: "minecraft:packed_ice".into(),
                 }],

@@ -14,6 +14,7 @@
 
 use crate::config::ConfigManager;
 use crate::modules::recipes::recipe::{Ingredient, Recipe, RecipeItemStack, ShapedRecipe};
+use crate::namespaced_id;
 
 /// Handles chainmail armor recipe registration.
 #[derive(Default)]
@@ -28,7 +29,7 @@ impl Recipe for Chainmail {
         vec![
             // Chainmail Helmet
             ShapedRecipe {
-                id: "pumpkinplus:chainmail_helmet".into(),
+                id: namespaced_id!("chainmail_helmet").into(),
                 height: 2,
                 width: 3,
                 pattern: vec!["AAA".into(), "A A".into()],
@@ -45,7 +46,7 @@ impl Recipe for Chainmail {
             },
             // Chainmail Chestplate
             ShapedRecipe {
-                id: "pumpkinplus:chainmail_chestplate".into(),
+                id: namespaced_id!("chainmail_chestplate").into(),
                 height: 3,
                 width: 3,
                 pattern: vec!["A A".into(), "AAA".into(), "AAA".into()],
@@ -62,7 +63,7 @@ impl Recipe for Chainmail {
             },
             // Chainmail Leggings
             ShapedRecipe {
-                id: "pumpkinplus:chainmail_leggings".into(),
+                id: namespaced_id!("chainmail_leggings").into(),
                 height: 3,
                 width: 3,
                 pattern: vec!["AAA".into(), "A A".into(), "A A".into()],
@@ -79,7 +80,7 @@ impl Recipe for Chainmail {
             },
             // Chainmail Boots
             ShapedRecipe {
-                id: "pumpkinplus:chainmail_boots".into(),
+                id: namespaced_id!("chainmail_boots").into(),
                 height: 2,
                 width: 3,
                 pattern: vec!["A A".into(), "A A".into()],

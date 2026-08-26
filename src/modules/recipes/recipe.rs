@@ -44,7 +44,7 @@ use tracing::info;
 ///
 ///     fn shaped(&self) -> Vec<ShapedRecipe> {
 ///         vec![ShapedRecipe {
-///             id: "pumpkinplus:example".into(),
+///             id: namespaced_id!("example").into(),
 ///             height: 2,
 ///             width: 3,
 ///             pattern: vec!["AAA".into(), "A A".into()],
@@ -220,7 +220,7 @@ pub struct RecipesConfig {
 /// Spaces represent empty slots.
 #[derive(Debug, Clone)]
 pub struct ShapedRecipe {
-    /// Unique recipe identifier (e.g. `"pumpkinplus:diamond_horse_armor"`).
+    /// Unique recipe identifier (e.g. `namespaced_id!("diamond_horse_armor")`).
     pub id: String,
     /// Grid height (1–3).
     pub height: u8,

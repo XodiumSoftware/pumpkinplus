@@ -6,7 +6,7 @@
 //! ## Status
 //!
 //! TODO: Implement once the following Pumpkin APIs are verified:
-//! - Custom enchantment registration via [`EnchantmentBuilder`].
+//! - Custom enchantment registration via `pumpkin_plugin_api::enchantment::EnchantmentBuilder`.
 //! - `BlockDropItemEvent` and `EntityDeathEvent`.
 //! - Reading the killer from `EntityDeathEvent`.
 //! - Adding items / experience points to a player inventory.

@@ -14,6 +14,7 @@ use crate::config::ConfigManager;
 use crate::modules::recipes::recipe::{
     CookingKind, CookingRecipe, Ingredient, Recipe, RecipeItemStack,
 };
+use crate::namespaced_id;
 
 /// Handles rotten-flesh-to-leather conversion recipes.
 #[derive(Default)]
@@ -28,7 +29,7 @@ impl Recipe for RottenFlesh {
         vec![
             // Furnace
             CookingRecipe {
-                id: "pumpkinplus:rotten_flesh_furnace".into(),
+                id: namespaced_id!("rotten_flesh_furnace").into(),
                 ingredient: Ingredient::Item {
                     id: "minecraft:rotten_flesh".into(),
                 },
@@ -42,7 +43,7 @@ impl Recipe for RottenFlesh {
             },
             // Smoker
             CookingRecipe {
-                id: "pumpkinplus:rotten_flesh_smoker".into(),
+                id: namespaced_id!("rotten_flesh_smoker").into(),
                 ingredient: Ingredient::Item {
                     id: "minecraft:rotten_flesh".into(),
                 },
@@ -56,7 +57,7 @@ impl Recipe for RottenFlesh {
             },
             // Campfire
             CookingRecipe {
-                id: "pumpkinplus:rotten_flesh_campfire".into(),
+                id: namespaced_id!("rotten_flesh_campfire").into(),
                 ingredient: Ingredient::Item {
                     id: "minecraft:rotten_flesh".into(),
                 },

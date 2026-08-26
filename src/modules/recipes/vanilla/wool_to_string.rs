@@ -11,6 +11,7 @@
 
 use crate::config::ConfigManager;
 use crate::modules::recipes::recipe::{Ingredient, Recipe, RecipeItemStack, ShapelessRecipe};
+use crate::namespaced_id;
 
 /// Handles wool-to-string shapeless recipe.
 #[derive(Default)]
@@ -23,7 +24,7 @@ impl Recipe for WoolToString {
 
     fn shapeless(&self) -> Vec<ShapelessRecipe> {
         vec![ShapelessRecipe {
-            id: "pumpkinplus:wool_to_string".into(),
+            id: namespaced_id!("wool_to_string").into(),
             ingredients: vec![Ingredient::Tag {
                 id: "minecraft:wool".into(),
             }],

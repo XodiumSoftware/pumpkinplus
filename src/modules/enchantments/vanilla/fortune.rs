@@ -1,8 +1,8 @@
 //! Fortune enchantment behavior override.
 //!
 //! Auto-replants mature ageable crops when they are broken with a hoe that has
-//! Fortune at least [`MIN_FORTUNE_LEVEL`]. The crop is reset to age 0 after a
-//! short delay, preserving the natural drops from the break.
+//! Fortune at least 2. The crop is reset to age 0 after a short delay,
+//! preserving the natural drops from the break.
 //!
 //! ## Configuration
 //!

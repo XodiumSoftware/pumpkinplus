@@ -50,7 +50,8 @@ impl Recipe for DiamondRecycle {
             .into_iter()
             .map(|id| CookingRecipe {
                 id: format!(
-                    "pumpkinplus:diamond_recycle_{}",
+                    "{}:diamond_recycle_{}",
+                    env!("CARGO_PKG_NAME"),
                     id.rsplit_once(':').map_or(id, |(_, s)| s)
                 ),
                 ingredient: Ingredient::Item { id: id.into() },

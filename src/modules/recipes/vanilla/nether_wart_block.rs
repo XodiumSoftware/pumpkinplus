@@ -11,6 +11,7 @@
 
 use crate::config::ConfigManager;
 use crate::modules::recipes::recipe::{Ingredient, Recipe, RecipeItemStack, ShapelessRecipe};
+use crate::namespaced_id;
 
 /// Handles nether-wart-block-to-nether-wart shapeless recipe.
 #[derive(Default)]
@@ -23,7 +24,7 @@ impl Recipe for NetherWartBlock {
 
     fn shapeless(&self) -> Vec<ShapelessRecipe> {
         vec![ShapelessRecipe {
-            id: "pumpkinplus:nether_wart_block_breakdown".into(),
+            id: namespaced_id!("nether_wart_block_breakdown").into(),
             ingredients: vec![Ingredient::Item {
                 id: "minecraft:nether_wart_block".into(),
             }],

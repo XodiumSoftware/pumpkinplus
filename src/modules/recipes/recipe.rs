@@ -200,12 +200,18 @@ pub struct RecipesConfig {
     pub chainmail: bool,
     /// Recycle diamond tools and armor back into diamonds.
     pub diamond_recycle: bool,
+    /// Break packed and blue ice down into lower-tier ice.
+    pub ice_breakdown: bool,
+    /// Break nether wart blocks back into nether warts.
+    pub nether_wart_block: bool,
     /// Placeholder recipes for painting variants.
     pub painting: bool,
     /// Cook rotten flesh into leather.
     pub rotten_flesh: bool,
     /// Convert wood/hyphae blocks back into logs/stems.
     pub wood_log: bool,
+    /// Convert wool blocks into string.
+    pub wool_to_string: bool,
 }
 
 /// A shaped crafting recipe.

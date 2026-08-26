@@ -27,12 +27,17 @@ pub use mirror_types::interaction::InteractAction;
 
 mod modules {
     pub mod recipes {
-        pub mod chainmail;
-        pub mod diamond_recycle;
-        pub mod painting;
         pub mod recipe;
-        pub mod rotten_flesh;
-        pub mod wood_log;
+        pub mod vanilla {
+            pub mod chainmail;
+            pub mod diamond_recycle;
+            pub mod ice_breakdown;
+            pub mod nether_wart_block;
+            pub mod painting;
+            pub mod rotten_flesh;
+            pub mod wood_log;
+            pub mod wool_to_string;
+        }
     }
     pub mod mechanics {
         pub mod mechanic;
@@ -74,12 +79,15 @@ use crate::mechanics::player::nickname::Nickname;
 use crate::mechanics::server::chat::Chat;
 use crate::mechanics::server::tablist::Tablist;
 use crate::mechanics::world::openable::Openable;
-use crate::modules::recipes::chainmail::Chainmail;
-use crate::modules::recipes::diamond_recycle::DiamondRecycle;
-use crate::modules::recipes::painting::Painting;
 use crate::modules::recipes::recipe::Recipe;
-use crate::modules::recipes::rotten_flesh::RottenFlesh;
-use crate::modules::recipes::wood_log::WoodLog;
+use crate::modules::recipes::vanilla::chainmail::Chainmail;
+use crate::modules::recipes::vanilla::diamond_recycle::DiamondRecycle;
+use crate::modules::recipes::vanilla::ice_breakdown::IceBreakdown;
+use crate::modules::recipes::vanilla::nether_wart_block::NetherWartBlock;
+use crate::modules::recipes::vanilla::painting::Painting;
+use crate::modules::recipes::vanilla::rotten_flesh::RottenFlesh;
+use crate::modules::recipes::vanilla::wood_log::WoodLog;
+use crate::modules::recipes::vanilla::wool_to_string::WoolToString;
 use pumpkin_plugin_api::{Context, Plugin, PluginMetadata};
 use std::time::Instant;
 use tracing::{error, info};
@@ -146,9 +154,12 @@ impl Plugin for PumpkinPlus {
         let recipes: Vec<&dyn Recipe> = vec![
             &Chainmail,
             &DiamondRecycle,
+            &IceBreakdown,
+            &NetherWartBlock,
             &Painting,
             &RottenFlesh,
             &WoodLog,
+            &WoolToString,
         ];
 
         let enabled_recipes = recipes.iter().filter(|r| r.enabled()).count();

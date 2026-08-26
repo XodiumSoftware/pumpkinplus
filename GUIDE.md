@@ -114,9 +114,12 @@ The plugin uses a JSON configuration file (`config.json`) that is automatically 
   "recipes": {
     "chainmail": false,
     "diamond_recycle": false,
+    "ice_breakdown": false,
+    "nether_wart_block": false,
     "painting": false,
     "rotten_flesh": false,
-    "wood_log": false
+    "wood_log": false,
+    "wool_to_string": false
   },
   "tablist": {
     "enabled": false,
@@ -144,9 +147,12 @@ The plugin uses a JSON configuration file (`config.json`) that is automatically 
 |--------------|-------------|---------|
 | `recipes.chainmail` | Craft chainmail armor pieces using iron bars | Disabled |
 | `recipes.diamond_recycle` | Smelt diamond tools/armor back into diamonds | Disabled |
+| `recipes.ice_breakdown` | Break blue ice into packed ice and packed ice into ice | Disabled |
+| `recipes.nether_wart_block` | Break nether wart blocks back into nether warts | Disabled |
 | `recipes.painting` | Placeholder shapeless recipes for painting variants (requires upstream stonecutter / data-component support to match vanilla behavior) | Disabled |
 | `recipes.rotten_flesh` | Cook rotten flesh into leather via furnace, smoker, and campfire | Disabled |
 | `recipes.wood_log` | Convert wood/hyphae blocks back into 4 logs/stems | Disabled |
+| `recipes.wool_to_string` | Convert any wool block into 4 string | Disabled |
 
 ### Placeholders
 
@@ -212,9 +218,12 @@ Each recipe pack can be enabled independently in the `recipes` section of `confi
 |-------------|--------------|-------------|
 | Chainmail | `chainmail` | Craft chainmail armor pieces using iron bars |
 | DiamondRecycle | `diamond_recycle` | Smelt diamond tools/armor back into diamonds |
+| IceBreakdown | `ice_breakdown` | Break blue ice into packed ice and packed ice into ice |
+| NetherWartBlock | `nether_wart_block` | Break nether wart blocks back into nether warts |
 | Painting | `painting` | Placeholder shapeless recipes for painting variants (requires upstream stonecutter / data-component support to match vanilla behavior) |
 | RottenFlesh | `rotten_flesh` | Cook rotten flesh into leather via furnace, smoker, and campfire |
 | WoodLog | `wood_log` | Convert wood/hyphae blocks back into 4 logs/stems |
+| WoolToString | `wool_to_string` | Convert any wool block into 4 string |
 
 ## Commands & Permissions
 

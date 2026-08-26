@@ -8,6 +8,7 @@
 - [Configuration](#configuration)
 - [Installation](#installation-1)
 - [Usage](#usage)
+- [Commands & Permissions](#commands--permissions)
 - [Troubleshooting](#troubleshooting)
 
 ---
@@ -61,40 +62,97 @@ Build the plugin yourself using Rust.
 
 The plugin uses a JSON configuration file (`config.json`) that is automatically created on first run.
 
+> **Note:** All gameplay mechanics are disabled by default. Enable the modules you want in `config.json` and restart the server. Recipes are always registered and do not have config toggles.
+
 ### Default Config Structure
 
 ```json
 {
-  "messages": {
-    "enabled": true,
-    "join_msg": "Welcome {player}!",
-    "leave_msg": "Goodbye {player}!",
-    "kick_msg": "{player} was kicked"
-  },
   "chat": {
     "enabled": false,
     "chat_format": "",
     "chat_filter": []
   },
+  "enderchest": {
+    "enabled": false,
+    "gamemodes": ["Survival", "Adventure"],
+    "actions": ["RightClickAir"]
+  },
+  "griefing": {
+    "enabled": false,
+    "cancelled_entities": [
+      "Blaze",
+      "Creeper",
+      "EnderDragon",
+      "Enderman",
+      "Fireball",
+      "SmallFireball",
+      "Wither"
+    ]
+  },
+  "head": {
+    "enabled": false,
+    "skull_drop_chance": 0.01
+  },
+  "locator": {
+    "enabled": false
+  },
+  "messages": {
+    "enabled": false,
+    "join_msg": "",
+    "leave_msg": "",
+    "kick_msg": ""
+  },
+  "nickname": {
+    "enabled": false
+  },
+  "openable": {
+    "enabled": false,
+    "gamemodes": ["Survival", "Adventure"],
+    "actions": ["RightClickBlock"],
+    "knock_enabled": false,
+    "knock_gamemodes": ["Survival", "Adventure"],
+    "knock_sneaking_required": true
+  },
+  "spawn_egg": {
+    "enabled": false
+  },
   "tablist": {
     "enabled": false,
     "header": "",
     "footer": ""
+  },
+  "tameable": {
+    "enabled": false
   }
 }
 ```
 
 ### Configuration Options
 
-| Module     | Description                     | Default  |
-|------------|---------------------------------|----------|
-| `messages` | Custom join/leave/kick messages | Enabled  |
-| `chat`     | Chat format and word filtering  | Disabled |
-| `tablist`  | Custom tablist header/footer    | Disabled |
+| Module | Description | Default |
+|--------|-------------|---------|
+| `chat` | Chat format and word filtering | Disabled |
+| `enderchest` | Open personal enderchest by right-clicking air with an ender chest | Disabled |
+| `griefing` | Cancel block-change and explosion events from configured mobs | Disabled |
+| `head` | Drop the dying player's head on death (stub — see notes below) | Disabled |
+| `locator` | Personalize the locator boss bar color (stub — see notes below) | Disabled |
+| `messages` | Custom join/leave/kick messages | Disabled |
+| `nickname` | Set a persistent nickname via `/nickname` or `/nick` | Disabled |
+| `openable` | Synchronize double doors and sneaky door-knocking | Disabled |
+| `spawn_egg` | Make mobs rarely drop their spawn egg on death (not yet enabled) | Disabled |
+| `tablist` | Custom tab-list header/footer with live placeholders | Disabled |
+| `tameable` | Transfer tameable mob ownership on death (not yet enabled) | Disabled |
 
 ### Placeholders
 
-- `{player}` — Replaced with the player's name in messages
+| Placeholder | Available in | Description |
+|-------------|--------------|-------------|
+| `{player}` | `messages.*`, `chat_format` | Player's display name |
+| `{message}` | `chat_format` | Original chat message |
+| `{online}` | `tablist.header`, `tablist.footer` | Number of online players |
+| `{tps}` | `tablist.header`, `tablist.footer` | Server TPS (ticks per second) |
+| `{mspt}` | `tablist.header`, `tablist.footer` | Milliseconds per tick |
 
 ## Installation
 
@@ -106,27 +164,72 @@ The plugin uses a JSON configuration file (`config.json`) that is automatically 
 
 ## Usage
 
-Once installed, the plugin runs automatically. Available features depend on enabled modules:
-
-### Messages Module
-
-Active by default. Provides custom join/leave/kick messages.
+Once installed, the plugin runs automatically. Available features depend on enabled modules.
 
 ### Chat Module
 
-When enabled, provides chat formatting and word filtering.
+When enabled, formats chat messages and/or filters blocked words.
 
-### Locator Module
+- `chat_format` — Message format. Use `{player}` and `{message}`.
+- `chat_filter` — Case-insensitive list of substrings; messages containing any entry are cancelled.
 
-When enabled, provides the `/locator` (or `/lc`) command:
+### Enderchest Module
 
-- `/locator color <color>` — Set locator bar color
-- `/locator hex <hex>` — Set custom hex color
-- `/locator reset` — Reset to default
+When enabled, right-clicking in the air while holding an ender chest opens the player's personal ender chest. Configurable by gamemode and interaction action.
 
-### Permission Nodes
+### Griefing Module
 
-- `pumpkinplus:command.locator` — Access to `/locator` command
+When enabled, cancels `EntityChangeBlockEvent` and `EntityExplodeEvent` for the entity types listed in `cancelled_entities`. Add or remove vanilla entity type names as needed.
+
+### Messages Module
+
+When enabled, overrides the default join/leave/kick messages. Leave any message empty to keep the vanilla message for that event.
+
+### Nickname Module
+
+When enabled, players can use `/nickname <name>` or `/nick <name>` to set a nickname, or `/nickname` / `/nick` with no argument (or `/nickname clear`) to remove it. Nicknames are persisted across logins.
+
+### Openable Module
+
+When enabled:
+
+- Right-clicking one door of a double-door pair toggles both doors together.
+- Sneaking and left-clicking a door with an empty main hand knocks on it (sound playback depends on upstream Pumpkin support).
+
+### Tablist Module
+
+When enabled, sets a custom header and footer for every player's tab list. The header/footer are refreshed on player join/leave and periodically so `{tps}` and `{mspt}` stay current.
+
+### Recipes
+
+The following recipe packs are always registered (no config toggle):
+
+| Recipe Pack | Description |
+|-------------|-------------|
+| Chainmail | Craft chainmail armor pieces using iron bars |
+| DiamondRecycle | Smelt diamond tools/armor back into diamonds |
+| Painting | Placeholder shapeless recipes for painting variants (requires upstream stonecutter / data-component support to match vanilla behavior) |
+| RottenFlesh | Cook rotten flesh into leather via furnace, smoker, and campfire |
+| WoodLog | Convert wood/hyphae blocks back into 4 logs/stems |
+
+## Commands & Permissions
+
+| Command | Alias | Permission | Description |
+|---------|-------|------------|-------------|
+| `/nickname [name]` | `/nick` | `pumpkinplus:command.nickname` | Set or remove your nickname |
+| `/locator <color\|hex\|reset>` | `/lc` | `pumpkinplus:command.locator` | Locator bar personalization (stub) |
+
+All command permissions default to `Allow`.
+
+## Notes on Experimental / Stub Modules
+
+The following modules exist in the codebase but are not fully functional yet because the required Pumpkin plugin API pieces are still missing:
+
+- **`head`** — Needs a way to set an item entity's carried `ItemStack` and a helper to build the `minecraft:profile` data component from a `PlayerSkin`.
+- **`locator`** — Needs an API to control the player's locator bar / boss bar appearance. The command currently replies "Not yet implemented."
+- **`spawn_egg`** and **`tameable`** — Not wired into the active module list in `lib.rs`.
+
+These modules stay disabled by default and can be ignored unless you want to experiment with them as the Pumpkin API evolves.
 
 ## Troubleshooting
 
@@ -155,6 +258,7 @@ When enabled, provides the `/locator` (or `/lc`) command:
   rustup target add wasm32-wasip2
   ```
 - Ensure you're using the latest stable Rust version
+- Run `cargo update` to pull the latest `pumpkin-plugin-api` revision
 
 ---
 

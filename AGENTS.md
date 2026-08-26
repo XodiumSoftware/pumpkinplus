@@ -26,6 +26,7 @@
 
 - **Repository**: https://github.com/Pumpkin-MC/Pumpkin
 - **Plugin API**: https://github.com/Pumpkin-MC/Pumpkin/tree/master/pumpkin-plugin-api
+- **Plugin Knowledge Base**: https://book.vypal.me/
 
 ### Pumpkin API Notes
 

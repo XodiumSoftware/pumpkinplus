@@ -82,8 +82,7 @@ impl ConfigManager {
 
 impl PluginConfig {
     fn load(context: &Context) -> Self {
-        let path =
-            PathBuf::from(context.get_data_folder().trim_start_matches("./")).join("config.json");
+        let path = PathBuf::from(context.get_data_folder()).join("config.json");
 
         let defaults_json = serde_json::to_string(&Self::default()).unwrap_or_else(|e| {
             error!("Failed to serialize default config: {e}");

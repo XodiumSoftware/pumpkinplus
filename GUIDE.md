@@ -94,9 +94,6 @@ The plugin uses a JSON configuration file (`config.json`) that is automatically 
     "enabled": false,
     "skull_drop_chance": 0.01
   },
-  "locator": {
-    "enabled": false
-  },
   "messages": {
     "enabled": false,
     "join_msg": "",
@@ -136,7 +133,6 @@ The plugin uses a JSON configuration file (`config.json`) that is automatically 
 | `enderchest` | Open personal enderchest by right-clicking air with an ender chest | Disabled |
 | `griefing` | Cancel block-change and explosion events from configured mobs | Disabled |
 | `head` | Drop the dying player's head on death (stub — see notes below) | Disabled |
-| `locator` | Personalize the locator boss bar color (stub — see notes below) | Disabled |
 | `messages` | Custom join/leave/kick messages | Disabled |
 | `nickname` | Set a persistent nickname via `/nickname` or `/nick` | Disabled |
 | `openable` | Synchronize double doors and sneaky door-knocking | Disabled |
@@ -217,7 +213,6 @@ The following recipe packs are always registered (no config toggle):
 | Command | Alias | Permission | Description |
 |---------|-------|------------|-------------|
 | `/nickname [name]` | `/nick` | `pumpkinplus:command.nickname` | Set or remove your nickname |
-| `/locator <color\|hex\|reset>` | `/lc` | `pumpkinplus:command.locator` | Locator bar personalization (stub) |
 
 All command permissions default to `Allow`.
 
@@ -226,7 +221,6 @@ All command permissions default to `Allow`.
 The following modules exist in the codebase but are not fully functional yet because the required Pumpkin plugin API pieces are still missing:
 
 - **`head`** — Needs a way to set an item entity's carried `ItemStack` and a helper to build the `minecraft:profile` data component from a `PlayerSkin`.
-- **`locator`** — Needs an API to control the player's locator bar / boss bar appearance. The command currently replies "Not yet implemented."
 - **`spawn_egg`** and **`tameable`** — Not wired into the active module list in `lib.rs`.
 
 These modules stay disabled by default and can be ignored unless you want to experiment with them as the Pumpkin API evolves.

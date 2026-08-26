@@ -19,7 +19,6 @@ pub use crate::modules::mechanics::entity::spawn_egg::SpawnEggConfig;
 pub use crate::modules::mechanics::entity::tameable::TameableConfig;
 pub use crate::modules::mechanics::player::enderchest::EnderchestConfig;
 pub use crate::modules::mechanics::player::head::HeadConfig;
-pub use crate::modules::mechanics::player::locator::LocatorConfig;
 pub use crate::modules::mechanics::player::messages::MessagesConfig;
 pub use crate::modules::mechanics::player::nickname::NicknameConfig;
 pub use crate::modules::mechanics::server::chat::ChatConfig;
@@ -47,8 +46,6 @@ pub struct PluginConfig {
     pub enderchest: EnderchestConfig,
     /// Player head drop mechanics.
     pub head: HeadConfig,
-    /// Locator bar personalization.
-    pub locator: LocatorConfig,
     /// Custom join/leave/kick messages.
     pub messages: MessagesConfig,
     /// Player nickname commands.

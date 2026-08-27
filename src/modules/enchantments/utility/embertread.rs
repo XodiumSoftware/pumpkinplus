@@ -22,7 +22,6 @@ use pumpkin_plugin_api::Player;
 use pumpkin_plugin_api::enchantment::{AttributeModifierSlot, EnchantmentBuilder};
 use pumpkin_plugin_api::events::{EntityDamageEvent, EventData, EventHandler, EventPriority};
 use pumpkin_plugin_api::text::TextComponent;
-use pumpkin_plugin_api::world::EquipmentSlot;
 use pumpkin_plugin_api::{Context, Server};
 use tracing::debug;
 
@@ -66,8 +65,7 @@ impl EventHandler<EntityDamageEvent> for Embertread {
             return event;
         };
 
-        let entity = player.as_entity();
-        let Some(boots) = entity.get_equipment(EquipmentSlot::Feet) else {
+        let Some(boots) = player.get_inventory().get_boots() else {
             return event;
         };
 

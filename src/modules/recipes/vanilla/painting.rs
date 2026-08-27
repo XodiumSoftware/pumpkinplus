@@ -19,7 +19,9 @@
 //! > upstream support to function identically.
 
 use crate::config::ConfigManager;
-use crate::modules::recipes::recipe::{Ingredient, Recipe, RecipeItemStack, ShapelessRecipe};
+use crate::modules::recipes::recipe::{Recipe, RecipeEntry};
+use pumpkin_plugin_api::ItemStack;
+use pumpkin_plugin_api::recipe::{RecipeCategory, ShapelessRecipeBuilder};
 
 /// Handles painting variant recipes.
 ///
@@ -33,7 +35,7 @@ impl Recipe for Painting {
         ConfigManager::get().is_some_and(|cm| cm.recipes.painting)
     }
 
-    fn shapeless(&self) -> Vec<ShapelessRecipe> {
+    fn recipes(&self) -> Vec<RecipeEntry> {
         // Vanilla painting variants as of Minecraft 1.21.4
         let variants: Vec<&str> = vec![
             "kebab",
@@ -77,15 +79,15 @@ impl Recipe for Painting {
 
         variants
             .into_iter()
-            .map(|variant| ShapelessRecipe {
-                id: format!("{}:painting_{variant}_stonecutting", env!("CARGO_PKG_NAME")),
-                ingredients: vec![Ingredient::Item {
-                    id: "minecraft:painting".into(),
-                }],
-                result: RecipeItemStack {
-                    id: "minecraft:painting".into(),
-                    count: 1,
-                },
+            .map(|variant| {
+                RecipeEntry::Shapeless(
+                    ShapelessRecipeBuilder::new(
+                        format!("{}:painting_{variant}_stonecutting", env!("CARGO_PKG_NAME")),
+                        ItemStack::new("minecraft:painting", 1),
+                    )
+                    .ingredient("minecraft:painting")
+                    .category(RecipeCategory::Misc),
+                )
             })
             .collect()
     }

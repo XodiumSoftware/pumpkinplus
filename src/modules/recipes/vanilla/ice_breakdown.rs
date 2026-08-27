@@ -11,8 +11,10 @@
 //! | Packed Ice  | Ice           | 9     |
 
 use crate::config::ConfigManager;
-use crate::modules::recipes::recipe::{Ingredient, Recipe, RecipeItemStack, ShapelessRecipe};
+use crate::modules::recipes::recipe::{Recipe, RecipeEntry};
 use crate::namespaced_id;
+use pumpkin_plugin_api::ItemStack;
+use pumpkin_plugin_api::recipe::{RecipeCategory, ShapelessRecipeBuilder};
 
 /// Handles ice breakdown shapeless recipes.
 #[derive(Default)]
@@ -23,28 +25,24 @@ impl Recipe for IceBreakdown {
         ConfigManager::get().is_some_and(|cm| cm.recipes.ice_breakdown)
     }
 
-    fn shapeless(&self) -> Vec<ShapelessRecipe> {
+    fn recipes(&self) -> Vec<RecipeEntry> {
         vec![
-            ShapelessRecipe {
-                id: namespaced_id!("blue_ice_breakdown").into(),
-                ingredients: vec![Ingredient::Item {
-                    id: "minecraft:blue_ice".into(),
-                }],
-                result: RecipeItemStack {
-                    id: "minecraft:packed_ice".into(),
-                    count: 9,
-                },
-            },
-            ShapelessRecipe {
-                id: namespaced_id!("packed_ice_breakdown").into(),
-                ingredients: vec![Ingredient::Item {
-                    id: "minecraft:packed_ice".into(),
-                }],
-                result: RecipeItemStack {
-                    id: "minecraft:ice".into(),
-                    count: 9,
-                },
-            },
+            RecipeEntry::Shapeless(
+                ShapelessRecipeBuilder::new(
+                    namespaced_id!("blue_ice_breakdown"),
+                    ItemStack::new("minecraft:packed_ice", 9),
+                )
+                .ingredient("minecraft:blue_ice")
+                .category(RecipeCategory::Misc),
+            ),
+            RecipeEntry::Shapeless(
+                ShapelessRecipeBuilder::new(
+                    namespaced_id!("packed_ice_breakdown"),
+                    ItemStack::new("minecraft:ice", 9),
+                )
+                .ingredient("minecraft:packed_ice")
+                .category(RecipeCategory::Misc),
+            ),
         ]
     }
 }

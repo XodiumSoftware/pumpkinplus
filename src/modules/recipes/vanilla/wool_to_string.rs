@@ -10,8 +10,10 @@
 //! | Wool  | String  | 4     |
 
 use crate::config::ConfigManager;
-use crate::modules::recipes::recipe::{Ingredient, Recipe, RecipeItemStack, ShapelessRecipe};
+use crate::modules::recipes::recipe::{Recipe, RecipeEntry};
 use crate::namespaced_id;
+use pumpkin_plugin_api::ItemStack;
+use pumpkin_plugin_api::recipe::{RecipeCategory, ShapelessRecipeBuilder};
 
 /// Handles wool-to-string shapeless recipe.
 #[derive(Default)]
@@ -22,16 +24,14 @@ impl Recipe for WoolToString {
         ConfigManager::get().is_some_and(|cm| cm.recipes.wool_to_string)
     }
 
-    fn shapeless(&self) -> Vec<ShapelessRecipe> {
-        vec![ShapelessRecipe {
-            id: namespaced_id!("wool_to_string").into(),
-            ingredients: vec![Ingredient::Tag {
-                id: "minecraft:wool".into(),
-            }],
-            result: RecipeItemStack {
-                id: "minecraft:string".into(),
-                count: 4,
-            },
-        }]
+    fn recipes(&self) -> Vec<RecipeEntry> {
+        vec![RecipeEntry::Shapeless(
+            ShapelessRecipeBuilder::new(
+                namespaced_id!("wool_to_string"),
+                ItemStack::new("minecraft:string", 4),
+            )
+            .ingredient("#minecraft:wool")
+            .category(RecipeCategory::Misc),
+        )]
     }
 }

@@ -17,9 +17,9 @@
 //! `diamond_spear`, `diamond_sword`
 
 use crate::config::ConfigManager;
-use crate::modules::recipes::recipe::{
-    CookingKind, CookingRecipe, Ingredient, Recipe, RecipeItemStack,
-};
+use crate::modules::recipes::recipe::{Recipe, RecipeEntry};
+use pumpkin_plugin_api::ItemStack;
+use pumpkin_plugin_api::recipe::{CookingRecipeBuilder, RecipeCategory};
 
 /// Handles diamond gear recycling via blast furnace.
 #[derive(Default)]
@@ -30,7 +30,7 @@ impl Recipe for DiamondRecycle {
         ConfigManager::get().is_some_and(|cm| cm.recipes.diamond_recycle)
     }
 
-    fn cooking(&self) -> Vec<CookingRecipe> {
+    fn recipes(&self) -> Vec<RecipeEntry> {
         let inputs: Vec<&str> = vec![
             "minecraft:diamond_axe",
             "minecraft:diamond_boots",
@@ -48,20 +48,18 @@ impl Recipe for DiamondRecycle {
 
         inputs
             .into_iter()
-            .map(|id| CookingRecipe {
-                id: format!(
-                    "{}:diamond_recycle_{}",
-                    env!("CARGO_PKG_NAME"),
-                    id.rsplit_once(':').map_or(id, |(_, s)| s)
-                ),
-                ingredient: Ingredient::Item { id: id.into() },
-                result: RecipeItemStack {
-                    id: "minecraft:diamond".into(),
-                    count: 1,
-                },
-                cook_time: 100,
-                experience: 1.0,
-                kind: CookingKind::Blasting,
+            .map(|id| {
+                let suffix = id.rsplit_once(':').map_or(id, |(_, s)| s);
+                RecipeEntry::Cooking(
+                    CookingRecipeBuilder::blasting(
+                        format!("{}:diamond_recycle_{suffix}", env!("CARGO_PKG_NAME")),
+                        id,
+                        ItemStack::new("minecraft:diamond", 1),
+                    )
+                    .cooking_time(100)
+                    .experience(1.0)
+                    .category(RecipeCategory::Misc),
+                )
             })
             .collect()
     }

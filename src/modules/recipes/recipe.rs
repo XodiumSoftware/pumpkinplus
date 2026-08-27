@@ -1,7 +1,7 @@
 //! Recipe system for `PumpkinPlus`.
 //!
-//! Each recipe category is implemented as a module implementing the [`Recipe`] trait.
-//! Recipes are registered with the server via [`Recipe::register`] using the upstream
+//! Each recipe pack is implemented as a module implementing the [`Recipe`] trait.
+//! Recipe packs return a list of [`RecipeEntry`] variants wrapping the upstream
 //! Pumpkin recipe builders.
 //!
 //! Recipe packs can be toggled individually via the `recipes` section of `config.json`;
@@ -16,13 +16,41 @@
 //! | `cooking`   | ✅ Available       | Furnace, smoker, campfire, blast     |
 //! | `potion`    | ⛔ Unavailable     | Potion brewing recipes               |
 
-use pumpkin_plugin_api::{
-    Context,
-    recipe::{CookingRecipeBuilder, RecipeCategory, ShapedRecipeBuilder, ShapelessRecipeBuilder},
+use pumpkin_plugin_api::Context;
+use pumpkin_plugin_api::recipe::{
+    CookingRecipeBuilder, RecipeError, ShapedRecipeBuilder, ShapelessRecipeBuilder,
 };
 use serde::{Deserialize, Serialize};
 use std::time::Instant;
 use tracing::{error, info};
+
+/// A single recipe entry produced by a recipe pack.
+///
+/// Wraps one of the upstream Pumpkin recipe builders so a pack can return a
+/// single heterogeneous list of recipes.
+pub enum RecipeEntry {
+    /// A shaped crafting recipe builder.
+    Shaped(ShapedRecipeBuilder),
+    /// A shapeless crafting recipe builder.
+    Shapeless(ShapelessRecipeBuilder),
+    /// A furnace / smoker / blast furnace / campfire recipe builder.
+    Cooking(CookingRecipeBuilder),
+}
+
+impl RecipeEntry {
+    /// Registers this recipe with the server.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RecipeError`] if upstream validation or registration fails.
+    fn register(self, context: &Context) -> Result<(), RecipeError> {
+        match self {
+            Self::Shaped(builder) => context.register_recipe(builder),
+            Self::Shapeless(builder) => context.register_recipe(builder),
+            Self::Cooking(builder) => context.register_recipe(builder),
+        }
+    }
+}
 
 /// A trait representing a collection of custom recipes that can be registered.
 ///
@@ -39,15 +67,13 @@ use tracing::{error, info};
 ///         ConfigManager::get().is_some_and(|cm| cm.recipes.my_recipes.enabled)
 ///     }
 ///
-///     fn shaped(&self) -> Vec<ShapedRecipe> {
-///         vec![ShapedRecipe {
-///             id: namespaced_id!("example").into(),
-///             height: 2,
-///             width: 3,
-///             pattern: vec!["AAA".into(), "A A".into()],
-///             keys: vec![('A', Ingredient::Item { id: "minecraft:diamond".into() })],
-///             result: RecipeItemStack { id: "minecraft:diamond_block".into(), count: 1 },
-///         }]
+///     fn recipes(&self) -> Vec<RecipeEntry> {
+///         vec![RecipeEntry::Shaped(
+///             ShapedRecipeBuilder::new("my_plugin:example", ItemStack::new("minecraft:diamond_block", 1))
+///                 .pattern(["AAA", "A A", "AAA"])
+///                 .key('A', "minecraft:diamond")
+///                 .category(RecipeCategory::Misc),
+///         )]
 ///     }
 /// }
 /// ```
@@ -60,28 +86,12 @@ pub trait Recipe {
     fn enabled(&self) -> bool {
         true
     }
-    /// Returns the shaped crafting recipes to be registered.
-    ///
-    /// Each entry describes a recipe with a fixed grid pattern. Override this
-    /// to provide shaped recipes. Defaults to an empty vector.
-    fn shaped(&self) -> Vec<ShapedRecipe> {
-        vec![]
-    }
 
-    /// Returns the shapeless crafting recipes to be registered.
+    /// Returns all recipes in this pack.
     ///
-    /// Each entry describes a recipe where ingredients can be placed in any
-    /// slot of the crafting grid. Override this to provide shapeless recipes.
-    /// Defaults to an empty vector.
-    fn shapeless(&self) -> Vec<ShapelessRecipe> {
-        vec![]
-    }
-
-    /// Returns the cooking recipes to be registered.
-    ///
-    /// Covers furnace, smoker, blast furnace, and campfire recipes. Override
-    /// this to provide cooking recipes. Defaults to an empty vector.
-    fn cooking(&self) -> Vec<CookingRecipe> {
+    /// Each [`RecipeEntry`] is registered with the server when [`Recipe::register`]
+    /// is called. Defaults to an empty vector.
+    fn recipes(&self) -> Vec<RecipeEntry> {
         vec![]
     }
 
@@ -89,7 +99,7 @@ pub trait Recipe {
     fn count(&self) -> u32 {
         #[allow(clippy::cast_possible_truncation)]
         {
-            self.shaped().len() as u32 + self.shapeless().len() as u32 + self.cooking().len() as u32
+            self.recipes().len() as u32
         }
     }
 
@@ -98,7 +108,7 @@ pub trait Recipe {
         self.count() > 0
     }
 
-    /// Registers all recipes returned by the trait methods with the server.
+    /// Registers all recipes returned by [`Recipe::recipes`] with the server.
     ///
     /// If the recipe pack is disabled via [`Recipe::enabled`], this is a no-op.
     /// Otherwise, logs the count and time taken. If no recipes are present this is a
@@ -115,76 +125,27 @@ pub trait Recipe {
         }
 
         let start = Instant::now();
+        let recipes = self.recipes();
+        let total = recipes.len();
+        let mut shaped = 0u32;
+        let mut shapeless = 0u32;
+        let mut cooking = 0u32;
 
-        let shaped = self.shaped();
-        let shapeless = self.shapeless();
-        let cooking = self.cooking();
-
-        let total = shaped.len() + shapeless.len() + cooking.len();
-
-        for recipe in &shaped {
-            if let Err(e) = ShapedRecipeBuilder::new(&recipe.id, recipe.result.as_stack())
-                .pattern(recipe.pattern.clone())
-                .keys(recipe.keys.clone())
-                .category(RecipeCategory::Misc)
-                .register_to_context(context)
-            {
-                error!("Failed to register shaped recipe '{}': {e}", recipe.id);
+        for recipe in recipes {
+            match &recipe {
+                RecipeEntry::Shaped(_) => shaped += 1,
+                RecipeEntry::Shapeless(_) => shapeless += 1,
+                RecipeEntry::Cooking(_) => cooking += 1,
             }
-        }
-
-        for recipe in &shapeless {
-            let mut builder = ShapelessRecipeBuilder::new(&recipe.id, recipe.result.as_stack())
-                .category(RecipeCategory::Misc);
-            for ingredient in &recipe.ingredients {
-                builder = builder.ingredient(ingredient.as_ingredient());
-            }
-            if let Err(e) = builder.register_to_context(context) {
-                error!("Failed to register shapeless recipe '{}': {e}", recipe.id);
-            }
-        }
-
-        for recipe in &cooking {
-            let builder = match recipe.kind {
-                CookingKind::Smelting => CookingRecipeBuilder::smelting(
-                    &recipe.id,
-                    recipe.ingredient.as_ingredient(),
-                    recipe.result.as_stack(),
-                ),
-                CookingKind::Blasting => CookingRecipeBuilder::blasting(
-                    &recipe.id,
-                    recipe.ingredient.as_ingredient(),
-                    recipe.result.as_stack(),
-                ),
-                CookingKind::Smoking => CookingRecipeBuilder::smoking(
-                    &recipe.id,
-                    recipe.ingredient.as_ingredient(),
-                    recipe.result.as_stack(),
-                ),
-                CookingKind::Campfire => CookingRecipeBuilder::campfire(
-                    &recipe.id,
-                    recipe.ingredient.as_ingredient(),
-                    recipe.result.as_stack(),
-                ),
-            };
-            if let Err(e) = builder
-                .cooking_time(recipe.cook_time)
-                .experience(recipe.experience)
-                .category(RecipeCategory::Misc)
-                .register_to_context(context)
-            {
-                error!("Failed to register cooking recipe '{}': {e}", recipe.id);
+            if let Err(e) = recipe.register(context) {
+                error!("Failed to register recipe: {e}");
             }
         }
 
         let elapsed = start.elapsed().as_millis();
         info!(
             "Registered: {} recipe(s) ({} shaped, {} shapeless, {} cooking) | Took {}ms",
-            total,
-            shaped.len(),
-            shapeless.len(),
-            cooking.len(),
-            elapsed
+            total, shaped, shapeless, cooking, elapsed
         );
     }
 }
@@ -213,131 +174,4 @@ pub struct RecipesConfig {
     pub wood_log: bool,
     /// Convert wool blocks into string.
     pub wool_to_string: bool,
-}
-
-/// A shaped crafting recipe.
-///
-/// Patterns use single-character keys mapped to [`Ingredient`] entries.
-/// Spaces represent empty slots.
-#[derive(Debug, Clone)]
-pub struct ShapedRecipe {
-    /// Unique recipe identifier (e.g. `namespaced_id!("diamond_horse_armor")`).
-    pub id: String,
-    /// Grid height (1–3).
-    pub height: u8,
-    /// Grid width (1–3).
-    pub width: u8,
-    /// Pattern rows. Each string must be exactly `width` characters.
-    /// Use a space `' '` for an empty slot.
-    pub pattern: Vec<String>,
-    /// Mapping from pattern characters to ingredients.
-    pub keys: Vec<(char, Ingredient)>,
-    /// The result item.
-    pub result: RecipeItemStack,
-}
-
-/// A shapeless crafting recipe.
-///
-/// Ingredients can be placed in any slot of the crafting grid.
-#[derive(Debug, Clone)]
-pub struct ShapelessRecipe {
-    /// Unique recipe identifier.
-    pub id: String,
-    /// List of ingredients (may include duplicates for multi-count slots).
-    pub ingredients: Vec<Ingredient>,
-    /// The result item.
-    pub result: RecipeItemStack,
-}
-
-/// A furnace / smoker / blast furnace / campfire recipe.
-#[derive(Debug, Clone)]
-pub struct CookingRecipe {
-    /// Unique recipe identifier.
-    pub id: String,
-    /// The input ingredient.
-    pub ingredient: Ingredient,
-    /// The result item.
-    pub result: RecipeItemStack,
-    /// Base cooking time in ticks (e.g. 200 for furnace).
-    pub cook_time: u32,
-    /// Experience granted when the item is removed.
-    pub experience: f32,
-    /// Which cooking block this applies to.
-    pub kind: CookingKind,
-}
-
-/// Variant of cooking recipe.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CookingKind {
-    /// Standard furnace.
-    Smelting,
-    /// Blast furnace (2× speed).
-    Blasting,
-    /// Smoker (2× speed).
-    Smoking,
-    /// Campfire (3× duration).
-    Campfire,
-}
-
-/// An ingredient accepted by a recipe.
-///
-/// Mirrors the Pumpkin WIT `RecipeIngredient` type.
-#[derive(Debug, Clone)]
-pub enum Ingredient {
-    /// Accept an exact item by its identifier (e.g. `"minecraft:diamond"`).
-    Item { id: String },
-    /// Accept any item in a tag (e.g. `"minecraft:logs"`).
-    Tag { id: String },
-}
-
-impl Ingredient {
-    /// Converts this recipe ingredient into the upstream `pumpkin_plugin_api::recipe::Ingredient`.
-    fn as_ingredient(&self) -> pumpkin_plugin_api::recipe::Ingredient {
-        match self {
-            Self::Item { id } => pumpkin_plugin_api::recipe::Ingredient::item(id.clone()),
-            Self::Tag { id } => pumpkin_plugin_api::recipe::Ingredient::tag(id.clone()),
-        }
-    }
-}
-
-/// A stack of items produced by a recipe.
-///
-/// Mirrors the Pumpkin WIT `ItemStack` type.
-#[derive(Debug, Clone)]
-pub struct RecipeItemStack {
-    /// Item identifier (e.g. `"minecraft:diamond_horse_armor"`).
-    pub id: String,
-    /// Number of items in the stack.
-    pub count: u8,
-}
-
-impl RecipeItemStack {
-    /// Converts this recipe result into an upstream `pumpkin_plugin_api::ItemStack`.
-    fn as_stack(&self) -> pumpkin_plugin_api::ItemStack {
-        pumpkin_plugin_api::ItemStack::new(&self.id, self.count)
-    }
-}
-
-impl Default for RecipeItemStack {
-    fn default() -> Self {
-        Self {
-            id: String::new(),
-            count: 1,
-        }
-    }
-}
-
-/// Adapts internal `ShapedRecipe` keys to upstream builder calls.
-trait ShapedKeys {
-    /// Applies all ingredient keys to a shaped recipe builder.
-    fn keys(self, keys: Vec<(char, Ingredient)>) -> Self;
-}
-
-impl ShapedKeys for ShapedRecipeBuilder {
-    fn keys(mut self, keys: Vec<(char, Ingredient)>) -> Self {
-        for (symbol, ingredient) in keys {
-            self = self.key(symbol, ingredient.as_ingredient());
-        }
-        self
-    }
 }

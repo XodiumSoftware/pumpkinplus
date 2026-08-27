@@ -24,7 +24,9 @@
 //! | ... (all stripped)    | ...                  |
 
 use crate::config::ConfigManager;
-use crate::modules::recipes::recipe::{Ingredient, Recipe, RecipeItemStack, ShapelessRecipe};
+use crate::modules::recipes::recipe::{Recipe, RecipeEntry};
+use pumpkin_plugin_api::ItemStack;
+use pumpkin_plugin_api::recipe::{RecipeCategory, ShapelessRecipeBuilder};
 
 /// Handles wood-to-log shapeless conversion recipes.
 #[derive(Default)]
@@ -35,7 +37,7 @@ impl Recipe for WoodLog {
         ConfigManager::get().is_some_and(|cm| cm.recipes.wood_log)
     }
 
-    fn shapeless(&self) -> Vec<ShapelessRecipe> {
+    fn recipes(&self) -> Vec<RecipeEntry> {
         let pairs: Vec<(&str, &str)> = vec![
             // Regular
             ("minecraft:oak_wood", "minecraft:oak_log"),
@@ -97,14 +99,14 @@ impl Recipe for WoodLog {
             .into_iter()
             .map(|(wood, log)| {
                 let name = log.rsplit_once(':').map_or(log, |(_, s)| s);
-                ShapelessRecipe {
-                    id: format!("{}:{name}_from_wood", env!("CARGO_PKG_NAME")),
-                    ingredients: vec![Ingredient::Item { id: wood.into() }],
-                    result: RecipeItemStack {
-                        id: log.into(),
-                        count: 4,
-                    },
-                }
+                RecipeEntry::Shapeless(
+                    ShapelessRecipeBuilder::new(
+                        format!("{}:{name}_from_wood", env!("CARGO_PKG_NAME")),
+                        ItemStack::new(log, 4),
+                    )
+                    .ingredient(wood)
+                    .category(RecipeCategory::Misc),
+                )
             })
             .collect()
     }

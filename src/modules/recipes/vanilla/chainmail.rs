@@ -13,8 +13,10 @@
 //! | Chainmail Boots     | `A A`, `A A`           | `A` = iron bars |
 
 use crate::config::ConfigManager;
-use crate::modules::recipes::recipe::{Ingredient, Recipe, RecipeItemStack, ShapedRecipe};
+use crate::modules::recipes::recipe::{Recipe, RecipeEntry};
 use crate::namespaced_id;
+use pumpkin_plugin_api::ItemStack;
+use pumpkin_plugin_api::recipe::{RecipeCategory, ShapedRecipeBuilder};
 
 /// Handles chainmail armor recipe registration.
 #[derive(Default)]
@@ -25,76 +27,44 @@ impl Recipe for Chainmail {
         ConfigManager::get().is_some_and(|cm| cm.recipes.chainmail)
     }
 
-    fn shaped(&self) -> Vec<ShapedRecipe> {
+    fn recipes(&self) -> Vec<RecipeEntry> {
         vec![
-            // Chainmail Helmet
-            ShapedRecipe {
-                id: namespaced_id!("chainmail_helmet").into(),
-                height: 2,
-                width: 3,
-                pattern: vec!["AAA".into(), "A A".into()],
-                keys: vec![(
-                    'A',
-                    Ingredient::Item {
-                        id: "minecraft:iron_bars".into(),
-                    },
-                )],
-                result: RecipeItemStack {
-                    id: "minecraft:chainmail_helmet".into(),
-                    count: 1,
-                },
-            },
-            // Chainmail Chestplate
-            ShapedRecipe {
-                id: namespaced_id!("chainmail_chestplate").into(),
-                height: 3,
-                width: 3,
-                pattern: vec!["A A".into(), "AAA".into(), "AAA".into()],
-                keys: vec![(
-                    'A',
-                    Ingredient::Item {
-                        id: "minecraft:iron_bars".into(),
-                    },
-                )],
-                result: RecipeItemStack {
-                    id: "minecraft:chainmail_chestplate".into(),
-                    count: 1,
-                },
-            },
-            // Chainmail Leggings
-            ShapedRecipe {
-                id: namespaced_id!("chainmail_leggings").into(),
-                height: 3,
-                width: 3,
-                pattern: vec!["AAA".into(), "A A".into(), "A A".into()],
-                keys: vec![(
-                    'A',
-                    Ingredient::Item {
-                        id: "minecraft:iron_bars".into(),
-                    },
-                )],
-                result: RecipeItemStack {
-                    id: "minecraft:chainmail_leggings".into(),
-                    count: 1,
-                },
-            },
-            // Chainmail Boots
-            ShapedRecipe {
-                id: namespaced_id!("chainmail_boots").into(),
-                height: 2,
-                width: 3,
-                pattern: vec!["A A".into(), "A A".into()],
-                keys: vec![(
-                    'A',
-                    Ingredient::Item {
-                        id: "minecraft:iron_bars".into(),
-                    },
-                )],
-                result: RecipeItemStack {
-                    id: "minecraft:chainmail_boots".into(),
-                    count: 1,
-                },
-            },
+            RecipeEntry::Shaped(
+                ShapedRecipeBuilder::new(
+                    namespaced_id!("chainmail_helmet"),
+                    ItemStack::new("minecraft:chainmail_helmet", 1),
+                )
+                .pattern(["AAA", "A A"])
+                .key('A', "minecraft:iron_bars")
+                .category(RecipeCategory::Misc),
+            ),
+            RecipeEntry::Shaped(
+                ShapedRecipeBuilder::new(
+                    namespaced_id!("chainmail_chestplate"),
+                    ItemStack::new("minecraft:chainmail_chestplate", 1),
+                )
+                .pattern(["A A", "AAA", "AAA"])
+                .key('A', "minecraft:iron_bars")
+                .category(RecipeCategory::Misc),
+            ),
+            RecipeEntry::Shaped(
+                ShapedRecipeBuilder::new(
+                    namespaced_id!("chainmail_leggings"),
+                    ItemStack::new("minecraft:chainmail_leggings", 1),
+                )
+                .pattern(["AAA", "A A", "A A"])
+                .key('A', "minecraft:iron_bars")
+                .category(RecipeCategory::Misc),
+            ),
+            RecipeEntry::Shaped(
+                ShapedRecipeBuilder::new(
+                    namespaced_id!("chainmail_boots"),
+                    ItemStack::new("minecraft:chainmail_boots", 1),
+                )
+                .pattern(["A A", "A A"])
+                .key('A', "minecraft:iron_bars")
+                .category(RecipeCategory::Misc),
+            ),
         ]
     }
 }

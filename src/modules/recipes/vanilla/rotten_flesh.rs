@@ -11,10 +11,10 @@
 //! | Campfire | 1× Leather | 0.05 | 600          |
 
 use crate::config::ConfigManager;
-use crate::modules::recipes::recipe::{
-    CookingKind, CookingRecipe, Ingredient, Recipe, RecipeItemStack,
-};
+use crate::modules::recipes::recipe::{Recipe, RecipeEntry};
 use crate::namespaced_id;
+use pumpkin_plugin_api::ItemStack;
+use pumpkin_plugin_api::recipe::{CookingRecipeBuilder, RecipeCategory};
 
 /// Handles rotten-flesh-to-leather conversion recipes.
 #[derive(Default)]
@@ -25,50 +25,41 @@ impl Recipe for RottenFlesh {
         ConfigManager::get().is_some_and(|cm| cm.recipes.rotten_flesh)
     }
 
-    fn cooking(&self) -> Vec<CookingRecipe> {
+    fn recipes(&self) -> Vec<RecipeEntry> {
         vec![
             // Furnace
-            CookingRecipe {
-                id: namespaced_id!("rotten_flesh_furnace").into(),
-                ingredient: Ingredient::Item {
-                    id: "minecraft:rotten_flesh".into(),
-                },
-                result: RecipeItemStack {
-                    id: "minecraft:leather".into(),
-                    count: 1,
-                },
-                cook_time: 200,
-                experience: 0.1,
-                kind: CookingKind::Smelting,
-            },
+            RecipeEntry::Cooking(
+                CookingRecipeBuilder::smelting(
+                    namespaced_id!("rotten_flesh_furnace"),
+                    "minecraft:rotten_flesh",
+                    ItemStack::new("minecraft:leather", 1),
+                )
+                .cooking_time(200)
+                .experience(0.1)
+                .category(RecipeCategory::Misc),
+            ),
             // Smoker
-            CookingRecipe {
-                id: namespaced_id!("rotten_flesh_smoker").into(),
-                ingredient: Ingredient::Item {
-                    id: "minecraft:rotten_flesh".into(),
-                },
-                result: RecipeItemStack {
-                    id: "minecraft:leather".into(),
-                    count: 1,
-                },
-                cook_time: 100,
-                experience: 0.1,
-                kind: CookingKind::Smoking,
-            },
+            RecipeEntry::Cooking(
+                CookingRecipeBuilder::smoking(
+                    namespaced_id!("rotten_flesh_smoker"),
+                    "minecraft:rotten_flesh",
+                    ItemStack::new("minecraft:leather", 1),
+                )
+                .cooking_time(100)
+                .experience(0.1)
+                .category(RecipeCategory::Misc),
+            ),
             // Campfire
-            CookingRecipe {
-                id: namespaced_id!("rotten_flesh_campfire").into(),
-                ingredient: Ingredient::Item {
-                    id: "minecraft:rotten_flesh".into(),
-                },
-                result: RecipeItemStack {
-                    id: "minecraft:leather".into(),
-                    count: 1,
-                },
-                cook_time: 600,
-                experience: 0.05,
-                kind: CookingKind::Campfire,
-            },
+            RecipeEntry::Cooking(
+                CookingRecipeBuilder::campfire(
+                    namespaced_id!("rotten_flesh_campfire"),
+                    "minecraft:rotten_flesh",
+                    ItemStack::new("minecraft:leather", 1),
+                )
+                .cooking_time(600)
+                .experience(0.05)
+                .category(RecipeCategory::Misc),
+            ),
         ]
     }
 }

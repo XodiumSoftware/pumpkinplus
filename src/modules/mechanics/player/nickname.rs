@@ -45,7 +45,7 @@ pub struct Nickname;
 
 impl Mechanic for Nickname {
     fn enabled(&self) -> bool {
-        ConfigManager::get().is_some_and(|cm| cm.nickname.enabled)
+        ConfigManager::get().is_some_and(|cm| cm.mechanics.nickname.enabled)
     }
 
     fn cmds(&self) -> Vec<Command> {

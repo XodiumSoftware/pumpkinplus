@@ -43,7 +43,7 @@ pub struct Openable;
 
 impl Mechanic for Openable {
     fn enabled(&self) -> bool {
-        ConfigManager::get().is_some_and(|cm| cm.openable.enabled)
+        ConfigManager::get().is_some_and(|cm| cm.mechanics.openable.enabled)
     }
 
     fn events(&self, context: &Context) {
@@ -62,7 +62,7 @@ impl EventHandler<PlayerInteractEvent> for Openable {
         }
 
         let config: OpenableConfig = ConfigManager::get()
-            .map(|cm| cm.openable)
+            .map(|cm| cm.mechanics.openable)
             .unwrap_or_default();
 
         let action = InteractAction::from(event.action);

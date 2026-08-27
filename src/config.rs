@@ -15,13 +15,7 @@ use std::path::PathBuf;
 use tracing::error;
 
 pub use crate::modules::enchantments::enchantment::EnchantmentsConfig;
-pub use crate::modules::mechanics::entity::griefing::GriefingConfig;
-pub use crate::modules::mechanics::player::enderchest::EnderchestConfig;
-pub use crate::modules::mechanics::player::messages::MessagesConfig;
-pub use crate::modules::mechanics::player::nickname::NicknameConfig;
-pub use crate::modules::mechanics::server::chat::ChatConfig;
-pub use crate::modules::mechanics::server::tablist::TablistConfig;
-pub use crate::modules::mechanics::world::openable::OpenableConfig;
+pub use crate::modules::mechanics::mechanic::MechanicsConfig;
 pub use crate::modules::recipes::recipe::RecipesConfig;
 
 thread_local! {
@@ -35,20 +29,8 @@ thread_local! {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct PluginConfig {
-    /// Mob griefing prevention.
-    pub griefing: GriefingConfig,
-    /// Shared enderchest mechanics.
-    pub enderchest: EnderchestConfig,
-    /// Custom join/leave/kick messages.
-    pub messages: MessagesConfig,
-    /// Player nickname commands.
-    pub nickname: NicknameConfig,
-    /// Chat formatting and filtering.
-    pub chat: ChatConfig,
-    /// Tab list header/footer.
-    pub tablist: TablistConfig,
-    /// Double-door synchronization.
-    pub openable: OpenableConfig,
+    /// All mechanic module toggles.
+    pub mechanics: MechanicsConfig,
     /// Custom recipe pack toggles.
     pub recipes: RecipesConfig,
     /// Vanilla enchantment behavior override toggles.

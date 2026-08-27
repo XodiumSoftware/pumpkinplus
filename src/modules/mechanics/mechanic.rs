@@ -3,10 +3,18 @@
 //! Each gameplay feature is implemented as a module implementing the [`Mechanic`] trait.
 //! Mechanics can register event handlers, commands, and permission nodes.
 
+pub use crate::modules::mechanics::entity::griefing::GriefingConfig;
+pub use crate::modules::mechanics::player::enderchest::EnderchestConfig;
+pub use crate::modules::mechanics::player::messages::MessagesConfig;
+pub use crate::modules::mechanics::player::nickname::NicknameConfig;
+pub use crate::modules::mechanics::server::chat::ChatConfig;
+pub use crate::modules::mechanics::server::tablist::TablistConfig;
+pub use crate::modules::mechanics::world::openable::OpenableConfig;
 use pumpkin_plugin_api::Context;
 use pumpkin_plugin_api::command::Command;
 use pumpkin_plugin_api::events::{EventHandler, EventPriority, FromIntoEvent};
 use pumpkin_plugin_api::permission::Permission;
+use serde::{Deserialize, Serialize};
 use tracing::error;
 
 /// A trait representing a plugin mechanic that can be enabled or disabled.
@@ -78,4 +86,27 @@ pub trait Mechanic {
             context.register_command(cmd, &perm);
         }
     }
+}
+
+/// Top-level configuration for all mechanics.
+///
+/// Each field toggles one mechanic module. All mechanics are disabled by default.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+#[allow(clippy::struct_excessive_bools)]
+pub struct MechanicsConfig {
+    /// Mob griefing prevention.
+    pub griefing: GriefingConfig,
+    /// Shared enderchest mechanics.
+    pub enderchest: EnderchestConfig,
+    /// Custom join/leave/kick messages.
+    pub messages: MessagesConfig,
+    /// Player nickname commands.
+    pub nickname: NicknameConfig,
+    /// Chat formatting and filtering.
+    pub chat: ChatConfig,
+    /// Tab list header/footer.
+    pub tablist: TablistConfig,
+    /// Double-door synchronization.
+    pub openable: OpenableConfig,
 }

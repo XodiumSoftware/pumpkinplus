@@ -34,15 +34,9 @@ impl Mechanic for Messages {
     }
 
     fn events(&self, context: &Context) {
-        context
-            .register_event_handler::<PlayerJoinEvent, _>(Messages, EventPriority::Highest, true)
-            .expect("failed to register join event handler");
-        context
-            .register_event_handler::<PlayerLeaveEvent, _>(Messages, EventPriority::Highest, true)
-            .expect("failed to register leave event handler");
-        context
-            .register_event_handler::<PlayerLoginEvent, _>(Messages, EventPriority::Highest, true)
-            .expect("failed to register login event handler");
+        self.register_event::<PlayerJoinEvent>(context, EventPriority::Highest, true);
+        self.register_event::<PlayerLeaveEvent>(context, EventPriority::Highest, true);
+        self.register_event::<PlayerLoginEvent>(context, EventPriority::Highest, true);
     }
 }
 

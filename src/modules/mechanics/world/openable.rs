@@ -47,9 +47,7 @@ impl Mechanic for Openable {
     }
 
     fn events(&self, context: &Context) {
-        context
-            .register_event_handler::<PlayerInteractEvent, _>(Openable, EventPriority::Normal, true)
-            .expect("failed to register openable event handler");
+        self.register_event::<PlayerInteractEvent>(context, EventPriority::Normal, true);
     }
 }
 

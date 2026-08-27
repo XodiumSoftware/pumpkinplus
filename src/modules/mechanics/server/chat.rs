@@ -32,9 +32,7 @@ impl Mechanic for Chat {
     }
 
     fn events(&self, context: &Context) {
-        context
-            .register_event_handler::<PlayerChatEvent, _>(Chat, EventPriority::Highest, true)
-            .expect("failed to register chat event handler");
+        self.register_event::<PlayerChatEvent>(context, EventPriority::Highest, true);
     }
 }
 

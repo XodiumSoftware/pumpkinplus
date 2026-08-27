@@ -24,7 +24,7 @@ use pumpkin_plugin_api::events::{EntityDamageEvent, EventData, EventHandler, Eve
 use pumpkin_plugin_api::text::TextComponent;
 use pumpkin_plugin_api::world::EquipmentSlot;
 use pumpkin_plugin_api::{Context, Server};
-use tracing::{debug, error, info};
+use tracing::debug;
 
 /// Unique identifier for the Embertread enchantment.
 const EMBERTREAD_ID: &str = namespaced_id!("embertread");
@@ -38,27 +38,17 @@ impl Enchantment for Embertread {
         ConfigManager::get().is_some_and(|cm| cm.enchantments.embertread)
     }
 
-    fn register_custom(&self, context: &Context) {
-        let description = TextComponent::text("Embertread");
-        let result = context.register_enchantment(
-            EnchantmentBuilder::new(EMBERTREAD_ID, description)
-                .max_level(1)
-                .anvil_cost(2)
-                .supported_items("#minecraft:enchantable/foot_armor")
-                .weight(2)
-                .slots([AttributeModifierSlot::Feet]),
-        );
-
-        match result {
-            Ok(()) => info!("[Embertread] Registered custom enchantment"),
-            Err(e) => error!("Failed to register Embertread enchantment: {e}"),
-        }
+    fn enchantment(&self) -> EnchantmentBuilder {
+        EnchantmentBuilder::new(EMBERTREAD_ID, TextComponent::text("Embertread"))
+            .max_level(1)
+            .anvil_cost(2)
+            .supported_items("#minecraft:enchantable/foot_armor")
+            .weight(2)
+            .slots([AttributeModifierSlot::Feet])
     }
 
     fn events(&self, context: &Context) {
-        context
-            .register_event_handler::<EntityDamageEvent, _>(Embertread, EventPriority::Normal, true)
-            .expect("failed to register Embertread damage event handler");
+        self.register_event::<EntityDamageEvent>(context, EventPriority::Normal, true);
     }
 }
 

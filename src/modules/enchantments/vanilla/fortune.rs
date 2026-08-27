@@ -33,9 +33,7 @@ impl Enchantment for Fortune {
     }
 
     fn events(&self, context: &Context) {
-        context
-            .register_event_handler::<BlockBreakEvent, _>(Fortune, EventPriority::Normal, true)
-            .expect("failed to register Fortune enchantment event handler");
+        self.register_event::<BlockBreakEvent>(context, EventPriority::Normal, true);
     }
 }
 

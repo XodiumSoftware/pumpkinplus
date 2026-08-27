@@ -18,14 +18,11 @@
 
 use pumpkin_plugin_api::{
     Context,
-    recipe::{
-        CookingRecipeBuilder, RecipeCategory, RecipeError, ShapedRecipeBuilder,
-        ShapelessRecipeBuilder,
-    },
+    recipe::{CookingRecipeBuilder, RecipeCategory, ShapedRecipeBuilder, ShapelessRecipeBuilder},
 };
 use serde::{Deserialize, Serialize};
 use std::time::Instant;
-use tracing::info;
+use tracing::{error, info};
 
 /// A trait representing a collection of custom recipes that can be registered.
 ///
@@ -107,16 +104,14 @@ pub trait Recipe {
     /// Otherwise, logs the count and time taken. If no recipes are present this is a
     /// no-op.
     ///
-    /// # Errors
-    ///
-    /// Returns [`RecipeError`] if any upstream recipe registration fails validation.
-    fn register(&self, context: &Context) -> Result<(), RecipeError> {
+    /// Any upstream registration error is logged here.
+    fn register(&self, context: &Context) {
         if !self.enabled() {
-            return Ok(());
+            return;
         }
 
         if !self.has_recipes() {
-            return Ok(());
+            return;
         }
 
         let start = Instant::now();
@@ -128,11 +123,14 @@ pub trait Recipe {
         let total = shaped.len() + shapeless.len() + cooking.len();
 
         for recipe in &shaped {
-            ShapedRecipeBuilder::new(&recipe.id, recipe.result.as_stack())
+            if let Err(e) = ShapedRecipeBuilder::new(&recipe.id, recipe.result.as_stack())
                 .pattern(recipe.pattern.clone())
                 .keys(recipe.keys.clone())
                 .category(RecipeCategory::Misc)
-                .register_to_context(context)?;
+                .register_to_context(context)
+            {
+                error!("Failed to register shaped recipe '{}': {e}", recipe.id);
+            }
         }
 
         for recipe in &shapeless {
@@ -141,7 +139,9 @@ pub trait Recipe {
             for ingredient in &recipe.ingredients {
                 builder = builder.ingredient(ingredient.as_ingredient());
             }
-            builder.register_to_context(context)?;
+            if let Err(e) = builder.register_to_context(context) {
+                error!("Failed to register shapeless recipe '{}': {e}", recipe.id);
+            }
         }
 
         for recipe in &cooking {
@@ -167,11 +167,14 @@ pub trait Recipe {
                     recipe.result.as_stack(),
                 ),
             };
-            builder
+            if let Err(e) = builder
                 .cooking_time(recipe.cook_time)
                 .experience(recipe.experience)
                 .category(RecipeCategory::Misc)
-                .register_to_context(context)?;
+                .register_to_context(context)
+            {
+                error!("Failed to register cooking recipe '{}': {e}", recipe.id);
+            }
         }
 
         let elapsed = start.elapsed().as_millis();
@@ -183,8 +186,6 @@ pub trait Recipe {
             cooking.len(),
             elapsed
         );
-
-        Ok(())
     }
 }
 

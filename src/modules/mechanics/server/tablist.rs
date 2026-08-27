@@ -43,12 +43,8 @@ impl Mechanic for Tablist {
     }
 
     fn events(&self, context: &Context) {
-        context
-            .register_event_handler::<PlayerJoinEvent, _>(Tablist, EventPriority::Normal, true)
-            .expect("failed to register tablist event handler");
-        context
-            .register_event_handler::<PlayerLeaveEvent, _>(Tablist, EventPriority::Normal, true)
-            .expect("failed to register tablist leave event handler");
+        self.register_event::<PlayerJoinEvent>(context, EventPriority::Normal, true);
+        self.register_event::<PlayerLeaveEvent>(context, EventPriority::Normal, true);
 
         // Keep live placeholders (TPS/MSPT) current for all online players.
         context.schedule_repeating_task(REFRESH_TICKS, REFRESH_TICKS, |server| {

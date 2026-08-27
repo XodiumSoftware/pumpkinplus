@@ -10,6 +10,7 @@ mod utils {
     pub mod block;
     pub mod command;
     pub mod entity;
+    pub mod macros;
     pub mod placeholders;
     pub mod player;
     pub mod text;
@@ -108,25 +109,82 @@ use crate::modules::recipes::vanilla::wood_log::WoodLog;
 use crate::modules::recipes::vanilla::wool_to_string::WoolToString;
 use pumpkin_plugin_api::{Context, Plugin, PluginMetadata};
 use std::time::Instant;
-use tracing::{error, info};
+use tracing::info;
 
 pub const PLUGIN_ID: &str = env!("CARGO_PKG_NAME");
 
-/// Produces a `const` namespaced identifier from the crate name and a suffix.
-///
-/// # Example
-///
-/// ```rust,ignore
-/// const EMBERTREAD_ID: &str = namespaced_id!("embertread");
-/// ```
-#[macro_export]
-macro_rules! namespaced_id {
-    ($suffix:expr) => {
-        concat!(env!("CARGO_PKG_NAME"), ":", $suffix)
-    };
-}
-
 pub struct PumpkinPlus {}
+
+impl PumpkinPlus {
+    /// Registers all mechanics and their commands/permissions.
+    fn register_mechanics(context: &Context) {
+        let mechanics: Vec<&dyn Mechanic> = vec![
+            &Griefing,
+            &Enderchest,
+            &Nickname,
+            &Messages,
+            &Chat,
+            &Tablist,
+            &Openable,
+        ];
+        let enabled_mechanics = mechanics.iter().filter(|m| m.enabled()).count();
+
+        let mut mechanic_total_ms = 0u128;
+        for mechanic in mechanics {
+            let start = Instant::now();
+            mechanic.register(context);
+            mechanic_total_ms += start.elapsed().as_millis();
+        }
+
+        info!(
+            "Registered: {} mechanic(s) | Took {}ms",
+            enabled_mechanics, mechanic_total_ms
+        );
+    }
+
+    /// Registers all recipe packs.
+    fn register_recipes(context: &Context) {
+        let recipes: Vec<&dyn Recipe> = vec![
+            &Chainmail,
+            &DiamondRecycle,
+            &IceBreakdown,
+            &NetherWartBlock,
+            &Painting,
+            &RottenFlesh,
+            &WoodLog,
+            &WoolToString,
+        ];
+
+        let enabled_recipes = recipes.iter().filter(|r| r.enabled()).count();
+        let mut recipe_total_ms = 0u128;
+        for recipe in recipes {
+            let start = Instant::now();
+            recipe.register(context);
+            recipe_total_ms += start.elapsed().as_millis();
+        }
+        info!(
+            "Registered: {} recipe pack(s) | Took {}ms",
+            enabled_recipes, recipe_total_ms
+        );
+    }
+
+    /// Registers all enchantments (custom definitions and behavior overrides).
+    fn register_enchantments(context: &Context) {
+        let enchantments: Vec<&dyn Enchantment> = vec![&Embertread, &Fortune];
+
+        let enabled_enchantments = enchantments.iter().filter(|e| e.enabled()).count();
+        let mut enchantment_total_ms = 0u128;
+        for enchantment in enchantments {
+            let start = Instant::now();
+            enchantment.register(context);
+            enchantment_total_ms += start.elapsed().as_millis();
+        }
+        info!(
+            "Registered: {} enchantment pack(s) | Took {}ms",
+            enabled_enchantments, enchantment_total_ms
+        );
+    }
+}
 
 impl Plugin for PumpkinPlus {
     fn new() -> Self {
@@ -153,80 +211,9 @@ impl Plugin for PumpkinPlus {
     fn on_load(&mut self, context: Context) -> pumpkin_plugin_api::Result<()> {
         ConfigManager::load(&context);
 
-        let griefing = Griefing;
-        let enderchest = Enderchest;
-        let nickname = Nickname;
-        let messages = Messages;
-        let chat = Chat;
-        let tablist = Tablist;
-        let openable = Openable;
-        let modules: Vec<&dyn Mechanic> = vec![
-            &griefing,
-            &enderchest,
-            &nickname,
-            &messages,
-            &chat,
-            &tablist,
-            &openable,
-        ];
-        let enabled_count = modules.iter().filter(|m| m.enabled()).count();
-
-        let mut total_ms = 0u128;
-        for module in modules {
-            let start = Instant::now();
-            module.register(&context);
-            total_ms += start.elapsed().as_millis();
-        }
-
-        info!(
-            "Registered: {} module(s) | Took {}ms",
-            enabled_count, total_ms
-        );
-
-        let recipes: Vec<&dyn Recipe> = vec![
-            &Chainmail,
-            &DiamondRecycle,
-            &IceBreakdown,
-            &NetherWartBlock,
-            &Painting,
-            &RottenFlesh,
-            &WoodLog,
-            &WoolToString,
-        ];
-
-        let enabled_recipes = recipes.iter().filter(|r| r.enabled()).count();
-        let mut registered_count = 0u32;
-        let mut recipe_total_ms = 0u128;
-        for recipe in recipes {
-            if !recipe.enabled() {
-                continue;
-            }
-            let start = Instant::now();
-            match recipe.register(&context) {
-                Ok(()) => registered_count += recipe.count(),
-                Err(e) => error!("Failed to register recipes: {e}"),
-            }
-            recipe_total_ms += start.elapsed().as_millis();
-        }
-        info!(
-            "Registered: {registered_count} recipe(s) ({} enabled pack(s)) | Took {recipe_total_ms}ms",
-            enabled_recipes
-        );
-
-        // Enchantments (custom definitions and/or behavior overrides)
-        let enchantments: Vec<&dyn Enchantment> = vec![&Embertread, &Fortune];
-
-        let enabled_enchantments = enchantments.iter().filter(|e| e.enabled()).count();
-        let mut enchantment_total_ms = 0u128;
-        for enchantment in enchantments {
-            let start = Instant::now();
-            enchantment.register(&context);
-            enchantment_total_ms += start.elapsed().as_millis();
-        }
-        info!(
-            "Registered: {} enchantment(s) | Took {}ms",
-            enabled_enchantments, enchantment_total_ms
-        );
+        Self::register_mechanics(&context);
+        Self::register_recipes(&context);
+        Self::register_enchantments(&context);
 
         info!("Pumpkin+ loaded. NICE TO CYA!");
         Ok(())

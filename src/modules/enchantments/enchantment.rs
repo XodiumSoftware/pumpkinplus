@@ -11,7 +11,11 @@
 //! `config.json`. Each enchantment is disabled by default.
 
 use pumpkin_plugin_api::Context;
+use pumpkin_plugin_api::enchantment::EnchantmentBuilder;
+use pumpkin_plugin_api::events::{EventHandler, EventPriority, FromIntoEvent};
+use pumpkin_plugin_api::text::TextComponent;
 use serde::{Deserialize, Serialize};
+use tracing::error;
 
 /// A trait representing a `PumpkinPlus` enchantment.
 ///
@@ -25,28 +29,50 @@ pub trait Enchantment {
         false
     }
 
-    /// Registers this enchantment's custom definition with the server.
+    /// Builds this enchantment's custom definition for registration.
     ///
-    /// Override this to call [`Context::register_enchantment`] for custom
-    /// enchantments that should appear in the enchanting table and on items.
-    /// No-op by default.
-    fn register_custom(&self, _context: &Context) {}
+    /// Override this to return an [`EnchantmentBuilder`] for custom enchantments
+    /// that should appear in the enchanting table and on items. Returns a builder
+    /// with a placeholder id by default; vanilla behavior overrides can leave this
+    /// as-is.
+    fn enchantment(&self) -> EnchantmentBuilder {
+        EnchantmentBuilder::new("pumpkinplus:noop", TextComponent::text("Noop"))
+    }
 
     /// Registers this enchantment's event handlers with the server.
     ///
-    /// Override this to call [`Context::register_event_handler`] for each event
-    /// this enchantment handles. No-op by default.
+    /// Override this to call [`Enchantment::register_event`] for each event this
+    /// enchantment handles. No-op by default.
     fn events(&self, _context: &Context) {}
+
+    /// Registers `Self` as the handler for event `T` and panics on failure.
+    ///
+    /// This is a thin wrapper around [`Context::register_event_handler`] that
+    /// supplies the enchantment-specific error message so individual
+    /// enchantments don't have to repeat it.
+    fn register_event<T>(&self, context: &Context, priority: EventPriority, ignore_cancelled: bool)
+    where
+        T: FromIntoEvent + Send + Sync + 'static,
+        Self: EventHandler<T> + Default + Send + Sync + 'static,
+    {
+        context
+            .register_event_handler::<T, _>(Self::default(), priority, ignore_cancelled)
+            .expect("failed to register enchantment event handler");
+    }
 
     /// Registers this enchantment with the server if it is enabled.
     ///
-    /// This calls [`Enchantment::register_custom`] followed by
-    /// [`Enchantment::events`].
+    /// This calls [`Enchantment::enchantment`] to build the definition, registers it
+    /// with the server, then calls [`Enchantment::events`]. Any registration error
+    /// is logged here so individual enchantments only need to build and return the
+    /// builder.
     fn register(&self, context: &Context) {
         if !self.enabled() {
             return;
         }
-        self.register_custom(context);
+        if let Err(e) = context.register_enchantment(self.enchantment()) {
+            error!("Failed to register enchantment: {e}");
+        }
         self.events(context);
     }
 }

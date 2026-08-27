@@ -35,13 +35,7 @@ impl Mechanic for Enderchest {
     }
 
     fn events(&self, context: &Context) {
-        context
-            .register_event_handler::<PlayerInteractEvent, _>(
-                Enderchest,
-                EventPriority::Normal,
-                true,
-            )
-            .expect("failed to register enderchest event handler");
+        self.register_event::<PlayerInteractEvent>(context, EventPriority::Normal, true);
     }
 }
 

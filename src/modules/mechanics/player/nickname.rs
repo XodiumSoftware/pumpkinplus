@@ -72,9 +72,7 @@ impl Mechanic for Nickname {
     }
 
     fn events(&self, context: &Context) {
-        context
-            .register_event_handler::<PlayerJoinEvent, _>(Nickname, EventPriority::Normal, true)
-            .expect("failed to register nickname join event handler");
+        self.register_event::<PlayerJoinEvent>(context, EventPriority::Normal, true);
     }
 }
 

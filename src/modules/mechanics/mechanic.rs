@@ -5,6 +5,7 @@
 
 use pumpkin_plugin_api::Context;
 use pumpkin_plugin_api::command::Command;
+use pumpkin_plugin_api::events::{EventHandler, EventPriority, FromIntoEvent};
 use pumpkin_plugin_api::permission::Permission;
 use tracing::error;
 
@@ -35,9 +36,24 @@ pub trait Mechanic {
 
     /// Registers event handlers for this mechanic.
     ///
-    /// Override this to call [`Context::register_event_handler`] for each event
-    /// this mechanic handles. No-op by default.
+    /// Override this to call [`Mechanic::register_event`] for each event this
+    /// mechanic handles. No-op by default.
     fn events(&self, _context: &Context) {}
+
+    /// Registers `Self` as the handler for event `T` and panics on failure.
+    ///
+    /// This is a thin wrapper around [`Context::register_event_handler`] that
+    /// supplies the module-specific error message so individual modules don't
+    /// have to repeat it.
+    fn register_event<T>(&self, context: &Context, priority: EventPriority, ignore_cancelled: bool)
+    where
+        T: FromIntoEvent + Send + Sync + 'static,
+        Self: EventHandler<T> + Default + Send + Sync + 'static,
+    {
+        context
+            .register_event_handler::<T, _>(Self::default(), priority, ignore_cancelled)
+            .expect("failed to register event handler");
+    }
 
     /// Registers this mechanic's event handlers and commands with the server.
     ///

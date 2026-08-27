@@ -42,16 +42,8 @@ impl Mechanic for Griefing {
     }
 
     fn events(&self, context: &Context) {
-        context
-            .register_event_handler::<EntityChangeBlockEvent, _>(
-                Griefing,
-                EventPriority::Normal,
-                true,
-            )
-            .expect("failed to register entity change block event handler");
-        context
-            .register_event_handler::<EntityExplodeEvent, _>(Griefing, EventPriority::Normal, true)
-            .expect("failed to register entity explode event handler");
+        self.register_event::<EntityChangeBlockEvent>(context, EventPriority::Normal, true);
+        self.register_event::<EntityExplodeEvent>(context, EventPriority::Normal, true);
     }
 }
 

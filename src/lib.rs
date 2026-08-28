@@ -41,6 +41,14 @@ mod modules {
             pub mod silk_touch;
         }
     }
+    pub mod items {
+        pub mod item;
+        pub mod weapons {
+            pub mod greatsword;
+            pub mod halberd;
+            pub mod longsword;
+        }
+    }
     pub mod recipes {
         pub mod recipe;
         pub mod vanilla {
@@ -78,6 +86,7 @@ pub use config::*;
 pub use modules::*;
 
 pub use modules::enchantments::enchantment::EnchantmentsConfig;
+pub use modules::items::item::Item;
 pub use modules::mechanics::entity::griefing::GriefingConfig;
 pub use modules::mechanics::player::enderchest::EnderchestConfig;
 pub use modules::mechanics::player::messages::MessagesConfig;

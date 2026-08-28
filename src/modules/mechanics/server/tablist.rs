@@ -46,7 +46,6 @@ impl Mechanic for Tablist {
         self.register_event::<PlayerJoinEvent>(context, EventPriority::Normal, true);
         self.register_event::<PlayerLeaveEvent>(context, EventPriority::Normal, true);
 
-        // Keep live placeholders (TPS/MSPT) current for all online players.
         context.schedule_repeating_task(REFRESH_TICKS, REFRESH_TICKS, |server| {
             Self::update_tablist_for_all_players(&server);
         });

@@ -17,7 +17,7 @@ use pumpkin_plugin_api::common::Hand;
 use pumpkin_plugin_api::events::{BlockBreakEvent, EventData, EventHandler, EventPriority};
 use pumpkin_plugin_api::scheduler::SchedulerExt;
 use pumpkin_plugin_api::world::{BlockFlags, BlockPos, World};
-use pumpkin_plugin_api::{Context, Server};
+use pumpkin_plugin_api::{BlockType, Context, Server};
 use tracing::info;
 
 /// Minimum Fortune level required to trigger auto-replanting.
@@ -128,10 +128,12 @@ fn try_parse_ageable(world: &World, pos: BlockPos) -> Option<AgeableInfo> {
     let info = pumpkin_plugin_api::world::block_state_to_info(state_id)?;
 
     // Supported crops and their vanilla maximum ages.
-    let max_age = match info.name.as_str() {
-        "wheat" | "carrots" | "potatoes" | "beetroots" => 7,
-        "nether_wart" => 3,
-        "torchflower_crop" | "pitcher_crop" => 0, // handled differently; ignore
+    // TorchflowerCrop and PitcherCrop are handled differently by vanilla, so
+    // they fall through to the wildcard arm and are ignored here.
+    let block_type = BlockType::from_registry_key(&info.name)?;
+    let max_age = match block_type {
+        BlockType::Wheat | BlockType::Carrots | BlockType::Potatoes | BlockType::Beetroots => 7,
+        BlockType::NetherWart => 3,
         _ => return None,
     };
 

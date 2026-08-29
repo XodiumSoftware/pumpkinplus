@@ -117,7 +117,6 @@ use crate::modules::recipes::vanilla::rotten_flesh::RottenFlesh;
 use crate::modules::recipes::vanilla::wood_log::WoodLog;
 use crate::modules::recipes::vanilla::wool_to_string::WoolToString;
 use pumpkin_plugin_api::{Context, Plugin, PluginMetadata};
-use pumpkin_plugin_utils::{UpdateError, check_for_updates, init};
 use std::time::Instant;
 use tracing::info;
 
@@ -220,34 +219,6 @@ impl Plugin for PumpkinPlus {
 
     fn on_load(&mut self, context: Context) -> pumpkin_plugin_api::Result<()> {
         ConfigManager::load(&context);
-
-        if let Err(e) = init(&context) {
-            info!("Failed to initialize plugin marketplace metadata: {e}");
-        }
-
-        match check_for_updates() {
-            Ok(update) => {
-                if update.update_available {
-                    if let Some(version) = update.latest_version {
-                        info!(
-                            "A new version of Pumpkin+ is available: {version} (current: {})",
-                            env!("CARGO_PKG_VERSION")
-                        );
-                    } else {
-                        info!(
-                            "A new version of Pumpkin+ is available (current: {})",
-                            env!("CARGO_PKG_VERSION")
-                        );
-                    }
-                }
-            }
-            Err(UpdateError::NotInitialized) => {
-                // Marketplace metadata unavailable; skip update check.
-            }
-            Err(e) => {
-                info!("Failed to check for updates: {e}");
-            }
-        }
 
         Self::register_mechanics(&context);
         Self::register_recipes(&context);

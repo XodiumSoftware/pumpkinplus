@@ -32,10 +32,55 @@ use crate::utils::block::toggle_open_property;
 use crate::{GameMode, InteractAction};
 use pumpkin_plugin_api::common::Hand;
 use pumpkin_plugin_api::events::{EventData, EventHandler, EventPriority, PlayerInteractEvent};
-use pumpkin_plugin_api::world::{BlockFlags, BlockPos, World, block_state_to_info};
-use pumpkin_plugin_api::{Context, Server};
+use pumpkin_plugin_api::world::{BlockFlags, BlockPos, BlockStateInfo, World, block_state_to_info};
+use pumpkin_plugin_api::{BlockType, Context, Server};
 use serde::{Deserialize, Serialize};
 use tracing::info;
+
+/// All vanilla door block types known by the typed registry.
+///
+/// Used instead of string suffix matching so door detection is type-safe for
+/// vanilla blocks. Custom/modded doors that end in `_door` are still matched
+/// by the fallback in [`is_door`].
+const DOOR_TYPES: &[BlockType] = &[
+    BlockType::AcaciaDoor,
+    BlockType::BambooDoor,
+    BlockType::BirchDoor,
+    BlockType::CherryDoor,
+    BlockType::CopperDoor,
+    BlockType::CrimsonDoor,
+    BlockType::DarkOakDoor,
+    BlockType::ExposedCopperDoor,
+    BlockType::IronDoor,
+    BlockType::JungleDoor,
+    BlockType::MangroveDoor,
+    BlockType::OakDoor,
+    BlockType::OxidizedCopperDoor,
+    BlockType::PaleOakDoor,
+    BlockType::SpruceDoor,
+    BlockType::WarpedDoor,
+    BlockType::WaxedCopperDoor,
+    BlockType::WaxedExposedCopperDoor,
+    BlockType::WaxedOxidizedCopperDoor,
+    BlockType::WaxedWeatheredCopperDoor,
+    BlockType::WeatheredCopperDoor,
+];
+
+/// Checks whether a [`BlockType`] is a known vanilla door variant.
+#[must_use]
+fn is_door_type(block_type: BlockType) -> bool {
+    DOOR_TYPES.contains(&block_type)
+}
+
+/// Checks whether the block described by `info` is a door.
+///
+/// Uses the typed block registry for vanilla doors and falls back to the
+/// resource-location suffix for custom/modded doors.
+#[must_use]
+fn is_door(info: &BlockStateInfo) -> bool {
+    BlockType::from_registry_key(&info.name).is_some_and(is_door_type)
+        || info.name.ends_with("_door")
+}
 
 /// Handles openable block synchronization and door knocking.
 #[derive(Default)]
@@ -105,7 +150,7 @@ impl EventHandler<PlayerInteractEvent> for Openable {
         };
 
         info!("[Openable] sync block name={}", clicked_info.name);
-        if !clicked_info.name.ends_with("_door") {
+        if !is_door(&clicked_info) {
             info!("[Openable] sync block is not a door, returning");
             return event;
         }
@@ -125,7 +170,7 @@ impl EventHandler<PlayerInteractEvent> for Openable {
             return event;
         };
 
-        if !adjacent_info.name.ends_with("_door") {
+        if !is_door(&adjacent_info) {
             info!("[Openable] sync adjacent block is not a door, returning");
             return event;
         }
@@ -207,7 +252,7 @@ fn handle_knock(
     };
 
     info!("[Openable] knock block name={}", clicked_info.name);
-    if !clicked_info.name.ends_with("_door") {
+    if !is_door(&clicked_info) {
         info!("[Openable] knock block is not a door, returning");
         return event;
     }
@@ -244,7 +289,7 @@ fn find_adjacent_door(world: &World, pos: BlockPos) -> Option<BlockPos> {
 
     for neighbor in &neighbors {
         let state_id = world.get_block_state_id(*neighbor);
-        if block_state_to_info(state_id).is_some_and(|info| info.name.ends_with("_door")) {
+        if block_state_to_info(state_id).is_some_and(|info| is_door(&info)) {
             return Some(*neighbor);
         }
     }

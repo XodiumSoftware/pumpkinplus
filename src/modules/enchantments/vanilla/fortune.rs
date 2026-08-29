@@ -17,7 +17,7 @@ use pumpkin_plugin_api::common::Hand;
 use pumpkin_plugin_api::events::{BlockBreakEvent, EventData, EventHandler, EventPriority};
 use pumpkin_plugin_api::scheduler::SchedulerExt;
 use pumpkin_plugin_api::world::{BlockFlags, BlockPos, World};
-use pumpkin_plugin_api::{BlockType, Context, Server};
+use pumpkin_plugin_api::{BlockType, Context, Item, ItemStackExt, Server};
 use tracing::info;
 
 /// Minimum Fortune level required to trigger auto-replanting.
@@ -96,15 +96,20 @@ impl EventHandler<BlockBreakEvent> for Fortune {
     }
 }
 
-/// Quick check for hoe-like item registry keys.
+/// All vanilla hoe item types known by the typed registry.
+const HOE_ITEMS: &[Item] = &[
+    Item::WoodenHoe,
+    Item::StoneHoe,
+    Item::IronHoe,
+    Item::GoldenHoe,
+    Item::DiamondHoe,
+    Item::NetheriteHoe,
+];
+
+/// Quick check for hoe-like items using the typed item registry.
+#[must_use]
 fn is_hoe(item: &pumpkin_plugin_api::ItemStack) -> bool {
-    let id = item.get_registry_key();
-    id == "minecraft:wooden_hoe"
-        || id == "minecraft:stone_hoe"
-        || id == "minecraft:iron_hoe"
-        || id == "minecraft:golden_hoe"
-        || id == "minecraft:diamond_hoe"
-        || id == "minecraft:netherite_hoe"
+    item.get_item().is_some_and(|it| HOE_ITEMS.contains(&it))
 }
 
 /// Parsed ageable crop state information.

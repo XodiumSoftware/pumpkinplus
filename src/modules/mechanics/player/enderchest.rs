@@ -19,11 +19,9 @@ use crate::mechanics::mechanic::Mechanic;
 use crate::{GameMode, InteractAction};
 use pumpkin_plugin_api::common::Hand;
 use pumpkin_plugin_api::events::{EventData, EventHandler, EventPriority, PlayerInteractEvent};
+use pumpkin_plugin_api::item::{Item, ItemStackExt};
 use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};
-
-/// Registry key for the ender chest item.
-const ENDER_CHEST_ITEM: &str = "ender_chest";
 
 /// Handles enderchest mechanics.
 #[derive(Default)]
@@ -62,7 +60,7 @@ impl EventHandler<PlayerInteractEvent> for Enderchest {
             return event;
         };
 
-        if item.get_registry_key() != ENDER_CHEST_ITEM {
+        if !item.is_item(Item::EnderChest) {
             return event;
         }
 

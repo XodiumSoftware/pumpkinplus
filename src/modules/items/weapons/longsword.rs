@@ -18,25 +18,26 @@
 //! > until server-side serialization is implemented. The builder still calls
 //! > `set_component` so the plugin is ready once support lands.
 
-use crate::items::item::Item;
+use crate::items::item::Item as ItemTrait;
 use crate::namespaced_id;
 use pumpkin_plugin_api::ItemStack;
 use pumpkin_plugin_api::common::{NbtTag, NbtTree};
 use pumpkin_plugin_api::data_components::DataComponent;
+use pumpkin_plugin_api::item::{Item, ItemStackExt};
 use pumpkin_plugin_api::text::TextComponent;
 
 /// Represents a Longsword.
 #[derive(Default)]
 pub struct Longsword;
 
-impl Item for Longsword {
+impl ItemTrait for Longsword {
     fn key(&self) -> &'static str {
         namespaced_id!("longsword")
     }
 
     fn build(&self) -> ItemStack {
         let (namespace, key) = self.key_parts();
-        let stack = ItemStack::new("minecraft:netherite_sword", 1);
+        let stack = ItemStack::of(Item::NetheriteSword, 1);
         stack.set_custom_name(Some(TextComponent::text("Longsword")));
         stack.set_custom_data(
             namespace,

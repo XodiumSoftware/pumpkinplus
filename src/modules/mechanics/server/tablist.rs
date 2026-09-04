@@ -4,9 +4,12 @@
 //!
 //! | Field     | Default | Description                                                          |
 //! |-----------|---------|----------------------------------------------------------------------|
-//! | `enabled` | `false` | Whether this module is active                                        |
-//! | `header`  | `""`    | Header text. Supports placeholders and Minecraft formatting codes  |
-//! | `footer`  | `""`    | Footer text. Supports placeholders and Minecraft formatting codes  |
+//! | `enabled` | `false` | Whether this module is active                                       |
+//! | `header`  | `""`    | Header text. Supports placeholders and `MiniMessage` formatting   |
+//! | `footer`  | `""`    | Footer text. Supports placeholders and `MiniMessage` formatting   |
+//!
+//! Header and footer support [MiniMessage](https://docs.advntr.dev/minimessage/format.html)
+//! formatting tags (resolved after placeholders).
 //!
 //! ## Placeholders
 //!
@@ -20,12 +23,12 @@
 use crate::config::ConfigManager;
 use crate::mechanics::mechanic::Mechanic;
 use crate::utils::placeholders::replace_all_placeholders;
+use crate::utils::text::parse_minimessage;
 use pumpkin_plugin_api::events::{
     EventData, EventHandler, EventPriority, PlayerJoinEvent, PlayerLeaveEvent,
 };
 use pumpkin_plugin_api::player::Player;
 use pumpkin_plugin_api::scheduler::SchedulerExt;
-use pumpkin_plugin_api::text::TextComponent;
 use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};
 
@@ -56,10 +59,9 @@ impl Tablist {
     /// Applies the configured header and footer to a single player,
     /// resolving placeholders for that player.
     fn update_tablist_for_player(config: &TablistConfig, server: &Server, player: &Player) {
-        let header = replace_all_placeholders(&config.header, server, player);
-        let footer = replace_all_placeholders(&config.footer, server, player);
-        player
-            .set_tab_list_header_footer(TextComponent::text(&header), TextComponent::text(&footer));
+        let header = parse_minimessage(&replace_all_placeholders(&config.header, server, player));
+        let footer = parse_minimessage(&replace_all_placeholders(&config.footer, server, player));
+        player.set_tab_list_header_footer(header, footer);
     }
 
     /// Refreshes the tab list header and footer for every online player.
@@ -125,8 +127,8 @@ impl EventHandler<PlayerLeaveEvent> for Tablist {
 pub struct TablistConfig {
     /// Whether this module is active.
     pub enabled: bool,
-    /// Header text displayed at the top of the tab list. Supports Minecraft formatting codes. Leave empty to disable.
+    /// Header text displayed at the top of the tab list. Supports `MiniMessage` tags. Leave empty to disable.
     pub header: String,
-    /// Footer text displayed at the bottom of the tab list. Supports Minecraft formatting codes. Leave empty to disable.
+    /// Footer text displayed at the bottom of the tab list. Supports `MiniMessage` tags. Leave empty to disable.
     pub footer: String,
 }

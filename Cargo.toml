@@ -10,6 +10,8 @@ crate-type = ["cdylib"]
 
 [dependencies]
 pumpkin-plugin-api = { version = "0.1.0", git = "https://github.com/Pumpkin-MC/Pumpkin" }
+minimessage-rs = "0.1.5"
+minimessage-rt-compat = { git = "https://github.com/Mettwasser/minimessage-rs" }
 tracing = "0.1"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0"

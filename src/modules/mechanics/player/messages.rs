@@ -9,6 +9,9 @@
 //! | `leave_msg` | `""`    | Message broadcast when a player leaves                             |
 //! | `kick_msg`  | `""`    | Message shown when a player is kicked during login                 |
 //!
+//! All message fields support [MiniMessage](https://docs.advntr.dev/minimessage/format.html)
+//! formatting tags (resolved after placeholders).
+//!
 //! ## Placeholders
 //!
 //! | Placeholder | Available in                                    |
@@ -18,10 +21,11 @@
 use crate::config::ConfigManager;
 use crate::mechanics::mechanic::Mechanic;
 use crate::utils::placeholders::replace_player_placeholders;
+use crate::utils::text::parse_minimessage;
 use pumpkin_plugin_api::events::{
     EventData, EventHandler, EventPriority, PlayerJoinEvent, PlayerLeaveEvent, PlayerLoginEvent,
 };
-use pumpkin_plugin_api::{Context, Server, text::TextComponent};
+use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};
 
 /// Handles player join, leave, and kick messages.
@@ -52,9 +56,10 @@ impl EventHandler<PlayerJoinEvent> for Messages {
         if config.join_msg.is_empty() {
             return event;
         }
-        event.join_message = TextComponent::text(
-            replace_player_placeholders(&config.join_msg, &event.player).as_str(),
-        );
+        event.join_message = parse_minimessage(&replace_player_placeholders(
+            &config.join_msg,
+            &event.player,
+        ));
         event
     }
 }
@@ -71,9 +76,10 @@ impl EventHandler<PlayerLeaveEvent> for Messages {
         if config.leave_msg.is_empty() {
             return event;
         }
-        event.leave_message = TextComponent::text(
-            replace_player_placeholders(&config.leave_msg, &event.player).as_str(),
-        );
+        event.leave_message = parse_minimessage(&replace_player_placeholders(
+            &config.leave_msg,
+            &event.player,
+        ));
         event
     }
 }
@@ -90,9 +96,10 @@ impl EventHandler<PlayerLoginEvent> for Messages {
         if config.kick_msg.is_empty() {
             return event;
         }
-        event.kick_message = TextComponent::text(
-            replace_player_placeholders(&config.kick_msg, &event.player).as_str(),
-        );
+        event.kick_message = parse_minimessage(&replace_player_placeholders(
+            &config.kick_msg,
+            &event.player,
+        ));
         event
     }
 }
@@ -102,10 +109,10 @@ impl EventHandler<PlayerLoginEvent> for Messages {
 pub struct MessagesConfig {
     /// Whether this module is active.
     pub enabled: bool,
-    /// Message broadcast when a player joins. Use `{player}` as a placeholder for the player's name. Leave empty to disable.
+    /// Message broadcast when a player joins. Use `{player}` as a placeholder for the player's name. Supports `MiniMessage` tags. Leave empty to disable.
     pub join_msg: String,
-    /// Message broadcast when a player leaves. Use `{player}` as a placeholder for the player's name. Leave empty to disable.
+    /// Message broadcast when a player leaves. Use `{player}` as a placeholder for the player's name. Supports `MiniMessage` tags. Leave empty to disable.
     pub leave_msg: String,
-    /// Message shown to the player when they are kicked during login. Use `{player}` as a placeholder for the player's name. Leave empty to disable.
+    /// Message shown to the player when they are kicked during login. Use `{player}` as a placeholder for the player's name. Supports `MiniMessage` tags. Leave empty to disable.
     pub kick_msg: String,
 }

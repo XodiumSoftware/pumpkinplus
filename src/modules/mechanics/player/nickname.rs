@@ -16,11 +16,13 @@
 //!
 //! - `/nickname` — clears the player's nickname.
 //! - `/nickname <name>` — sets the player's nickname.
+//! - Nicknames support [MiniMessage](https://docs.advntr.dev/minimessage/format.html)
+//!   formatting tags (e.g. `/nick <red><bold>Illyrius`).
 //! - Nicknames are persisted on the player's entity via `PersistentDataHolder`.
 //! - On join, the stored nickname is applied to the player's display name and tab list name.
 
 use crate::utils::command::default_permission;
-use crate::utils::text::parse_legacy_text;
+use crate::utils::text::parse_minimessage;
 use crate::{PLUGIN_ID, config::ConfigManager, mechanics::mechanic::Mechanic};
 use pumpkin_plugin_api::{
     Context, PersistentDataHolder, Server,
@@ -133,12 +135,12 @@ impl EventHandler<PlayerJoinEvent> for Nickname {
 fn update_player(player: &Player, nickname: Option<&str>) {
     let display = nickname.map_or_else(
         || TextComponent::text(&player.get_name()),
-        parse_legacy_text,
+        parse_minimessage,
     );
 
     let tab_list = nickname.map_or_else(
         || TextComponent::text(&player.get_name()),
-        parse_legacy_text,
+        parse_minimessage,
     );
 
     player.set_display_name(display);

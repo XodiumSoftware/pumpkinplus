@@ -25,9 +25,10 @@ Download pre-built WASM binaries from GitHub releases.
 ### Setup
 
 1. Download the latest nightly release:
-   ```bash
-   curl -L -o pumpkinplus.wasm https://github.com/XodiumSoftware/pumpkinplus/releases/download/nightly/pumpkinplus-wasm32-wasip2
-   ```
+
+    ```bash
+    curl -L -o pumpkinplus.wasm https://github.com/XodiumSoftware/pumpkinplus/releases/download/nightly/pumpkinplus-wasm32-wasip2
+    ```
 
 2. Place the `.wasm` file in your Pumpkin server's `plugins/` directory
 
@@ -43,20 +44,22 @@ Build the plugin yourself using Rust.
 ### Setup
 
 1. Clone the repository:
-   ```bash
-   git clone https://github.com/XodiumSoftware/pumpkinplus.git
-   cd pumpkinplus
-   ```
+
+    ```bash
+    git clone https://github.com/XodiumSoftware/pumpkinplus.git
+    cd pumpkinplus
+    ```
 
 2. Build the plugin:
-   ```bash
-   cargo build --release --target wasm32-wasip2
-   ```
+
+    ```bash
+    cargo build --release --target wasm32-wasip2
+    ```
 
 3. The output file is at:
-   ```
-   target/wasm32-wasip2/release/pumpkinplus.wasm
-   ```
+    ```
+    target/wasm32-wasip2/release/pumpkinplus.wasm
+    ```
 
 ## Configuration
 
@@ -68,118 +71,112 @@ The plugin uses a JSON configuration file (`config.json`) that is automatically 
 
 ```json
 {
-  "chat": {
-    "enabled": false,
-    "chat_format": "",
-    "chat_filter": []
-  },
-  "enderchest": {
-    "enabled": false,
-    "gamemodes": ["Survival", "Adventure"],
-    "actions": ["RightClickAir"]
-  },
-  "griefing": {
-    "enabled": false,
-    "cancelled_entities": [
-      "Blaze",
-      "Creeper",
-      "EnderDragon",
-      "Enderman",
-      "Fireball",
-      "SmallFireball",
-      "Wither"
-    ]
-  },
-  "head": {
-    "enabled": false,
-    "skull_drop_chance": 0.01
-  },
-  "messages": {
-    "enabled": false,
-    "join_msg": "",
-    "leave_msg": "",
-    "kick_msg": ""
-  },
-  "nickname": {
-    "enabled": false
-  },
-  "openable": {
-    "enabled": false,
-    "gamemodes": ["Survival", "Adventure"],
-    "actions": ["RightClickBlock"],
-    "knock_enabled": false,
-    "knock_gamemodes": ["Survival", "Adventure"],
-    "knock_sneaking_required": true
-  },
-  "recipes": {
-    "chainmail": false,
-    "diamond_recycle": false,
-    "ice_breakdown": false,
-    "nether_wart_block": false,
-    "painting": false,
-    "rotten_flesh": false,
-    "wood_log": false,
-    "wool_to_string": false
-  },
-  "enchantments": {
-    "embertread": false,
-    "feather_falling": false,
-    "fortune": false,
-    "silk_touch": false
-  },
-  "tablist": {
-    "enabled": false,
-    "header": "",
-    "footer": ""
-  }
+    "chat": {
+        "enabled": false,
+        "chat_format": "",
+        "chat_filter": []
+    },
+    "enderchest": {
+        "enabled": false,
+        "gamemodes": ["Survival", "Adventure"],
+        "actions": ["RightClickAir"]
+    },
+    "griefing": {
+        "enabled": false,
+        "cancelled_entities": ["Blaze", "Creeper", "EnderDragon", "Enderman", "Fireball", "SmallFireball", "Wither"]
+    },
+    "head": {
+        "enabled": false,
+        "skull_drop_chance": 0.01
+    },
+    "messages": {
+        "enabled": false,
+        "join_msg": "",
+        "leave_msg": "",
+        "kick_msg": ""
+    },
+    "nickname": {
+        "enabled": false
+    },
+    "openable": {
+        "enabled": false,
+        "gamemodes": ["Survival", "Adventure"],
+        "actions": ["RightClickBlock"],
+        "knock_enabled": false,
+        "knock_gamemodes": ["Survival", "Adventure"],
+        "knock_sneaking_required": true
+    },
+    "recipes": {
+        "chainmail": false,
+        "diamond_recycle": false,
+        "ice_breakdown": false,
+        "nether_wart_block": false,
+        "painting": false,
+        "rotten_flesh": false,
+        "wood_log": false,
+        "wool_to_string": false
+    },
+    "enchantments": {
+        "embertread": false,
+        "feather_falling": false,
+        "fortune": false,
+        "silk_touch": false
+    },
+    "tablist": {
+        "enabled": false,
+        "header": "",
+        "footer": ""
+    }
 }
 ```
 
 ### Configuration Options
 
-| Module | Description | Default |
-|--------|-------------|---------|
-| `chat` | Chat format and word filtering | Disabled |
+| Module       | Description                                                        | Default  |
+| ------------ | ------------------------------------------------------------------ | -------- |
+| `chat`       | Chat format and word filtering                                     | Disabled |
 | `enderchest` | Open personal enderchest by right-clicking air with an ender chest | Disabled |
-| `griefing` | Cancel block-change and explosion events from configured mobs | Disabled |
-| `messages` | Custom join/leave/kick messages | Disabled |
-| `nickname` | Set a persistent nickname via `/nickname` or `/nick` | Disabled |
-| `openable` | Synchronize double doors and sneaky door-knocking | Disabled |
-| `tablist` | Custom tab-list header/footer with live placeholders | Disabled |
+| `griefing`   | Cancel block-change and explosion events from configured mobs      | Disabled |
+| `messages`   | Custom join/leave/kick messages                                    | Disabled |
+| `nickname`   | Set a persistent nickname via `/nickname` or `/nick`               | Disabled |
+| `openable`   | Synchronize double doors and sneaky door-knocking                  | Disabled |
+| `tablist`    | Custom tab-list header/footer with live placeholders               | Disabled |
 
 ### Enchantments
 
-| Config Field | Description | Default |
-|--------------|-------------|---------|
-| `enchantments.embertread` | Cancel contact and fire damage when wearing boots with the Embertread custom enchantment | Disabled |
-| `enchantments.feather_falling` | Cancel farmland trampling when wearing Feather Falling boots | Disabled |
-| `enchantments.fortune` | Auto-replant mature crops when broken with a Fortune hoe | Disabled |
-| `enchantments.silk_touch` | Drop spawners and budding amethyst when broken with Silk Touch pickaxes | Disabled |
+| Config Field                   | Description                                                                              | Default  |
+| ------------------------------ | ---------------------------------------------------------------------------------------- | -------- |
+| `enchantments.embertread`      | Cancel contact and fire damage when wearing boots with the Embertread custom enchantment | Disabled |
+| `enchantments.feather_falling` | Cancel farmland trampling when wearing Feather Falling boots                             | Disabled |
+| `enchantments.fortune`         | Auto-replant mature crops when broken with a Fortune hoe                                 | Disabled |
+| `enchantments.silk_touch`      | Drop spawners and budding amethyst when broken with Silk Touch pickaxes                  | Disabled |
 
 `embertread` registers a new custom enchantment; the other enchantments change the behavior of existing vanilla enchantments.
 
 ### Recipe Packs
 
-| Config Field | Description | Default |
-|--------------|-------------|---------|
-| `recipes.chainmail` | Craft chainmail armor pieces using iron bars | Disabled |
-| `recipes.diamond_recycle` | Smelt diamond tools/armor back into diamonds | Disabled |
-| `recipes.ice_breakdown` | Break blue ice into packed ice and packed ice into ice | Disabled |
-| `recipes.nether_wart_block` | Break nether wart blocks back into nether warts | Disabled |
-| `recipes.painting` | Placeholder shapeless recipes for painting variants (requires upstream stonecutter / data-component support to match vanilla behavior) | Disabled |
-| `recipes.rotten_flesh` | Cook rotten flesh into leather via furnace, smoker, and campfire | Disabled |
-| `recipes.wood_log` | Convert wood/hyphae blocks back into 4 logs/stems | Disabled |
-| `recipes.wool_to_string` | Convert any wool block into 4 string | Disabled |
+| Config Field                | Description                                                                                                                            | Default  |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| `recipes.chainmail`         | Craft chainmail armor pieces using iron bars                                                                                           | Disabled |
+| `recipes.diamond_recycle`   | Smelt diamond tools/armor back into diamonds                                                                                           | Disabled |
+| `recipes.ice_breakdown`     | Break blue ice into packed ice and packed ice into ice                                                                                 | Disabled |
+| `recipes.nether_wart_block` | Break nether wart blocks back into nether warts                                                                                        | Disabled |
+| `recipes.painting`          | Placeholder shapeless recipes for painting variants (requires upstream stonecutter / data-component support to match vanilla behavior) | Disabled |
+| `recipes.rotten_flesh`      | Cook rotten flesh into leather via furnace, smoker, and campfire                                                                       | Disabled |
+| `recipes.wood_log`          | Convert wood/hyphae blocks back into 4 logs/stems                                                                                      | Disabled |
+| `recipes.wool_to_string`    | Convert any wool block into 4 string                                                                                                   | Disabled |
 
 ### Placeholders
 
-| Placeholder | Available in | Description |
-|-------------|--------------|-------------|
-| `{player}` | `messages.*`, `chat_format` | Player's display name |
-| `{message}` | `chat_format` | Original chat message |
-| `{online}` | `tablist.header`, `tablist.footer` | Number of online players |
-| `{tps}` | `tablist.header`, `tablist.footer` | Server TPS (ticks per second) |
-| `{mspt}` | `tablist.header`, `tablist.footer` | Milliseconds per tick |
+| Placeholder | Available in                       | Description                   |
+| ----------- | ---------------------------------- | ----------------------------- |
+| `{player}`  | `messages.*`, `chat_format`        | Player's display name         |
+| `{message}` | `chat_format`                      | Original chat message         |
+| `{online}`  | `tablist.header`, `tablist.footer` | Number of online players      |
+| `{tps}`     | `tablist.header`, `tablist.footer` | Server TPS (ticks per second) |
+| `{mspt}`    | `tablist.header`, `tablist.footer` | Milliseconds per tick         |
+
+Messages, nicknames, and the tab-list header/footer also support [MiniMessage](https://docs.advntr.dev/minimessage/format.html) formatting tags (e.g. `<gradient:red:blue>`, `<bold>`, `<hover:show_text:...>`). Placeholders are resolved first, then MiniMessage tags are parsed.
 
 ## Installation
 
@@ -210,11 +207,11 @@ When enabled, cancels `EntityChangeBlockEvent` and `EntityExplodeEvent` for the 
 
 ### Messages Module
 
-When enabled, overrides the default join/leave/kick messages. Leave any message empty to keep the vanilla message for that event.
+When enabled, overrides the default join/leave/kick messages. Leave any message empty to keep the vanilla message for that event. Messages support MiniMessage formatting tags, e.g. `"<green><bold>{player}</bold> joined the game"`.
 
 ### Nickname Module
 
-When enabled, players can use `/nickname <name>` or `/nick <name>` to set a nickname, or `/nickname` / `/nick` with no argument (or `/nickname clear`) to remove it. Nicknames are persisted across logins.
+When enabled, players can use `/nickname <name>` or `/nick <name>` to set a nickname, or `/nickname` / `/nick` with no argument (or `/nickname clear`) to remove it. Nicknames are persisted across logins and support MiniMessage formatting tags, e.g. `/nick <rainbow>Illyrius`.
 
 ### Openable Module
 
@@ -225,22 +222,22 @@ When enabled:
 
 ### Tablist Module
 
-When enabled, sets a custom header and footer for every player's tab list. The header/footer are refreshed on player join/leave and periodically so `{tps}` and `{mspt}` stay current.
+When enabled, sets a custom header and footer for every player's tab list. The header/footer are refreshed on player join/leave and periodically so `{tps}` and `{mspt}` stay current. Header and footer support MiniMessage formatting tags.
 
 ### Recipes
 
 Each recipe pack can be enabled independently in the `recipes` section of `config.json`:
 
-| Recipe Pack | Config Field | Description |
-|-------------|--------------|-------------|
-| Chainmail | `chainmail` | Craft chainmail armor pieces using iron bars |
-| DiamondRecycle | `diamond_recycle` | Smelt diamond tools/armor back into diamonds |
-| IceBreakdown | `ice_breakdown` | Break blue ice into packed ice and packed ice into ice |
-| NetherWartBlock | `nether_wart_block` | Break nether wart blocks back into nether warts |
-| Painting | `painting` | Placeholder shapeless recipes for painting variants (requires upstream stonecutter / data-component support to match vanilla behavior) |
-| RottenFlesh | `rotten_flesh` | Cook rotten flesh into leather via furnace, smoker, and campfire |
-| WoodLog | `wood_log` | Convert wood/hyphae blocks back into 4 logs/stems |
-| WoolToString | `wool_to_string` | Convert any wool block into 4 string |
+| Recipe Pack     | Config Field        | Description                                                                                                                            |
+| --------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Chainmail       | `chainmail`         | Craft chainmail armor pieces using iron bars                                                                                           |
+| DiamondRecycle  | `diamond_recycle`   | Smelt diamond tools/armor back into diamonds                                                                                           |
+| IceBreakdown    | `ice_breakdown`     | Break blue ice into packed ice and packed ice into ice                                                                                 |
+| NetherWartBlock | `nether_wart_block` | Break nether wart blocks back into nether warts                                                                                        |
+| Painting        | `painting`          | Placeholder shapeless recipes for painting variants (requires upstream stonecutter / data-component support to match vanilla behavior) |
+| RottenFlesh     | `rotten_flesh`      | Cook rotten flesh into leather via furnace, smoker, and campfire                                                                       |
+| WoodLog         | `wood_log`          | Convert wood/hyphae blocks back into 4 logs/stems                                                                                      |
+| WoolToString    | `wool_to_string`    | Convert any wool block into 4 string                                                                                                   |
 
 ### Enchantments
 
@@ -248,17 +245,17 @@ Each enchantment can be enabled independently in the `enchantments` section of
 `config.json`. Some entries register brand new custom enchantments, while others
 change how existing vanilla enchantments behave.
 
-| Enchantment | Config Field | Type | Description |
-|-------------|--------------|------|-------------|
-| Embertread | `embertread` | Custom | Cancel contact and fire damage when wearing Embertread boots |
-| FeatherFalling | `feather_falling` | Vanilla override | Cancel farmland trampling when wearing Feather Falling boots |
-| Fortune | `fortune` | Vanilla override | Auto-replant mature crops when broken with a hoe carrying at least Fortune II |
-| SilkTouch | `silk_touch` | Vanilla override | Drop spawners and budding amethyst when broken with a Silk Touch pickaxe |
+| Enchantment    | Config Field      | Type             | Description                                                                   |
+| -------------- | ----------------- | ---------------- | ----------------------------------------------------------------------------- |
+| Embertread     | `embertread`      | Custom           | Cancel contact and fire damage when wearing Embertread boots                  |
+| FeatherFalling | `feather_falling` | Vanilla override | Cancel farmland trampling when wearing Feather Falling boots                  |
+| Fortune        | `fortune`         | Vanilla override | Auto-replant mature crops when broken with a hoe carrying at least Fortune II |
+| SilkTouch      | `silk_touch`      | Vanilla override | Drop spawners and budding amethyst when broken with a Silk Touch pickaxe      |
 
 ## Commands & Permissions
 
-| Command | Alias | Permission | Description |
-|---------|-------|------------|-------------|
+| Command            | Alias   | Permission                     | Description                 |
+| ------------------ | ------- | ------------------------------ | --------------------------- |
 | `/nickname [name]` | `/nick` | `pumpkinplus:command.nickname` | Set or remove your nickname |
 
 All command permissions default to `Allow`.
@@ -290,9 +287,9 @@ There are currently no experimental modules. All shipped mechanics are fully wir
 ### Build errors
 
 - Make sure you have the `wasm32-wasip2` target installed:
-  ```bash
-  rustup target add wasm32-wasip2
-  ```
+    ```bash
+    rustup target add wasm32-wasip2
+    ```
 - Ensure you're using the latest stable Rust version
 - Run `cargo update` to pull the latest `pumpkin-plugin-api` revision
 

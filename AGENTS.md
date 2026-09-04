@@ -13,12 +13,12 @@
 ## APIs & Tools
 
 | Category          | Technology                                                  | Purpose                          |
-|-------------------|-------------------------------------------------------------|----------------------------------|
+| ----------------- | ----------------------------------------------------------- | -------------------------------- |
 | **Core API**      | [pumpkin-plugin-api](https://github.com/Pumpkin-MC/Pumpkin) | Minecraft server plugin API      |
 | **Language**      | Rust 2024                                                   | Systems language                 |
 | **Build Tool**    | Cargo                                                       | Build automation                 |
 | **Serialization** | serde + json                                                | Config serialization             |
-| **Config**        | config                                                     | JSON config with merge semantics |
+| **Config**        | config                                                      | JSON config with merge semantics |
 | **Logging**       | tracing                                                     | Structured logging               |
 | **Docs**          | rustdoc (via `cargo doc`)                                   | API documentation                |
 
@@ -38,12 +38,14 @@
 
 ## Quick Commands
 
+Build tasks run through [just](https://github.com/casey/just) (cross-platform; see the `justfile` for all recipes).
+
 ```bash
-# Build the WASM plugin (debug) and copy to .server/plugins/
-powershell -ExecutionPolicy Bypass -File build.ps1
+# Build the WASM plugin (debug), fetch the Pumpkin nightly server, and copy to .server/plugins/
+just build-copy
 
 # Build the WASM plugin (release)
-powershell -ExecutionPolicy Bypass -File build.ps1 -Release
+just build
 
 # Generate documentation
 cargo doc --no-deps --target wasm32-wasip2
@@ -70,7 +72,7 @@ cargo clippy --all-targets --all-features --target wasm32-wasip2 -- -W clippy::p
 Every feature implements the **`Mechanic`** trait (`src/modules/mechanics/mechanic.rs`):
 
 | Method       | Purpose                                          | Default     |
-|--------------|--------------------------------------------------|-------------|
+| ------------ | ------------------------------------------------ | ----------- |
 | `enabled()`  | Returns whether module is active                 | Required    |
 | `cmds()`     | Returns `Vec<Command>` to register               | Empty vec   |
 | `perms()`    | Returns `HashSet<String>` permission nodes       | Empty set   |
@@ -90,17 +92,17 @@ Modules are plain structs (not singletons) instantiated with `Default::default()
 
 ### Active Modules
 
-| Module    | File                               | Description                                                                   |
-|-----------|------------------------------------|-------------------------------------------------------------------------------|
-| `Messages`| `src/modules/mechanics/player/messages.rs` | Custom join/leave/kick messages                                    |
-| `Chat`    | `src/modules/mechanics/server/chat.rs`   | Chat format/filter                                                 |
-| `Tablist` | `src/modules/mechanics/tablist.rs` | Dynamic tab list header/footer with `{player}`, `{online}`, `{tps}`, `{mspt}` |
-| `Locator` | `src/modules/mechanics/locator.rs` | Locator bar personalization (`/locator` command, stub)                        |
+| Module     | File                                       | Description                                                                   |
+| ---------- | ------------------------------------------ | ----------------------------------------------------------------------------- |
+| `Messages` | `src/modules/mechanics/player/messages.rs` | Custom join/leave/kick messages                                               |
+| `Chat`     | `src/modules/mechanics/server/chat.rs`     | Chat format/filter                                                            |
+| `Tablist`  | `src/modules/mechanics/tablist.rs`         | Dynamic tab list header/footer with `{player}`, `{online}`, `{tps}`, `{mspt}` |
+| `Locator`  | `src/modules/mechanics/locator.rs`         | Locator bar personalization (`/locator` command, stub)                        |
 
 ### Placeholders
 
 | Placeholder | Available in       | Description                   |
-|-------------|--------------------|-------------------------------|
+| ----------- | ------------------ | ----------------------------- |
 | `{player}`  | All message fields | Player's display name         |
 | `{message}` | `chat_format`      | Original chat message         |
 | `{online}`  | `header`, `footer` | Number of online players      |

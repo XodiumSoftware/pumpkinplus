@@ -217,7 +217,7 @@ impl Plugin for PumpkinPlus {
         }
     }
 
-    fn on_load(&mut self, context: Context) -> pumpkin_plugin_api::Result<()> {
+    fn on_load(&self, context: Context) -> pumpkin_plugin_api::Result<()> {
         ConfigManager::load(&context);
 
         Self::register_mechanics(&context);
@@ -228,7 +228,7 @@ impl Plugin for PumpkinPlus {
         Ok(())
     }
 
-    fn on_unload(&mut self, _context: Context) -> pumpkin_plugin_api::Result<()> {
+    fn on_unload(&self, _context: Context) -> pumpkin_plugin_api::Result<()> {
         info!("Pumpkin+ unloaded. CYA NEXT TIME!");
         Ok(())
     }

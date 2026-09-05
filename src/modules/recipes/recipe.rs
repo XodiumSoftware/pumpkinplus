@@ -9,12 +9,19 @@
 //!
 //! ## Supported Recipe Types
 //!
-//! | Type        | Pumpkin API Status | Description                          |
-//! |-------------|--------------------|--------------------------------------|
-//! | `shaped`    | ✅ Available       | Crafting recipes with a fixed layout |
-//! | `shapeless` | ✅ Available       | Crafting recipes with loose items    |
-//! | `cooking`   | ✅ Available       | Furnace, smoker, campfire, blast     |
-//! | `potion`    | ⛔ Unavailable     | Potion brewing recipes               |
+//! | Type           | Pumpkin API Status | Description                                   |
+//! |----------------|--------------------|-----------------------------------------------|
+//! | `shaped`       | ✅ Available       | Crafting recipes with a fixed layout          |
+//! | `shapeless`    | ✅ Available       | Crafting recipes with loose items             |
+//! | `cooking`      | ✅ Available       | Furnace, smoker, campfire, blast furnace      |
+//! | `complex`      | ⛔ Unavailable     | Dynamic special recipes (map cloning, dyeing) |
+//! | `merchant`     | ⛔ Unavailable     | Villager/trader trade offers                  |
+//! | `potion`       | ⛔ Unavailable     | Potion brewing recipes                        |
+//! | `smithing`     | ⛔ Unavailable     | Smithing table transform/trim recipes         |
+//! | `stonecutting` | ⛔ Unavailable     | Stonecutter recipes                           |
+//!
+//! Unavailable types have no host-side registration function in the Pumpkin
+//! plugin API yet; the table tracks the parity gaps with Paper.
 
 use pumpkin_plugin_api::Context;
 use pumpkin_plugin_api::recipe::{

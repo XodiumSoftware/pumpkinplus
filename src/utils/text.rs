@@ -14,11 +14,8 @@ use pumpkin_plugin_api::text::TextComponent;
 /// in the config never breaks message delivery.
 #[must_use]
 pub fn parse_minimessage(input: &str) -> TextComponent {
-    minimessage_rs::deserialize(input).map_or_else(
-        |err| {
-            tracing::warn!("Failed to parse MiniMessage input {input:?}: {err}");
-            TextComponent::text(input)
-        },
-        |component| minimessage_rt_compat::convert(&component),
-    )
+    minimessage_runtime::deserialize(input).unwrap_or_else(|err| {
+        tracing::warn!("Failed to parse MiniMessage input {input:?}: {err}");
+        TextComponent::text(input)
+    })
 }

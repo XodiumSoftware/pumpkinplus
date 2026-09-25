@@ -11,16 +11,11 @@ crate-type = ["cdylib"]
 [dependencies]
 pumpkin-plugin-api = "0.1.0-dev+26.2-26.45"
 minimessage-rs = "0.1.5"
-minimessage-rt-compat = { git = "https://github.com/Mettwasser/minimessage-rs" }
+minimessage-runtime = { git = "https://github.com/Mettwasser/minimessage-rs" }
 tracing = "0.1"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0"
 config = { version = "0.15", default-features = false, features = ["json"] }
-
-# Unify `pumpkin-plugin-api`: `minimessage-rt-compat` depends on the git build,
-# redirect it to the crates.io release so `TextComponent` types match.
-[patch."https://github.com/Pumpkin-MC/Pumpkin"]
-pumpkin-plugin-api = "0.1.0-dev+26.2-26.45"
 
 [profile.release]
 lto = true

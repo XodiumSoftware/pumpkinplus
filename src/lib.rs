@@ -6,6 +6,10 @@
 #![allow(clippy::must_use_candidate)]
 
 mod config;
+mod dialogs {
+    pub mod dialog;
+    pub mod nickname;
+}
 mod utils {
     pub mod block;
     pub mod command;
@@ -43,11 +47,6 @@ mod modules {
     }
     pub mod items {
         pub mod item;
-        pub mod weapons {
-            pub mod greatsword;
-            pub mod halberd;
-            pub mod longsword;
-        }
     }
     pub mod recipes {
         pub mod recipe;

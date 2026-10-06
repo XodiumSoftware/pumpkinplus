@@ -4,14 +4,6 @@
 //! created on demand by commands, recipes, or other modules. Items defined here
 //! are plain builders: they are not registered with the server because Pumpkin
 //! currently exposes no custom item registry API.
-//!
-//! ## Available Items
-//!
-//! | Item        | Path                                                     | Base Item              | Attack damage | Attack speed |
-//! |-------------|----------------------------------------------------------|------------------------|---------------|--------------|
-//! | `Greatsword`| [`crate::items::weapons::greatsword::Greatsword`]        | `minecraft:netherite_sword` | `+10.0` | `+1.2` |
-//! | `Longsword` | [`crate::items::weapons::longsword::Longsword`]          | `minecraft:netherite_sword` | `+8.0`  | `+1.6` |
-//! | `Halberd`   | [`crate::items::weapons::halberd::Halberd`]              | `minecraft:netherite_spear` | `+11.0` | `+0.8` |
 
 use pumpkin_plugin_api::ItemStack;
 

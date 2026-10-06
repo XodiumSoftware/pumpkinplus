@@ -163,16 +163,32 @@ impl PumpkinPlus {
             &WoolToString,
         ];
 
-        let enabled_recipes = recipes.iter().filter(|r| r.enabled()).count();
+        let mut counts = crate::modules::recipes::recipe::RecipeCounts::default();
+        let mut packs_with_recipes = 0u32;
         let mut recipe_total_ms = 0u128;
+
         for recipe in recipes {
+            if !recipe.enabled() {
+                continue;
+            }
+            let pack_counts = recipe.counts();
+            if pack_counts.total() > 0 {
+                packs_with_recipes += 1;
+            }
+            counts += pack_counts;
             let start = Instant::now();
             recipe.register(context);
             recipe_total_ms += start.elapsed().as_millis();
         }
+
         info!(
-            "Registered: {} recipe pack(s) | Took {}ms",
-            enabled_recipes, recipe_total_ms
+            "Registered: {} recipe pack(s) producing {} recipe(s) ({} shaped, {} shapeless, {} cooking) | Took {}ms",
+            packs_with_recipes,
+            counts.total(),
+            counts.shaped,
+            counts.shapeless,
+            counts.cooking,
+            recipe_total_ms
         );
     }
 
@@ -188,7 +204,7 @@ impl PumpkinPlus {
             enchantment_total_ms += start.elapsed().as_millis();
         }
         info!(
-            "Registered: {} enchantment pack(s) | Took {}ms",
+            "Registered: {} enchantment(s) | Took {}ms",
             enabled_enchantments, enchantment_total_ms
         );
     }

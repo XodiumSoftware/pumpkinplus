@@ -28,8 +28,34 @@ use pumpkin_plugin_api::recipe::{
     CookingRecipeBuilder, RecipeError, ShapedRecipeBuilder, ShapelessRecipeBuilder,
 };
 use serde::{Deserialize, Serialize};
-use std::time::Instant;
-use tracing::{error, info};
+use tracing::error;
+
+/// Recipe counts grouped by kind.
+#[derive(Debug, Clone, Copy, Default)]
+pub struct RecipeCounts {
+    /// Number of shaped crafting recipes.
+    pub shaped: u32,
+    /// Number of shapeless crafting recipes.
+    pub shapeless: u32,
+    /// Number of cooking recipes (furnace, smoker, campfire, blast furnace).
+    pub cooking: u32,
+}
+
+impl RecipeCounts {
+    /// Returns the total number of recipes across all kinds.
+    #[must_use]
+    pub fn total(self) -> u32 {
+        self.shaped + self.shapeless + self.cooking
+    }
+}
+
+impl std::ops::AddAssign for RecipeCounts {
+    fn add_assign(&mut self, other: Self) {
+        self.shaped += other.shaped;
+        self.shapeless += other.shapeless;
+        self.cooking += other.cooking;
+    }
+}
 
 /// A single recipe entry produced by a recipe pack.
 ///
@@ -102,12 +128,24 @@ pub trait Recipe {
         vec![]
     }
 
+    /// Returns the total number of recipes provided by this module grouped by
+    /// kind (shaped, shapeless, cooking).
+    fn counts(&self) -> RecipeCounts {
+        let mut counts = RecipeCounts::default();
+        for entry in self.recipes() {
+            match entry {
+                RecipeEntry::Shaped(_) => counts.shaped += 1,
+                RecipeEntry::Shapeless(_) => counts.shapeless += 1,
+                RecipeEntry::Cooking(_) => counts.cooking += 1,
+            }
+        }
+        counts
+    }
+
     /// Returns the total number of recipes provided by this module.
     fn count(&self) -> u32 {
-        #[allow(clippy::cast_possible_truncation)]
-        {
-            self.recipes().len() as u32
-        }
+        let counts = self.counts();
+        counts.shaped + counts.shapeless + counts.cooking
     }
 
     /// Returns `true` if there is at least one recipe to register.
@@ -118,8 +156,6 @@ pub trait Recipe {
     /// Registers all recipes returned by [`Recipe::recipes`] with the server.
     ///
     /// If the recipe pack is disabled via [`Recipe::enabled`], this is a no-op.
-    /// Otherwise, logs the count and time taken. If no recipes are present this is a
-    /// no-op.
     ///
     /// Any upstream registration error is logged here.
     fn register(&self, context: &Context) {
@@ -131,29 +167,12 @@ pub trait Recipe {
             return;
         }
 
-        let start = Instant::now();
         let recipes = self.recipes();
-        let total = recipes.len();
-        let mut shaped = 0u32;
-        let mut shapeless = 0u32;
-        let mut cooking = 0u32;
-
         for recipe in recipes {
-            match &recipe {
-                RecipeEntry::Shaped(_) => shaped += 1,
-                RecipeEntry::Shapeless(_) => shapeless += 1,
-                RecipeEntry::Cooking(_) => cooking += 1,
-            }
             if let Err(e) = recipe.register(context) {
                 error!("Failed to register recipe: {e}");
             }
         }
-
-        let elapsed = start.elapsed().as_millis();
-        info!(
-            "Registered: {} recipe(s) ({} shaped, {} shapeless, {} cooking) | Took {}ms",
-            total, shaped, shapeless, cooking, elapsed
-        );
     }
 }
 

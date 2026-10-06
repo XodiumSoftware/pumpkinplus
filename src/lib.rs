@@ -65,6 +65,7 @@ mod modules {
         pub mod mechanic;
         pub mod entity {
             pub mod griefing;
+            pub mod tameable;
         }
         pub mod world {
             pub mod openable;
@@ -87,6 +88,7 @@ pub use modules::*;
 pub use modules::enchantments::enchantment::EnchantmentsConfig;
 pub use modules::items::item::Item;
 pub use modules::mechanics::entity::griefing::GriefingConfig;
+pub use modules::mechanics::entity::tameable::TameableConfig;
 pub use modules::mechanics::player::enderchest::EnderchestConfig;
 pub use modules::mechanics::player::messages::MessagesConfig;
 pub use modules::mechanics::player::nickname::NicknameConfig;
@@ -96,6 +98,7 @@ pub use modules::mechanics::world::openable::OpenableConfig;
 pub use modules::recipes::recipe::RecipesConfig;
 
 use crate::mechanics::entity::griefing::Griefing;
+use crate::mechanics::entity::tameable::Tameable;
 use crate::mechanics::mechanic::Mechanic;
 use crate::mechanics::player::enderchest::Enderchest;
 use crate::mechanics::player::messages::Messages;
@@ -128,6 +131,7 @@ impl PumpkinPlus {
     fn register_mechanics(context: &Context) {
         let mechanics: Vec<&dyn Mechanic> = vec![
             &Griefing,
+            &Tameable,
             &Enderchest,
             &Nickname,
             &Messages,

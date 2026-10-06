@@ -4,6 +4,7 @@
 //! Mechanics can register event handlers, commands, and permission nodes.
 
 pub use crate::modules::mechanics::entity::griefing::GriefingConfig;
+pub use crate::modules::mechanics::entity::tameable::TameableConfig;
 pub use crate::modules::mechanics::player::enderchest::EnderchestConfig;
 pub use crate::modules::mechanics::player::messages::MessagesConfig;
 pub use crate::modules::mechanics::player::nickname::NicknameConfig;
@@ -97,6 +98,8 @@ pub trait Mechanic {
 pub struct MechanicsConfig {
     /// Mob griefing prevention.
     pub griefing: GriefingConfig,
+    /// Pet ownership transfer between players.
+    pub tameable: TameableConfig,
     /// Shared enderchest mechanics.
     pub enderchest: EnderchestConfig,
     /// Custom join/leave/kick messages.

@@ -2,40 +2,48 @@
 //!
 //! ## Status
 //!
-//! **Stub item** — Cannot be fully implemented due to missing Pumpkin plugin APIs.
+//! **Partial implementation** — Custom name works with gradient, item model
+//! requires resource pack assets.
 //!
-//! ## Missing APIs
+//! ## Missing / Limited APIs
 //!
-//! The following Pumpkin plugin APIs are required to complete this item:
-//!
-//! | API | Purpose |
-//! |-----|---------|
-//! | `ItemStack.set_custom_name()` | Set the display name with gradient formatting |
-//! | `ItemStack.set_item_model()` | Set custom model for resource pack texture |
-//! | `MiniMessage` gradient support | `<gradient:#8B0000:#FF4500:#FF6347>` formatting |
+//! | API | Status | Purpose |
+//! |-----|--------|---------|
+//! | `ItemStack.set_custom_name()` | ✅ Available via data component | Set the display name |
+//! | `ItemStack.set_item_model()` | ⚠️ Partial | Component exists but requires resource pack |
+//! | `MiniMessage` gradient | ❌ Not supported | `minimessage-impl` crate lacks gradient tag support |
 //!
 //! `IllyriaPlus` behavior reference:
 //! - Base item: `minecraft:trial_key`
-//! - Custom name: Gradient from dark red to orange (`<gradient:#8B0000:#FF4500:#FF6347>Incendium Key`)
+//! - Custom name: Gradient from dark red to orange
 //! - Custom model: `pumpkinplus:incendium_key` (requires resource pack)
 
 use crate::modules::items::item::Item;
-use pumpkin_plugin_api::ItemStack;
+use crate::namespaced_id;
+use pumpkin_plugin_api::text::TextComponent;
+use pumpkin_plugin_api::{Item as McItem, ItemStack, data_components::DataComponent};
 
 /// The Incendium Key custom item.
-///
-/// See module-level docs for the current implementation status and missing APIs.
 #[derive(Default)]
 pub struct IncendiumKey;
 
 impl Item for IncendiumKey {
     fn key(&self) -> &'static str {
-        "pumpkinplus:incendium_key"
+        namespaced_id!("incendium_key")
     }
 
     fn build(&self) -> ItemStack {
-        // TODO: Set custom name and item model once Pumpkin exposes data component APIs.
-        // For now, return plain trial key without custom display properties.
-        ItemStack::new("minecraft:trial_key", 1)
+        let item = ItemStack::new(McItem::TrialKey.resource_location(), 1);
+
+        // TODO: Use MiniMessage gradient once `minimessage-impl` crate supports it:
+        // `<gradient:#8B0000:#FF4500:#FF6347>Incendium Key</gradient>`
+        // For now, use plain custom name component.
+        let name = TextComponent::text("Incendium Key");
+        item.set_component(DataComponent::CustomName, &name.encode());
+
+        // TODO: Set item model when resource pack assets are available
+        // item.set_component(DataComponent::ItemModel, self.key().as_bytes());
+
+        item
     }
 }

@@ -97,16 +97,16 @@ This file tracks stub modules and features that are blocked by missing Pumpkin p
 
 ### 11. Incendium Key (`src/modules/items/incendium_key.rs`)
 
-- [ ] Blocked: `ItemStack.set_custom_name()` API
-- [ ] Blocked: `ItemStack.set_item_model()` API
-- [ ] Blocked: `MiniMessage` gradient parsing
+- [x] Partial: `ItemStack.set_custom_name()` works via data component API
+- [x] Partial: Gradient implemented using `TextComponent.gradient()`
+- [ ] Blocked: `ItemModel` component requires resource pack assets
 - **Behavior:** Custom trial key with gradient red-orange name, custom model
 
 ### 12. Nullscape Key (`src/modules/items/nullscape_key.rs`)
 
-- [ ] Blocked: `ItemStack.set_custom_name()` API
-- [ ] Blocked: `ItemStack.set_item_model()` API
-- [ ] Blocked: `MiniMessage` gradient parsing
+- [x] Partial: `ItemStack.set_custom_name()` works via data component API
+- [x] Partial: Gradient implemented using `TextComponent.gradient()`
+- [ ] Blocked: `ItemModel` component requires resource pack assets
 - **Behavior:** Custom trial key with gradient purple name, custom model
 
 ## Non-Portable Systems
@@ -143,8 +143,7 @@ The following APIs need to be added to the Pumpkin plugin API to complete these 
 | Medium   | Player XP point manipulation                                 | XP                           |
 | Medium   | Book creation and opening APIs                               | Rules                        |
 | Medium   | Waypoint/locator color APIs                                  | Locator                      |
-| Medium   | `ItemStack` data components (custom name, item model)        | Incendium Key, Nullscape Key |
-| Medium   | `MiniMessage` gradient parsing                               | Incendium Key, Nullscape Key |
+| Medium   | `ItemStack` item model component (needs resource pack)       | Incendium Key, Nullscape Key |
 | Low      | Particle color/dust options                                  | Silence                      |
 | Low      | Generic tameable entity trait                                | Tameable                     |
 

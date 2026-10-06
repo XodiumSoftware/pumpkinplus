@@ -46,7 +46,9 @@ mod modules {
         }
     }
     pub mod items {
+        pub mod incendium_key;
         pub mod item;
+        pub mod nullscape_key;
     }
     pub mod recipes {
         pub mod recipe;
@@ -64,19 +66,29 @@ mod modules {
     pub mod mechanics {
         pub mod mechanic;
         pub mod entity {
+            pub mod bat;
             pub mod griefing;
+            pub mod husk;
+            pub mod silence;
+            pub mod spawn_egg;
             pub mod tameable;
         }
         pub mod world {
             pub mod openable;
         }
         pub mod player {
+            pub mod anvil;
+            pub mod condense;
             pub mod enderchest;
+            pub mod head;
+            pub mod locator;
             pub mod messages;
             pub mod nickname;
+            pub mod xp;
         }
         pub mod server {
             pub mod chat;
+            pub mod rules;
             pub mod tablist;
         }
     }
@@ -87,23 +99,43 @@ pub use modules::*;
 
 pub use modules::enchantments::enchantment::EnchantmentsConfig;
 pub use modules::items::item::Item;
+pub use modules::mechanics::entity::bat::BatConfig;
 pub use modules::mechanics::entity::griefing::GriefingConfig;
+pub use modules::mechanics::entity::husk::HuskConfig;
+pub use modules::mechanics::entity::silence::SilenceConfig;
+pub use modules::mechanics::entity::spawn_egg::SpawnEggConfig;
 pub use modules::mechanics::entity::tameable::TameableConfig;
+pub use modules::mechanics::player::anvil::AnvilConfig;
+pub use modules::mechanics::player::condense::CondenseConfig;
 pub use modules::mechanics::player::enderchest::EnderchestConfig;
+pub use modules::mechanics::player::head::HeadConfig;
+pub use modules::mechanics::player::locator::LocatorConfig;
 pub use modules::mechanics::player::messages::MessagesConfig;
 pub use modules::mechanics::player::nickname::NicknameConfig;
+pub use modules::mechanics::player::xp::XpConfig;
 pub use modules::mechanics::server::chat::ChatConfig;
+pub use modules::mechanics::server::rules::RulesConfig;
 pub use modules::mechanics::server::tablist::TablistConfig;
 pub use modules::mechanics::world::openable::OpenableConfig;
 pub use modules::recipes::recipe::RecipesConfig;
 
+use crate::mechanics::entity::bat::Bat;
 use crate::mechanics::entity::griefing::Griefing;
+use crate::mechanics::entity::husk::Husk;
+use crate::mechanics::entity::silence::Silence;
+use crate::mechanics::entity::spawn_egg::SpawnEgg;
 use crate::mechanics::entity::tameable::Tameable;
 use crate::mechanics::mechanic::Mechanic;
+use crate::mechanics::player::anvil::Anvil;
+use crate::mechanics::player::condense::Condense;
 use crate::mechanics::player::enderchest::Enderchest;
+use crate::mechanics::player::head::Head;
+use crate::mechanics::player::locator::Locator;
 use crate::mechanics::player::messages::Messages;
 use crate::mechanics::player::nickname::Nickname;
+use crate::mechanics::player::xp::Xp;
 use crate::mechanics::server::chat::Chat;
+use crate::mechanics::server::rules::Rules;
 use crate::mechanics::server::tablist::Tablist;
 use crate::mechanics::world::openable::Openable;
 use crate::modules::enchantments::enchantment::Enchantment;
@@ -130,12 +162,22 @@ impl PumpkinPlus {
     /// Registers all mechanics and their commands/permissions.
     fn register_mechanics(context: &Context) {
         let mechanics: Vec<&dyn Mechanic> = vec![
+            &Bat,
             &Griefing,
+            &Husk,
+            &Silence,
+            &SpawnEgg,
             &Tameable,
+            &Anvil,
+            &Condense,
             &Enderchest,
+            &Head,
+            &Locator,
             &Nickname,
             &Messages,
+            &Xp,
             &Chat,
+            &Rules,
             &Tablist,
             &Openable,
         ];

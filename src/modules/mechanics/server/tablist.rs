@@ -5,10 +5,11 @@
 //! | Field     | Default | Description                                                          |
 //! |-----------|---------|----------------------------------------------------------------------|
 //! | `enabled` | `false` | Whether this module is active                                       |
-//! | `header`  | `""`    | Header text. Supports placeholders and `MiniMessage` formatting   |
-//! | `footer`  | `""`    | Footer text. Supports placeholders and `MiniMessage` formatting   |
+//! | `header`  | `[]`    | Header lines, joined with newlines. Supports placeholders and `MiniMessage` formatting |
+//! | `footer`  | `[]`    | Footer lines, joined with newlines. Supports placeholders and `MiniMessage` formatting |
 //!
-//! Header and footer support [MiniMessage](https://docs.advntr.dev/minimessage/format.html)
+//! Header and footer lines are joined with newlines and support
+//! [MiniMessage](https://docs.advntr.dev/minimessage/format.html)
 //! formatting tags (resolved after placeholders).
 //!
 //! ## Placeholders
@@ -59,8 +60,16 @@ impl Tablist {
     /// Applies the configured header and footer to a single player,
     /// resolving placeholders for that player.
     fn update_tablist_for_player(config: &TablistConfig, server: &Server, player: &Player) {
-        let header = parse_minimessage(&replace_all_placeholders(&config.header, server, player));
-        let footer = parse_minimessage(&replace_all_placeholders(&config.footer, server, player));
+        let header = parse_minimessage(&replace_all_placeholders(
+            &config.header.join("\n"),
+            server,
+            player,
+        ));
+        let footer = parse_minimessage(&replace_all_placeholders(
+            &config.footer.join("\n"),
+            server,
+            player,
+        ));
         player.set_tab_list_header_footer(header, footer);
     }
 
@@ -127,8 +136,8 @@ impl EventHandler<PlayerLeaveEvent> for Tablist {
 pub struct TablistConfig {
     /// Whether this module is active.
     pub enabled: bool,
-    /// Header text displayed at the top of the tab list. Supports `MiniMessage` tags. Leave empty to disable.
-    pub header: String,
-    /// Footer text displayed at the bottom of the tab list. Supports `MiniMessage` tags. Leave empty to disable.
-    pub footer: String,
+    /// Header lines displayed at the top of the tab list, joined with newlines. Supports `MiniMessage` tags. Leave empty to disable.
+    pub header: Vec<String>,
+    /// Footer lines displayed at the bottom of the tab list, joined with newlines. Supports `MiniMessage` tags. Leave empty to disable.
+    pub footer: Vec<String>,
 }

@@ -10,7 +10,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 pumpkin-plugin-api = "0.2.0"
-minimessage-runtime = { git = "https://github.com/Mettwasser/minimessage-rs" }
+minimessage-impl = "0.1.2"
 tracing = "0.1"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0"

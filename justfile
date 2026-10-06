@@ -58,23 +58,26 @@ build:
     cargo build --release --target wasm32-wasip2
 
 # Build debug WASM, fetch the Pumpkin server, and copy the plugin to .server/plugins/
+#
+# NOTE: Debug builds fail to load in the Pumpkin runtime due to a wasmtime
+# locals limit in the wit-bindgen `handle-event` export. Always use release.
 [unix]
 build-copy: fetch-server
     #!/usr/bin/env sh
     set -eu
-    cargo build --target wasm32-wasip2
+    cargo build --release --target wasm32-wasip2
     mkdir -p .server/plugins
-    cp target/wasm32-wasip2/debug/pumpkinplus.wasm .server/plugins/pumpkinplus.wasm
-    echo "Copied target/wasm32-wasip2/debug/pumpkinplus.wasm -> .server/plugins/pumpkinplus.wasm"
+    cp target/wasm32-wasip2/release/pumpkinplus.wasm .server/plugins/pumpkinplus.wasm
+    echo "Copied target/wasm32-wasip2/release/pumpkinplus.wasm -> .server/plugins/pumpkinplus.wasm"
 
 [windows]
 build-copy: fetch-server
     #!/usr/bin/env powershell
     $ErrorActionPreference = "Stop"
-    cargo build --target wasm32-wasip2
+    cargo build --release --target wasm32-wasip2
     New-Item -ItemType Directory -Force -Path .server/plugins | Out-Null
-    Copy-Item target/wasm32-wasip2/debug/pumpkinplus.wasm .server/plugins/pumpkinplus.wasm -Force
-    Write-Host "Copied target/wasm32-wasip2/debug/pumpkinplus.wasm -> .server/plugins/pumpkinplus.wasm"
+    Copy-Item target/wasm32-wasip2/release/pumpkinplus.wasm .server/plugins/pumpkinplus.wasm -Force
+    Write-Host "Copied target/wasm32-wasip2/release/pumpkinplus.wasm -> .server/plugins/pumpkinplus.wasm"
 
 # Fetch the Pumpkin server and build the release WASM plugin
 build-copy-release: fetch-server build

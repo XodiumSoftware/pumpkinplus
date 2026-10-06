@@ -22,8 +22,9 @@
 //! | Field                  | Default                       | Description                                              |
 //! |------------------------|-------------------------------|----------------------------------------------------------|
 //! | `enabled`              | `false`                       | Whether this module is active                                    |
-//! | `gamemodes`            | `["Survival", "Adventure"]`   | Gamemodes that trigger sync                                      |
-//! | `actions`              | `["RightClickBlock"]`         | Actions that trigger sync                                        |
+//! | `sync_enabled`         | `false`                       | Whether double door sync is enabled                              |
+//! | `sync_gamemodes`       | `["Survival", "Adventure"]`   | Gamemodes that trigger sync                                      |
+//! | `sync_actions`         | `["RightClickBlock"]`         | Actions that trigger sync                                        |
 //! | `knock_enabled`        | `false`                       | Whether sneaking left-click knock is enabled                    |
 //! | `knock_gamemodes`      | `["Survival", "Adventure"]`   | Gamemodes allowed to knock                                       |
 //! | `knock_sneaking_required` | `true`                     | Whether the player must be sneaking to knock                     |
@@ -91,12 +92,16 @@ impl EventHandler<PlayerInteractEvent> for Openable {
             return handle_knock(event, &config);
         }
 
-        if !action.matches_config(&config.actions) {
+        if !config.sync_enabled {
+            return event;
+        }
+
+        if !action.matches_config(&config.sync_actions) {
             return event;
         }
 
         let gamemode = GameMode::from(event.player.get_gamemode());
-        if !gamemode.matches_config(&config.gamemodes) {
+        if !gamemode.matches_config(&config.sync_gamemodes) {
             return event;
         }
 
@@ -232,14 +237,19 @@ fn find_adjacent_door(world: &World, pos: BlockPos) -> Option<BlockPos> {
 }
 
 /// Configuration for the openable mechanics module.
+// Config structs intentionally use multiple feature toggles; a state machine
+// does not apply here since fields are deserialized independently.
+#[allow(clippy::struct_excessive_bools)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OpenableConfig {
     /// Whether this module is active.
     pub enabled: bool,
+    /// Whether double door sync is enabled.
+    pub sync_enabled: bool,
     /// List of gamemodes allowed to trigger door sync. Use variant names like "Survival", "Creative", etc. Leave empty to allow all.
-    pub gamemodes: Vec<GameMode>,
+    pub sync_gamemodes: Vec<GameMode>,
     /// List of interaction actions that trigger door sync. Use variant names like `RightClickBlock`, `RightClickAir`, etc. Leave empty to allow all.
-    pub actions: Vec<InteractAction>,
+    pub sync_actions: Vec<InteractAction>,
     /// Whether sneaking left-click knock is enabled.
     pub knock_enabled: bool,
     /// List of gamemodes allowed to knock on doors. Leave empty to allow all.
@@ -252,8 +262,9 @@ impl Default for OpenableConfig {
     fn default() -> Self {
         Self {
             enabled: false,
-            gamemodes: vec![GameMode::Survival, GameMode::Adventure],
-            actions: vec![InteractAction::RightClickBlock],
+            sync_enabled: false,
+            sync_gamemodes: vec![GameMode::Survival, GameMode::Adventure],
+            sync_actions: vec![InteractAction::RightClickBlock],
             knock_enabled: false,
             knock_gamemodes: vec![GameMode::Survival, GameMode::Adventure],
             knock_sneaking_required: true,

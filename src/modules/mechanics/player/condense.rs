@@ -48,9 +48,19 @@
 //!
 //! ## Configuration
 //!
-//! | Field     | Default | Description                     |
-//! |-----------|---------|---------------------------------|
-//! | `enabled` | `false` | Whether this module is active   |
+//! | Field         | Default           | Description                                          |
+//! |---------------|-------------------|------------------------------------------------------|
+//! | `enabled`     | `false`           | Whether this module is active                        |
+//! | `condensable` | see default impl  | Map of item IDs to block IDs (`[item, block]` pairs) |
+//!
+//! The `condensable` field is a list of `[item_id, block_id]` pairs in JSON:
+//!
+//! ```json
+//! "condensable": [
+//!   ["minecraft:amethyst_shard", "minecraft:amethyst_block"],
+//!   ["minecraft:coal", "minecraft:coal_block"]
+//! ]
+//! ```
 
 use crate::config::ConfigManager;
 use crate::mechanics::mechanic::Mechanic;
@@ -133,41 +143,31 @@ impl CommandHandler for CondenseExecutor {
 }
 
 /// Map of item to block for condensing, or block to item for uncondensing.
-fn condensable_map(reverse: bool) -> HashMap<Item, Item> {
-    let forward = [
-        (Item::AmethystShard, Item::AmethystBlock),
-        (Item::BoneMeal, Item::BoneBlock),
-        (Item::Coal, Item::CoalBlock),
-        (Item::CopperIngot, Item::CopperBlock),
-        (Item::Diamond, Item::DiamondBlock),
-        (Item::DriedKelp, Item::DriedKelpBlock),
-        (Item::Emerald, Item::EmeraldBlock),
-        (Item::GoldIngot, Item::GoldBlock),
-        (Item::GoldNugget, Item::GoldIngot),
-        (Item::IronIngot, Item::IronBlock),
-        (Item::IronNugget, Item::IronIngot),
-        (Item::LapisLazuli, Item::LapisBlock),
-        (Item::MelonSlice, Item::Melon),
-        (Item::NetherWart, Item::NetherWartBlock),
-        (Item::NetheriteIngot, Item::NetheriteBlock),
-        (Item::Quartz, Item::QuartzBlock),
-        (Item::Redstone, Item::RedstoneBlock),
-        (Item::SlimeBall, Item::SlimeBlock),
-        (Item::Wheat, Item::HayBlock),
-    ];
-
-    if reverse {
-        forward.iter().map(|(k, v)| (*v, *k)).collect()
-    } else {
-        forward.iter().copied().collect()
-    }
+fn condensable_map(config: &CondenseConfig, reverse: bool) -> HashMap<Item, Item> {
+    config
+        .condensable
+        .iter()
+        .filter_map(|(item_id, block_id)| {
+            let item = Item::from_registry_key(item_id)?;
+            let block = Item::from_registry_key(block_id)?;
+            Some(if reverse {
+                (block, item)
+            } else {
+                (item, block)
+            })
+        })
+        .collect()
 }
 
 /// Condenses or uncondenses all applicable items in the player's inventory.
 ///
 /// Returns the total number of items condensed/uncondensed.
 fn condense_inventory(player: &Player, reverse: bool) -> u32 {
-    let map = condensable_map(reverse);
+    let config: CondenseConfig = ConfigManager::get()
+        .map(|cm| cm.mechanics.condense)
+        .unwrap_or_default();
+
+    let map = condensable_map(&config, reverse);
     let inventory = player.get_inventory().as_inventory();
     let size = inventory.get_size();
     let mut total = 0u32;
@@ -254,4 +254,7 @@ fn add_items(inventory: &pumpkin_plugin_api::inventory::Inventory, item: Item, m
 pub struct CondenseConfig {
     /// Whether this module is active.
     pub enabled: bool,
+    /// Map of item IDs to block IDs for condensing.
+    /// Each entry is `[item_id, block_id]` (e.g., `["minecraft:coal", "minecraft:coal_block"]`).
+    pub condensable: Vec<(String, String)>,
 }

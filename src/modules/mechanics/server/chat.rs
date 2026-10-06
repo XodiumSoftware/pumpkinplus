@@ -5,8 +5,11 @@
 //! | Field         | Default | Description                                                        |
 //! |---------------|---------|--------------------------------------------------------------------|
 //! | `enabled`     | `false` | Whether this module is active                                      |
-//! | `chat_format` | `""`    | Custom chat format. Use `{player}` and `{message}` placeholders    |
+//! | `chat_format` | `""`    | Chat format with `MiniMessage` tags and `{player}`/`{message}` placeholders |
 //! | `chat_filter` | `[]`    | List of blocked words/phrases (case-insensitive)                   |
+//!
+//! The `chat_format` field supports [MiniMessage](https://docs.advntr.dev/minimessage/format.html)
+//! formatting tags (resolved after placeholders).
 //!
 //! ## Placeholders
 //!
@@ -18,7 +21,8 @@
 use crate::config::ConfigManager;
 use crate::mechanics::mechanic::Mechanic;
 use crate::utils::placeholders::replace_placeholders;
-use pumpkin_plugin_api::events::{EventData, EventHandler, EventPriority, PlayerChatEvent};
+use crate::utils::text::parse_minimessage;
+use pumpkin_plugin_api::events::{AsyncPlayerChatEvent, EventData, EventHandler, EventPriority};
 use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};
 
@@ -32,16 +36,16 @@ impl Mechanic for Chat {
     }
 
     fn events(&self, context: &Context) {
-        self.register_event::<PlayerChatEvent>(context, EventPriority::Highest, true);
+        self.register_event::<AsyncPlayerChatEvent>(context, EventPriority::Highest, true);
     }
 }
 
-impl EventHandler<PlayerChatEvent> for Chat {
+impl EventHandler<AsyncPlayerChatEvent> for Chat {
     fn handle(
         &self,
         _server: Server,
-        mut event: EventData<PlayerChatEvent>,
-    ) -> EventData<PlayerChatEvent> {
+        mut event: EventData<AsyncPlayerChatEvent>,
+    ) -> EventData<AsyncPlayerChatEvent> {
         let config: ChatConfig = ConfigManager::get()
             .map(|cm| cm.mechanics.chat)
             .unwrap_or_default();
@@ -61,10 +65,11 @@ impl EventHandler<PlayerChatEvent> for Chat {
         if !config.chat_format.is_empty() {
             let name = event.player.get_display_name().get_text();
             let original = event.message.clone();
-            event.message = replace_placeholders(
+            let formatted = replace_placeholders(
                 &config.chat_format,
                 &[("{player}", name.as_str()), ("{message}", &original)],
             );
+            event.format = parse_minimessage(&formatted);
         }
 
         event
@@ -76,7 +81,7 @@ impl EventHandler<PlayerChatEvent> for Chat {
 pub struct ChatConfig {
     /// Whether this module is active.
     pub enabled: bool,
-    /// Custom chat format. Use `{player}` and `{message}` as placeholders. Leave empty to disable.
+    /// Custom chat format. Use `{player}` and `{message}` as placeholders. Supports `MiniMessage` tags. Leave empty to disable.
     pub chat_format: String,
     /// List of blocked words/phrases. Messages containing any entry (case-insensitive) are cancelled. Leave empty to disable.
     pub chat_filter: Vec<String>,

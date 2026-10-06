@@ -1,29 +1,31 @@
-//! Messages module - custom join, leave, and kick messages.
+//! Messages module - custom join, leave, kick, and death messages.
 //!
 //! ## Configuration
 //!
-//! | Field       | Default | Description                                                        |
-//! |-------------|---------|--------------------------------------------------------------------|
-//! | `enabled`   | `false` | Whether this module is active                                      |
-//! | `join_msg`  | `""`    | Message broadcast when a player joins                              |
-//! | `leave_msg` | `""`    | Message broadcast when a player leaves                             |
-//! | `kick_msg`  | `""`    | Message shown when a player is kicked during login                 |
+//! | Field         | Default | Description                                                        |
+//! |---------------|---------|--------------------------------------------------------------------|
+//! | `enabled`     | `false` | Whether this module is active                                      |
+//! | `join_msg`    | `""`    | Message broadcast when a player joins                              |
+//! | `leave_msg`   | `""`    | Message broadcast when a player leaves                             |
+//! | `kick_msg`    | `""`    | Message shown when a player is kicked during login                 |
+//! | `death_msg`   | `""`    | Message broadcast when a player dies                               |
 //!
 //! All message fields support [MiniMessage](https://docs.advntr.dev/minimessage/format.html)
 //! formatting tags (resolved after placeholders).
 //!
 //! ## Placeholders
 //!
-//! | Placeholder | Available in                                    |
-//! |-------------|-------------------------------------------------|
-//! | `{player}`  | `join_msg`, `leave_msg`, `kick_msg`             |
+//! | Placeholder | Available in                                     |
+//! |-------------|--------------------------------------------------|
+//! | `{player}`  | `join_msg`, `leave_msg`, `kick_msg`, `death_msg` |
 
 use crate::config::ConfigManager;
 use crate::mechanics::mechanic::Mechanic;
 use crate::utils::placeholders::replace_player_placeholders;
 use crate::utils::text::parse_minimessage;
 use pumpkin_plugin_api::events::{
-    EventData, EventHandler, EventPriority, PlayerJoinEvent, PlayerLeaveEvent, PlayerLoginEvent,
+    EventData, EventHandler, EventPriority, PlayerDeathEvent, PlayerJoinEvent, PlayerLeaveEvent,
+    PlayerLoginEvent,
 };
 use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};
@@ -41,6 +43,7 @@ impl Mechanic for Messages {
         self.register_event::<PlayerJoinEvent>(context, EventPriority::Highest, true);
         self.register_event::<PlayerLeaveEvent>(context, EventPriority::Highest, true);
         self.register_event::<PlayerLoginEvent>(context, EventPriority::Highest, true);
+        self.register_event::<PlayerDeathEvent>(context, EventPriority::Highest, true);
     }
 }
 
@@ -104,6 +107,26 @@ impl EventHandler<PlayerLoginEvent> for Messages {
     }
 }
 
+impl EventHandler<PlayerDeathEvent> for Messages {
+    fn handle(
+        &self,
+        _server: Server,
+        mut event: EventData<PlayerDeathEvent>,
+    ) -> EventData<PlayerDeathEvent> {
+        let config: MessagesConfig = ConfigManager::get()
+            .map(|cm| cm.mechanics.messages)
+            .unwrap_or_default();
+        if config.death_msg.is_empty() {
+            return event;
+        }
+        event.death_message = parse_minimessage(&replace_player_placeholders(
+            &config.death_msg,
+            &event.player,
+        ));
+        event
+    }
+}
+
 /// Configuration for the messages module.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct MessagesConfig {
@@ -115,4 +138,6 @@ pub struct MessagesConfig {
     pub leave_msg: String,
     /// Message shown to the player when they are kicked during login. Use `{player}` as a placeholder for the player's name. Supports `MiniMessage` tags. Leave empty to disable.
     pub kick_msg: String,
+    /// Message broadcast when a player dies. Use `{player}` as a placeholder for the player's name. Supports `MiniMessage` tags. Leave empty to disable.
+    pub death_msg: String,
 }

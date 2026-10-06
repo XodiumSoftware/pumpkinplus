@@ -1,20 +1,21 @@
-//! Openable module — synchronizes multi-block openable structures (doors,
-//! trapdoors, fence gates) and adds a knock mechanic.
+//! Openable module — synchronizes double doors and adds a knock mechanic to
+//! doors, trapdoors, and fence gates.
 //!
-//! ## Double openable sync
+//! ## Double door sync
 //!
-//! When a player right-clicks an openable block that is part of a multi-block
-//! setup (e.g., double doors), the adjacent block is toggled to match, so both
-//! open and close together.
+//! When a player right-clicks a door that is part of a double door setup, the
+//! adjacent door is toggled to match, so both open and close together. This
+//! sync only applies to doors; trapdoors and fence gates are not synced.
 //!
 //! ## Knock
 //!
-//! When a player left-clicks an openable block while sneaking with an empty
-//! main hand, the interaction is cancelled so the block is not damaged.
+//! When a player left-clicks an openable block (door, trapdoor, or fence gate)
+//! while sneaking with an empty main hand, the interaction is cancelled so the
+//! block is not damaged.
 //!
-//! > **Note:** `world.play_sound()` relies on a `Sound` enum that is not currently
-//! > exported by `pumpkin-plugin-api`, so the knock sound is disabled until the
-//! > API exposes it.
+//! > **Note:** The knock sound is temporarily disabled due to a WASM ABI
+//! > compatibility issue with the `Sound` enum. It will be re-enabled when the
+//! > upstream Pumpkin plugin API fixes the issue.
 //!
 //! ## Configuration
 //!
@@ -36,7 +37,6 @@ use pumpkin_plugin_api::events::{EventData, EventHandler, EventPriority, PlayerI
 use pumpkin_plugin_api::world::{BlockFlags, BlockPos, BlockStateInfo, World, block_state_to_info};
 use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};
-use tracing::info;
 
 /// Checks whether the block described by `info` is an openable structure
 /// (door, trapdoor, or fence gate).
@@ -47,6 +47,14 @@ use tracing::info;
 fn is_openable(info: &BlockStateInfo) -> bool {
     let name = &info.name;
     name.ends_with("_door") || name.ends_with("_trapdoor") || name.ends_with("_fence_gate")
+}
+
+/// Checks whether the block described by `info` is a door specifically.
+///
+/// Doors support double-block sync; trapdoors and fence gates do not.
+#[must_use]
+fn is_door(info: &BlockStateInfo) -> bool {
+    info.name.ends_with("_door")
 }
 
 /// Handles openable block synchronization and door knocking.
@@ -78,83 +86,55 @@ impl EventHandler<PlayerInteractEvent> for Openable {
             .unwrap_or_default();
 
         let action = InteractAction::from(event.action);
-        info!("[Openable] event action={:?}", action);
 
         if action == InteractAction::LeftClickBlock && config.knock_enabled {
             return handle_knock(event, &config);
         }
 
         if !action.matches_config(&config.actions) {
-            info!("[Openable] sync action not allowed, returning");
             return event;
         }
 
         let gamemode = GameMode::from(event.player.get_gamemode());
-        info!(
-            "[Openable] sync gamemode={:?}, allowed={:?}",
-            gamemode, config.gamemodes
-        );
         if !gamemode.matches_config(&config.gamemodes) {
-            info!("[Openable] sync gamemode not allowed, returning");
             return event;
         }
 
         let Some(clicked_pos) = event.clicked_pos else {
-            info!("[Openable] sync no clicked_pos, returning");
             return event;
         };
 
         let world = event.player.get_world();
 
         let clicked_state_id = world.get_block_state_id(clicked_pos);
-        info!(
-            "[Openable] sync clicked_pos={:?}, state_id={}",
-            clicked_pos, clicked_state_id
-        );
         let Some(clicked_info) = block_state_to_info(clicked_state_id) else {
-            info!("[Openable] sync could not resolve block info, returning");
             return event;
         };
 
-        info!("[Openable] sync block name={}", clicked_info.name);
-        if !is_openable(&clicked_info) {
-            info!("[Openable] sync block is not openable, returning");
+        if !is_door(&clicked_info) {
             return event;
         }
 
-        let Some(adjacent_pos) = find_adjacent_openable(&world, clicked_pos) else {
-            info!("[Openable] sync no adjacent openable, returning");
+        let Some(adjacent_pos) = find_adjacent_door(&world, clicked_pos) else {
             return event;
         };
 
         let adjacent_state_id = world.get_block_state_id(adjacent_pos);
-        info!(
-            "[Openable] sync adjacent_pos={:?}, state_id={}",
-            adjacent_pos, adjacent_state_id
-        );
         let Some(adjacent_info) = block_state_to_info(adjacent_state_id) else {
-            info!("[Openable] sync could not resolve adjacent block info, returning");
             return event;
         };
 
-        if !is_openable(&adjacent_info) {
-            info!("[Openable] sync adjacent block is not openable, returning");
+        if !is_door(&adjacent_info) {
             return event;
         }
 
         let Some(new_clicked_id) = toggle_open_property(&clicked_info) else {
-            info!("[Openable] sync could not toggle clicked door, returning");
             return event;
         };
         let Some(new_adjacent_id) = toggle_open_property(&adjacent_info) else {
-            info!("[Openable] sync could not toggle adjacent door, returning");
             return event;
         };
 
-        info!(
-            "[Openable] sync toggling doors: {} -> {}, {} -> {}",
-            clicked_state_id, new_clicked_id, adjacent_state_id, new_adjacent_id
-        );
         event.cancelled = true;
 
         let flags = BlockFlags::NOTIFY_NEIGHBORS | BlockFlags::NOTIFY_LISTENERS;
@@ -162,7 +142,6 @@ impl EventHandler<PlayerInteractEvent> for Openable {
         world.set_block_state(clicked_pos, new_clicked_id, flags);
         world.set_block_state(adjacent_pos, new_adjacent_id, flags);
 
-        info!("[Openable] sync complete");
         event
     }
 }
@@ -172,65 +151,53 @@ fn handle_knock(
     mut event: EventData<PlayerInteractEvent>,
     config: &OpenableConfig,
 ) -> EventData<PlayerInteractEvent> {
-    info!("[Openable] Knock attempt detected");
-
     let gamemode = GameMode::from(event.player.get_gamemode());
-    info!(
-        "[Openable] knock gamemode={:?}, allowed={:?}",
-        gamemode, config.knock_gamemodes
-    );
     if !gamemode.matches_config(&config.knock_gamemodes) {
-        info!("[Openable] knock gamemode not allowed, returning");
         return event;
     }
 
     let is_sneaking = event.player.as_entity().is_sneaking();
-    info!(
-        "[Openable] knock sneaking_required={}, is_sneaking={}",
-        config.knock_sneaking_required, is_sneaking
-    );
     if config.knock_sneaking_required && !is_sneaking {
-        info!("[Openable] player not sneaking, returning");
         return event;
     }
 
     let hand_item = event.player.get_item_in_hand(Hand::Right);
-    info!("[Openable] knock hand_item_present={}", hand_item.is_some());
     if hand_item.is_some() {
-        info!("[Openable] hand not empty, returning");
         return event;
     }
 
     let Some(clicked_pos) = event.clicked_pos else {
-        info!("[Openable] no clicked_pos for knock, returning");
         return event;
     };
 
     let world = event.player.get_world();
 
     let clicked_state_id = world.get_block_state_id(clicked_pos);
-    info!(
-        "[Openable] knock clicked_pos={:?}, state_id={}",
-        clicked_pos, clicked_state_id
-    );
     let Some(clicked_info) = block_state_to_info(clicked_state_id) else {
-        info!("[Openable] could not resolve knock block info, returning");
         return event;
     };
 
-    info!("[Openable] knock block name={}", clicked_info.name);
     if !is_openable(&clicked_info) {
-        info!("[Openable] knock block is not openable, returning");
         return event;
     }
 
-    info!("[Openable] knock handled and event cancelled");
     event.cancelled = true;
+
+    // TODO: play_sound is disabled due to a WASM ABI compatibility issue
+    // with the Sound enum (LegacySyncReentry error). Re-enable when fixed.
+    // world.play_sound(
+    //     KNOCK_SOUND,
+    //     wit::pumpkin::plugin::sounds::SoundCategory::Blocks,
+    //     block_center(clicked_pos),
+    //     1.0,
+    //     1.0,
+    // );
+
     event
 }
 
-/// Searches the four horizontal neighbors for another openable block.
-fn find_adjacent_openable(world: &World, pos: BlockPos) -> Option<BlockPos> {
+/// Searches the four horizontal neighbors for another door block.
+fn find_adjacent_door(world: &World, pos: BlockPos) -> Option<BlockPos> {
     let neighbors = [
         BlockPos {
             x: pos.x + 1,
@@ -256,22 +223,12 @@ fn find_adjacent_openable(world: &World, pos: BlockPos) -> Option<BlockPos> {
 
     for neighbor in &neighbors {
         let state_id = world.get_block_state_id(*neighbor);
-        if block_state_to_info(state_id).is_some_and(|info| is_openable(&info)) {
+        if block_state_to_info(state_id).is_some_and(|info| is_door(&info)) {
             return Some(*neighbor);
         }
     }
 
     None
-}
-
-/// Returns the center of a block position as a world position.
-#[expect(dead_code)]
-fn block_center(pos: BlockPos) -> (f64, f64, f64) {
-    (
-        f64::from(pos.x) + 0.5,
-        f64::from(pos.y) + 0.5,
-        f64::from(pos.z) + 0.5,
-    )
 }
 
 /// Configuration for the openable mechanics module.
@@ -284,9 +241,6 @@ pub struct OpenableConfig {
     /// List of interaction actions that trigger door sync. Use variant names like `RightClickBlock`, `RightClickAir`, etc. Leave empty to allow all.
     pub actions: Vec<InteractAction>,
     /// Whether sneaking left-click knock is enabled.
-    ///
-    /// Note: sound playback is currently disabled because `pumpkin-plugin-api`
-    /// does not export the `Sound` enum required by `world.play_sound()`.
     pub knock_enabled: bool,
     /// List of gamemodes allowed to knock on doors. Leave empty to allow all.
     pub knock_gamemodes: Vec<GameMode>,

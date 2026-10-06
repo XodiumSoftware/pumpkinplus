@@ -16,6 +16,12 @@ serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0"
 config = { version = "0.15", default-features = false, features = ["json"] }
 
+# The crates.io pumpkin-plugin-api 0.2.0 bundles an outdated v0.1 WIT that
+# mismatches the nightly server's event variant. Override with the git source
+# so cargo builds use the current WIT interface from the Pumpkin monorepo.
+[patch.crates-io]
+pumpkin-plugin-api = { git = "https://github.com/Pumpkin-MC/Pumpkin", rev = "2c7931a" }
+
 [profile.release]
 lto = true
 strip = true

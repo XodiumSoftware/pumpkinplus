@@ -1,15 +1,16 @@
-//! Openable module — synchronizes multi-block openable structures like double doors
-//! and adds a door-knock mechanic.
+//! Openable module — synchronizes multi-block openable structures (doors,
+//! trapdoors, fence gates) and adds a knock mechanic.
 //!
-//! ## Double door sync
+//! ## Double openable sync
 //!
-//! When a player right-clicks a door that is part of a double-door setup,
-//! the adjacent door is toggled to match, so both open and close together.
+//! When a player right-clicks an openable block that is part of a multi-block
+//! setup (e.g., double doors), the adjacent block is toggled to match, so both
+//! open and close together.
 //!
-//! ## Door knock
+//! ## Knock
 //!
-//! When a player left-clicks a door while sneaking with an empty main hand,
-//! the interaction is cancelled so the door is not damaged.
+//! When a player left-clicks an openable block while sneaking with an empty
+//! main hand, the interaction is cancelled so the block is not damaged.
 //!
 //! > **Note:** `world.play_sound()` relies on a `Sound` enum that is not currently
 //! > exported by `pumpkin-plugin-api`, so the knock sound is disabled until the
@@ -19,12 +20,12 @@
 //!
 //! | Field                  | Default                       | Description                                              |
 //! |------------------------|-------------------------------|----------------------------------------------------------|
-//! | `enabled`              | `false`                       | Whether this module is active                          |
-//! | `gamemodes`            | `["Survival", "Adventure"]`   | Gamemodes that trigger door sync                       |
-//! | `actions`              | `["RightClickBlock"]`         | Actions that trigger door sync                         |
-//! | `knock_enabled`        | `false`                       | Whether sneaking left-click door knocking is enabled   |
-//! | `knock_gamemodes`      | `["Survival", "Adventure"]`   | Gamemodes allowed to knock                             |
-//! | `knock_sneaking_required` | `true`                     | Whether the player must be sneaking to knock           |
+//! | `enabled`              | `false`                       | Whether this module is active                                    |
+//! | `gamemodes`            | `["Survival", "Adventure"]`   | Gamemodes that trigger sync                                      |
+//! | `actions`              | `["RightClickBlock"]`         | Actions that trigger sync                                        |
+//! | `knock_enabled`        | `false`                       | Whether sneaking left-click knock is enabled                    |
+//! | `knock_gamemodes`      | `["Survival", "Adventure"]`   | Gamemodes allowed to knock                                       |
+//! | `knock_sneaking_required` | `true`                     | Whether the player must be sneaking to knock                     |
 
 use crate::config::ConfigManager;
 use crate::mechanics::mechanic::Mechanic;
@@ -33,53 +34,19 @@ use crate::{GameMode, InteractAction};
 use pumpkin_plugin_api::common::Hand;
 use pumpkin_plugin_api::events::{EventData, EventHandler, EventPriority, PlayerInteractEvent};
 use pumpkin_plugin_api::world::{BlockFlags, BlockPos, BlockStateInfo, World, block_state_to_info};
-use pumpkin_plugin_api::{BlockType, Context, Server};
+use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};
 use tracing::info;
 
-/// All vanilla door block types known by the typed registry.
+/// Checks whether the block described by `info` is an openable structure
+/// (door, trapdoor, or fence gate).
 ///
-/// Used instead of string suffix matching so door detection is type-safe for
-/// vanilla blocks. Custom/modded doors that end in `_door` are still matched
-/// by the fallback in [`is_door`].
-const DOOR_TYPES: &[BlockType] = &[
-    BlockType::AcaciaDoor,
-    BlockType::BambooDoor,
-    BlockType::BirchDoor,
-    BlockType::CherryDoor,
-    BlockType::CopperDoor,
-    BlockType::CrimsonDoor,
-    BlockType::DarkOakDoor,
-    BlockType::ExposedCopperDoor,
-    BlockType::IronDoor,
-    BlockType::JungleDoor,
-    BlockType::MangroveDoor,
-    BlockType::OakDoor,
-    BlockType::OxidizedCopperDoor,
-    BlockType::PaleOakDoor,
-    BlockType::SpruceDoor,
-    BlockType::WarpedDoor,
-    BlockType::WaxedCopperDoor,
-    BlockType::WaxedExposedCopperDoor,
-    BlockType::WaxedOxidizedCopperDoor,
-    BlockType::WaxedWeatheredCopperDoor,
-    BlockType::WeatheredCopperDoor,
-];
-
-/// Checks whether a [`BlockType`] is a known vanilla door variant.
+/// Uses name-based suffix matching instead of the typed [`BlockType`] registry
+/// so that custom/modded openables are detected without hardcoding.
 #[must_use]
-fn is_door_type(block_type: BlockType) -> bool {
-    DOOR_TYPES.contains(&block_type)
-}
-
-/// Checks whether the block described by `info` is a door.
-///
-/// Uses the typed block registry for vanilla doors and falls back to the
-/// resource-location suffix for custom/modded doors.
-#[must_use]
-fn is_door(info: &BlockStateInfo) -> bool {
-    BlockType::from_registry_key(&info.name).is_some_and(is_door_type)
-        || info.name.ends_with("_door")
+fn is_openable(info: &BlockStateInfo) -> bool {
+    let name = &info.name;
+    name.ends_with("_door") || name.ends_with("_trapdoor") || name.ends_with("_fence_gate")
 }
 
 /// Handles openable block synchronization and door knocking.
@@ -150,13 +117,13 @@ impl EventHandler<PlayerInteractEvent> for Openable {
         };
 
         info!("[Openable] sync block name={}", clicked_info.name);
-        if !is_door(&clicked_info) {
-            info!("[Openable] sync block is not a door, returning");
+        if !is_openable(&clicked_info) {
+            info!("[Openable] sync block is not openable, returning");
             return event;
         }
 
-        let Some(adjacent_pos) = find_adjacent_door(&world, clicked_pos) else {
-            info!("[Openable] sync no adjacent door, returning");
+        let Some(adjacent_pos) = find_adjacent_openable(&world, clicked_pos) else {
+            info!("[Openable] sync no adjacent openable, returning");
             return event;
         };
 
@@ -170,8 +137,8 @@ impl EventHandler<PlayerInteractEvent> for Openable {
             return event;
         };
 
-        if !is_door(&adjacent_info) {
-            info!("[Openable] sync adjacent block is not a door, returning");
+        if !is_openable(&adjacent_info) {
+            info!("[Openable] sync adjacent block is not openable, returning");
             return event;
         }
 
@@ -252,8 +219,8 @@ fn handle_knock(
     };
 
     info!("[Openable] knock block name={}", clicked_info.name);
-    if !is_door(&clicked_info) {
-        info!("[Openable] knock block is not a door, returning");
+    if !is_openable(&clicked_info) {
+        info!("[Openable] knock block is not openable, returning");
         return event;
     }
 
@@ -262,8 +229,8 @@ fn handle_knock(
     event
 }
 
-/// Searches the four horizontal neighbors for another door block.
-fn find_adjacent_door(world: &World, pos: BlockPos) -> Option<BlockPos> {
+/// Searches the four horizontal neighbors for another openable block.
+fn find_adjacent_openable(world: &World, pos: BlockPos) -> Option<BlockPos> {
     let neighbors = [
         BlockPos {
             x: pos.x + 1,
@@ -289,7 +256,7 @@ fn find_adjacent_door(world: &World, pos: BlockPos) -> Option<BlockPos> {
 
     for neighbor in &neighbors {
         let state_id = world.get_block_state_id(*neighbor);
-        if block_state_to_info(state_id).is_some_and(|info| is_door(&info)) {
+        if block_state_to_info(state_id).is_some_and(|info| is_openable(&info)) {
             return Some(*neighbor);
         }
     }
@@ -316,7 +283,7 @@ pub struct OpenableConfig {
     pub gamemodes: Vec<GameMode>,
     /// List of interaction actions that trigger door sync. Use variant names like `RightClickBlock`, `RightClickAir`, etc. Leave empty to allow all.
     pub actions: Vec<InteractAction>,
-    /// Whether sneaking left-click door knocking is enabled.
+    /// Whether sneaking left-click knock is enabled.
     ///
     /// Note: sound playback is currently disabled because `pumpkin-plugin-api`
     /// does not export the `Sound` enum required by `world.play_sound()`.

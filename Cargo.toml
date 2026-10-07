@@ -20,7 +20,7 @@ toml = "1"
 # mismatches the nightly server's event variant. Override with the git source
 # so cargo builds use the current WIT interface from the Pumpkin monorepo.
 [patch.crates-io]
-pumpkin-plugin-api = { git = "https://github.com/Pumpkin-MC/Pumpkin", rev = "2c7931a" }
+pumpkin-plugin-api = { git = "https://github.com/Pumpkin-MC/Pumpkin", branch = "master" }
 
 [profile.release]
 lto = true

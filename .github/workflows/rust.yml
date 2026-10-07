@@ -115,7 +115,7 @@ jobs:
 
       - id: upload_artifact
         name: Upload Artifact
-        uses: actions/upload-artifact@v7.0.1
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: ${{ steps.get_name.outputs.NAME }}-wasm32-wasip2
           path: target/wasm32-wasip2/release/${{ steps.get_name.outputs.NAME }}.wasm

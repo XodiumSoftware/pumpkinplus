@@ -29,7 +29,6 @@ pub use crate::modules::recipes::RecipesConfig;
 
 thread_local! {
     static CONFIG: RefCell<Option<PluginConfig>> = const { RefCell::new(None) };
-    static DATA_FOLDER: RefCell<Option<String>> = const { RefCell::new(None) };
 }
 
 /// Master module group toggles stored in `config.toml`.
@@ -85,7 +84,6 @@ impl ConfigManager {
     ///
     /// Call this once in `Plugin::on_load` after all modules are ready.
     pub fn load(context: &Context) -> PluginConfig {
-        DATA_FOLDER.with(|f| *f.borrow_mut() = Some(context.get_data_folder()));
         let config = PluginConfig::load(context);
         CONFIG.with(|c| *c.borrow_mut() = Some(config.clone()));
         config
@@ -95,37 +93,6 @@ impl ConfigManager {
     #[must_use]
     pub fn get() -> Option<PluginConfig> {
         CONFIG.with(|c| c.borrow().clone())
-    }
-
-    /// Updates the master toggles in memory and persists `config.toml`.
-    ///
-    /// Errors are logged and swallowed — the in-memory update still happens
-    /// even if persisting fails.
-    ///
-    /// Note: this flips the toggles for future reads and for the next plugin
-    /// load. It does **not** unregister event handlers, commands, or
-    /// permissions for currently-loaded modules — those are wired up at
-    /// plugin load time in `Plugin::on_load`.
-    pub fn save_toggles(update: impl FnOnce(&mut ModuleToggles)) {
-        let mut current = Self::get().unwrap_or_default();
-        update(&mut current.modules);
-
-        let data_folder = DATA_FOLDER.with(|f| f.borrow().clone());
-        if let Some(folder) = data_folder {
-            let path = PathBuf::from(folder).join("config.toml");
-            match toml::to_string_pretty(&current.modules) {
-                Ok(contents) => {
-                    if let Err(e) = fs::write(&path, contents) {
-                        error!("Failed to write config.toml: {e}");
-                    }
-                }
-                Err(e) => error!("Failed to serialize module toggles: {e}"),
-            }
-        } else {
-            error!("ConfigManager::load must be called before save_toggles");
-        }
-
-        CONFIG.with(|c| *c.borrow_mut() = Some(current));
     }
 }
 

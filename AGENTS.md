@@ -62,7 +62,7 @@ cargo clippy --all-targets --all-features --target wasm32-wasip2 -- -W clippy::p
 
 1. **Registration**: Via `register_plugin!(PumpkinPlus)` macro
 2. **`on_load`**:
-    - Initializes `ConfigManager` (loads/creates `config.json`)
+    - Initializes `ConfigManager` (loads/creates `config.toml` and the per-group TOML files)
     - Registers all module configs
     - Calls `Module::register` for each enabled module
 3. **`on_unload`**: Logs farewell message
@@ -83,12 +83,14 @@ Modules are plain structs (not singletons) instantiated with `Default::default()
 
 ### Configuration
 
-**`ConfigManager`** (`src/config.rs`) — JSON-backed config using the [`config`](https://crates.io/crates/config) crate:
+**`ConfigManager`** (`src/config.rs`) — TOML-backed config using the [`config`](https://crates.io/crates/config) crate:
 
-- Config located at `{data_folder}/config.json`
-- On first load: creates file with all module defaults
+- Master toggles live in `{data_folder}/config.toml` under a `[modules]` section
+- Each module group has its own file: `mechanics.toml`, `enchantments.toml`, `recipes.toml`
+- On first load: creates all files with module defaults
 - On subsequent loads: merges user values with defaults and preserves extra fields
-- All module configs live in a single `PluginConfig` struct; modules access their section via `ConfigManager::get().map(|cm| cm.section)`
+- All module configs live in a single `PluginConfig` struct in memory; modules access their section via `ConfigManager::get().map(|cm| cm.section)`
+- Setting a master toggle to `false` skips loading that group's file entirely
 
 ### Active Modules
 
@@ -114,7 +116,7 @@ Modules are plain structs (not singletons) instantiated with `Default::default()
 ```
 src/
 ├── lib.rs                    # Plugin entry point, `PumpkinPlus` struct
-├── config.rs                 # `ConfigManager` — JSON config load/save
+├── config.rs                 # `ConfigManager` — TOML config load/save
 └── modules/
     ├── module.rs             # `Module` trait definition
     └── mechanics/

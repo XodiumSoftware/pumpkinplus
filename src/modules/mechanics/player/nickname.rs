@@ -1,10 +1,12 @@
-//! Nickname module — set player nicknames via an interactive dialog.
+//! Nickname module — set player nicknames via a chat command.
 //!
 //! ## Commands
 //!
-//! | Command              | Aliases | Permission                      | Description              |
-//! |----------------------|---------|---------------------------------|--------------------------|
-//! | `/nickname`          | `nick`  | `pumpkinplus:command.nickname` | Open nickname dialog     |
+//! | Command              | Aliases | Permission                     | Description                          |
+//! |----------------------|---------|--------------------------------|--------------------------------------|
+//! | `/nickname <text>`   | `nick`  | `pumpkinplus:command.nickname` | Set your nickname                    |
+//! | `/nickname`          | `nick`  | `pumpkinplus:command.nickname` | Clear your nickname                  |
+//! | `/nickname clear`    | `nick`  | `pumpkinplus:command.nickname` | Clear your nickname                  |
 //!
 //! ## Configuration
 //!
@@ -14,27 +16,22 @@
 //!
 //! ## Mechanics
 //!
-//! - `/nickname` — opens an interactive dialog to set nickname (Java only).
-//! - Nicknames support [MiniMessage](https://docs.advntr.dev/minimessage/format.html)
-//!   formatting tags (e.g. `<red><bold>Illyrius`).
+//! - `/nickname <text>` — sets your nickname (supports
+//!   [MiniMessage](https://docs.advntr.dev/minimessage/format.html) tags, e.g.
+//!   `/nick <red><bold>Illyrius`).
+//! - `/nickname` with no argument, or `/nickname clear`, removes your nickname.
 //! - Nicknames are persisted on the player's entity via `PersistentDataHolder`.
 //! - On join, the stored nickname is applied to the player's display name and tab list name.
-//!
-//! ## Platform Support
-//!
-//! The dialog only works for Java Edition players. Bedrock players will
-//! receive a chat message explaining dialogs are not supported.
 
-use crate::dialogs::dialog::DialogBuilder;
-use crate::dialogs::nickname::NicknameDialog;
 use crate::utils::command::default_permission;
 use crate::utils::text::parse_minimessage;
 use crate::{PLUGIN_ID, config::ConfigManager, mechanics::mechanic::Mechanic};
 use pumpkin_plugin_api::{
     Context, PersistentDataHolder, Server,
-    command::{Command, CommandError, CommandSender},
+    command::{Command, CommandError, CommandNode, CommandSender, ConsumedArgs},
+    command_wit::{Arg, ArgumentType, StringType},
     commands::CommandHandler,
-    events::{DialogClickActionEvent, EventData, EventHandler, EventPriority, PlayerJoinEvent},
+    events::{EventData, EventHandler, EventPriority, PlayerJoinEvent},
     permission::Permission,
     player::Player,
     text::TextComponent,
@@ -59,8 +56,13 @@ impl Mechanic for Nickname {
         vec![
             Command::new(
                 &["nickname".to_string(), "nick".to_string()],
-                "Open nickname dialog",
+                "Set or clear your nickname",
             )
+            .then(
+                CommandNode::argument("name", &ArgumentType::String(StringType::Greedy))
+                    .execute(NicknameExecutor),
+            )
+            .then(CommandNode::literal("clear").execute(NicknameExecutor))
             .execute(NicknameExecutor),
         ]
     }
@@ -75,11 +77,10 @@ impl Mechanic for Nickname {
 
     fn events(&self, context: &Context) {
         self.register_event::<PlayerJoinEvent>(context, EventPriority::Normal, true);
-        self.register_event::<DialogClickActionEvent>(context, EventPriority::Normal, true);
     }
 }
 
-/// Command executor that shows the nickname dialog.
+/// Command executor that sets or clears the player's nickname.
 struct NicknameExecutor;
 
 impl CommandHandler for NicknameExecutor {
@@ -87,10 +88,28 @@ impl CommandHandler for NicknameExecutor {
         &self,
         sender: CommandSender,
         _server: Server,
-        _args: pumpkin_plugin_api::command::ConsumedArgs,
+        args: ConsumedArgs,
     ) -> Result<i32, CommandError> {
         let player = sender.as_player().ok_or(CommandError::PermissionDenied)?;
-        NicknameDialog.show(&player);
+
+        let nickname = match args.get_value("name") {
+            Arg::Simple(value) | Arg::Msg(value) => value.trim().to_string(),
+            _ => String::new(),
+        };
+
+        if nickname.is_empty() || nickname.eq_ignore_ascii_case("clear") {
+            player.remove_custom_data(DATA_NAMESPACE, NICKNAME_KEY);
+            update_player(&player, None);
+            player.send_system_message(TextComponent::text("Nickname cleared."), false);
+        } else {
+            player.set_string(DATA_NAMESPACE, NICKNAME_KEY, &nickname);
+            update_player(&player, Some(&nickname));
+            player.send_system_message(
+                TextComponent::text(&format!("Nickname updated to: {nickname}")),
+                false,
+            );
+        }
+
         Ok(1)
     }
 }
@@ -107,30 +126,6 @@ impl EventHandler<PlayerJoinEvent> for Nickname {
 
         if let Some(nickname) = event.player.get_string(DATA_NAMESPACE, NICKNAME_KEY) {
             update_player(&event.player, Some(&nickname));
-        }
-
-        event
-    }
-}
-
-impl EventHandler<DialogClickActionEvent> for Nickname {
-    fn handle(
-        &self,
-        _server: Server,
-        mut event: EventData<DialogClickActionEvent>,
-    ) -> EventData<DialogClickActionEvent> {
-        if !self.enabled() {
-            return event;
-        }
-
-        let player = &event.player;
-        let action_id = &event.id;
-
-        // Check if this is our nickname dialog save action
-        if action_id == crate::dialogs::nickname::NICKNAME_SAVE_ACTION {
-            let payload_ref = event.payload.as_deref();
-            crate::dialogs::nickname::handle_save_action(player, payload_ref);
-            event.cancelled = true;
         }
 
         event

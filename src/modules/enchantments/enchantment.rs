@@ -7,8 +7,8 @@
 //!
 //! ## Configuration
 //!
-//! Enchantments can be toggled individually via the `enchantments` section of
-//! `config.json`. Each enchantment is disabled by default.
+//! Enchantments can be toggled individually in `enchantments.toml`. Each
+//! enchantment is disabled by default.
 
 use pumpkin_plugin_api::Context;
 use pumpkin_plugin_api::enchantment::EnchantmentBuilder;

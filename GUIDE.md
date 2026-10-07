@@ -63,71 +63,65 @@ Build the plugin yourself using Rust.
 
 ## Configuration
 
-The plugin uses a JSON configuration file (`config.json`) that is automatically created on first run.
+Configuration is split across four TOML files in the plugin's data folder:
 
-> **Note:** All gameplay mechanics, recipe packs, and enchantments are disabled by default. Enable the modules you want in `config.json` and restart the server.
+| File                | Purpose                                                       |
+| ------------------- | ------------------------------------------------------------- |
+| `config.toml`       | Master on/off toggles for each module group                   |
+| `mechanics.toml`    | Per-mechanic settings (`chat`, `enderchest`, `messages`, ...) |
+| `enchantments.toml` | Per-enchantment toggles (`embertread`, `fortune`, ...)        |
+| `recipes.toml`      | Per-recipe pack toggles (`chainmail`, `rotten_flesh`, ...)    |
 
-### Default Config Structure
+All four files are created on first run with sensible defaults. Setting a master toggle in `config.toml` to `false` disables that entire group and skips loading its own file.
 
-```json
-{
-    "chat": {
-        "enabled": false,
-        "chat_format": "",
-        "chat_filter": []
-    },
-    "enderchest": {
-        "enabled": false,
-        "gamemodes": ["Survival", "Adventure"],
-        "actions": ["RightClickAir"]
-    },
-    "griefing": {
-        "enabled": false,
-        "cancelled_entities": ["Blaze", "Creeper", "EnderDragon", "Enderman", "Fireball", "SmallFireball", "Wither"]
-    },
-    "head": {
-        "enabled": false,
-        "skull_drop_chance": 0.01
-    },
-    "messages": {
-        "enabled": false,
-        "join_msg": "",
-        "leave_msg": "",
-        "kick_msg": ""
-    },
-    "nickname": {
-        "enabled": false
-    },
-    "openable": {
-        "enabled": false,
-        "gamemodes": ["Survival", "Adventure"],
-        "actions": ["RightClickBlock"],
-        "knock_enabled": false,
-        "knock_gamemodes": ["Survival", "Adventure"],
-        "knock_sneaking_required": true
-    },
-    "recipes": {
-        "chainmail": false,
-        "diamond_recycle": false,
-        "ice_breakdown": false,
-        "nether_wart_block": false,
-        "painting": false,
-        "rotten_flesh": false,
-        "wood_log": false,
-        "wool_to_string": false
-    },
-    "enchantments": {
-        "embertread": false,
-        "feather_falling": false,
-        "fortune": false,
-        "silk_touch": false
-    },
-    "tablist": {
-        "enabled": false,
-        "header": "",
-        "footer": ""
-    }
-}
+> **Note:** All gameplay mechanics, recipe packs, and enchantments are disabled by default. Enable the modules you want in their TOML file and restart the server.
+
+### `config.toml`
+
+```toml
+[modules]
+enchantments = true
+mechanics    = true
+recipes      = true
+```
+
+### `mechanics.toml` (excerpt)
+
+```toml
+[chat]
+enabled     = false
+chat_format = ""
+chat_filter = []
+
+[messages]
+enabled   = false
+join_msg  = ""
+leave_msg = ""
+kick_msg  = ""
+
+# ... one [section] per mechanic
+```
+
+### `enchantments.toml`
+
+```toml
+embertread      = false
+feather_falling = false
+fortune         = false
+silk_touch      = false
+```
+
+### `recipes.toml`
+
+```toml
+chainmail         = false
+diamond_recycle   = false
+ice_breakdown     = false
+nether_wart_block = false
+painting          = false
+rotten_flesh      = false
+wood_log          = false
+wool_to_string    = false
 ```
 
 ### Configuration Options
@@ -144,27 +138,31 @@ The plugin uses a JSON configuration file (`config.json`) that is automatically 
 
 ### Enchantments
 
-| Config Field                   | Description                                                                              | Default  |
-| ------------------------------ | ---------------------------------------------------------------------------------------- | -------- |
-| `enchantments.embertread`      | Cancel contact and fire damage when wearing boots with the Embertread custom enchantment | Disabled |
-| `enchantments.feather_falling` | Cancel farmland trampling when wearing Feather Falling boots                             | Disabled |
-| `enchantments.fortune`         | Auto-replant mature crops when broken with a Fortune hoe                                 | Disabled |
-| `enchantments.silk_touch`      | Drop spawners and budding amethyst when broken with Silk Touch pickaxes                  | Disabled |
+| Config File Field | Description                                                                              | Default  |
+| ----------------- | ---------------------------------------------------------------------------------------- | -------- |
+| `embertread`      | Cancel contact and fire damage when wearing boots with the Embertread custom enchantment | Disabled |
+| `feather_falling` | Cancel farmland trampling when wearing Feather Falling boots                             | Disabled |
+| `fortune`         | Auto-replant mature crops when broken with a Fortune hoe                                 | Disabled |
+| `silk_touch`      | Drop spawners and budding amethyst when broken with Silk Touch pickaxes                  | Disabled |
+
+These toggles live in `enchantments.toml`.
 
 `embertread` registers a new custom enchantment; the other enchantments change the behavior of existing vanilla enchantments.
 
 ### Recipe Packs
 
-| Config Field                | Description                                                                                                                            | Default  |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| `recipes.chainmail`         | Craft chainmail armor pieces using iron bars                                                                                           | Disabled |
-| `recipes.diamond_recycle`   | Smelt diamond tools/armor back into diamonds                                                                                           | Disabled |
-| `recipes.ice_breakdown`     | Break blue ice into packed ice and packed ice into ice                                                                                 | Disabled |
-| `recipes.nether_wart_block` | Break nether wart blocks back into nether warts                                                                                        | Disabled |
-| `recipes.painting`          | Placeholder shapeless recipes for painting variants (requires upstream stonecutter / data-component support to match vanilla behavior) | Disabled |
-| `recipes.rotten_flesh`      | Cook rotten flesh into leather via furnace, smoker, and campfire                                                                       | Disabled |
-| `recipes.wood_log`          | Convert wood/hyphae blocks back into 4 logs/stems                                                                                      | Disabled |
-| `recipes.wool_to_string`    | Convert any wool block into 4 string                                                                                                   | Disabled |
+| Config File Field   | Description                                                                                                                            | Default  |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| `chainmail`         | Craft chainmail armor pieces using iron bars                                                                                           | Disabled |
+| `diamond_recycle`   | Smelt diamond tools/armor back into diamonds                                                                                           | Disabled |
+| `ice_breakdown`     | Break blue ice into packed ice and packed ice into ice                                                                                 | Disabled |
+| `nether_wart_block` | Break nether wart blocks back into nether warts                                                                                        | Disabled |
+| `painting`          | Placeholder shapeless recipes for painting variants (requires upstream stonecutter / data-component support to match vanilla behavior) | Disabled |
+| `rotten_flesh`      | Cook rotten flesh into leather via furnace, smoker, and campfire                                                                       | Disabled |
+| `wood_log`          | Convert wood/hyphae blocks back into 4 logs/stems                                                                                      | Disabled |
+| `wool_to_string`    | Convert any wool block into 4 string                                                                                                   | Disabled |
+
+These toggles live in `recipes.toml`.
 
 ### Placeholders
 
@@ -182,8 +180,8 @@ Messages, nicknames, and the tab-list header/footer also support [MiniMessage](h
 
 1. Place `pumpkinplus.wasm` in your Pumpkin server's `plugins/` directory
 2. Start the server
-3. The plugin will load and create `config.json` in the plugin data folder
-4. Stop the server and edit `config.json` as needed
+3. The plugin will load and create `config.toml` plus the per-group TOML files in the plugin data folder
+4. Stop the server and edit the TOML files as needed
 5. Restart the server
 
 ## Usage
@@ -226,7 +224,7 @@ When enabled, sets a custom header and footer for every player's tab list. The h
 
 ### Recipes
 
-Each recipe pack can be enabled independently in the `recipes` section of `config.json`:
+Each recipe pack can be enabled independently in `recipes.toml`:
 
 | Recipe Pack     | Config Field        | Description                                                                                                                            |
 | --------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
@@ -241,9 +239,9 @@ Each recipe pack can be enabled independently in the `recipes` section of `confi
 
 ### Enchantments
 
-Each enchantment can be enabled independently in the `enchantments` section of
-`config.json`. Some entries register brand new custom enchantments, while others
-change how existing vanilla enchantments behave.
+Each enchantment can be enabled independently in `enchantments.toml`. Some
+entries register brand new custom enchantments, while others change how
+existing vanilla enchantments behave.
 
 | Enchantment    | Config Field      | Type             | Description                                                                   |
 | -------------- | ----------------- | ---------------- | ----------------------------------------------------------------------------- |
@@ -262,7 +260,7 @@ All command permissions default to `Allow`.
 
 ### Notes on Experimental Modules
 
-There are currently no experimental modules. All shipped mechanics are fully wired and can be enabled in `config.json`.
+There are currently no experimental modules. All shipped mechanics are fully wired and can be enabled via their TOML config file.
 
 ## Troubleshooting
 
@@ -274,13 +272,14 @@ There are currently no experimental modules. All shipped mechanics are fully wir
 
 ### "Config not loading"
 
-- Check that `config.json` is valid JSON
-- The plugin will regenerate the config if it's invalid
-- Stop the server before editing the config file
+- Check that the offending `.toml` file is valid TOML
+- The plugin will regenerate a config file if it's invalid and fall back to defaults
+- Stop the server before editing config files
 
 ### Commands not working
 
-- Ensure the module is enabled in `config.json`
+- Ensure the module is enabled in `mechanics.toml`
+- Ensure the `mechanics` master toggle in `config.toml` is `true`
 - Check that you have the required permission node
 - Verify the plugin loaded successfully in server logs
 

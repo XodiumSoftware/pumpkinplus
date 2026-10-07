@@ -4,8 +4,8 @@
 //! Recipe packs return a list of [`RecipeEntry`] variants wrapping the upstream
 //! Pumpkin recipe builders.
 //!
-//! Recipe packs can be toggled individually via the `recipes` section of `config.json`;
-//! each pack is disabled by default.
+//! Recipe packs can be toggled individually in `recipes.toml`; each pack is
+//! disabled by default.
 //!
 //! ## Supported Recipe Types
 //!

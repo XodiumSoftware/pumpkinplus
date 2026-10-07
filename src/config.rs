@@ -1,14 +1,14 @@
 //! Configuration management system.
 //!
-//! The plugin configuration is split across multiple JSON files inside the
+//! The plugin configuration is split across multiple TOML files inside the
 //! plugin's data folder:
 //!
-//! | File               | Purpose                                            |
-//! |--------------------|----------------------------------------------------|
-//! | `config.json`      | Master toggles for each module group               |
-//! | `mechanics.json`   | Per-mechanic settings under `MechanicsConfig`      |
-//! | `enchantments.json`| Per-enchantment toggles under `EnchantmentsConfig` |
-//! | `recipes.json`     | Per-recipe pack toggles under `RecipesConfig`      |
+//! | File                | Purpose                                            |
+//! |---------------------|----------------------------------------------------|
+//! | `config.toml`       | Master toggles for each module group               |
+//! | `mechanics.toml`    | Per-mechanic settings under `MechanicsConfig`      |
+//! | `enchantments.toml` | Per-enchantment toggles under `EnchantmentsConfig` |
+//! | `recipes.toml`      | Per-recipe pack toggles under `RecipesConfig`      |
 //!
 //! Each file is merged layered onto its typed defaults using the
 //! [`config`](https://crates.io/crates/config) crate, so missing keys fall back
@@ -17,10 +17,10 @@
 use config::{File, FileFormat};
 use pumpkin_plugin_api::Context;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use std::cell::RefCell;
 use std::fs;
 use std::path::{Path, PathBuf};
+use toml::Value;
 use tracing::error;
 
 pub use crate::modules::enchantments::enchantment::EnchantmentsConfig;
@@ -31,7 +31,7 @@ thread_local! {
     static CONFIG: RefCell<Option<PluginConfig>> = const { RefCell::new(None) };
 }
 
-/// Master module group toggles stored in `config.json`.
+/// Master module group toggles stored in `config.toml`.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct ModuleToggles {
@@ -55,21 +55,21 @@ impl Default for ModuleToggles {
 
 /// Top-level plugin configuration.
 ///
-/// The `modules` field is read from `config.json` and controls whether each
+/// The `modules` field is read from `config.toml` and controls whether each
 /// module group's own file is even consulted. The remaining fields hold the
-/// fully-merged per-group configurations loaded from their own JSON files.
+/// fully-merged per-group configurations loaded from their own TOML files.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct PluginConfig {
-    /// Master toggles for each module group (from `config.json`).
+    /// Master toggles for each module group (from `config.toml`).
     pub modules: ModuleToggles,
-    /// All mechanic module configs (from `mechanics.json`).
+    /// All mechanic module configs (from `mechanics.toml`).
     #[serde(skip)]
     pub mechanics: MechanicsConfig,
-    /// Custom recipe pack toggles (from `recipes.json`).
+    /// Custom recipe pack toggles (from `recipes.toml`).
     #[serde(skip)]
     pub recipes: RecipesConfig,
-    /// Vanilla enchantment behavior override toggles (from `enchantments.json`).
+    /// Vanilla enchantment behavior override toggles (from `enchantments.toml`).
     #[serde(skip)]
     pub enchantments: EnchantmentsConfig,
 }
@@ -79,7 +79,7 @@ pub struct PluginConfig {
 pub struct ConfigManager;
 
 impl ConfigManager {
-    /// Loads `config.json` plus all enabled module group configs, stores the
+    /// Loads `config.toml` plus all enabled module group configs, stores the
     /// merged result globally, and persists merged files back to disk.
     ///
     /// Call this once in `Plugin::on_load` after all modules are ready.
@@ -100,7 +100,7 @@ impl PluginConfig {
     fn load(context: &Context) -> Self {
         let data_folder = PathBuf::from(context.get_data_folder());
 
-        let modules: ModuleToggles = load_section(&data_folder, "config.json");
+        let modules: ModuleToggles = load_section(&data_folder, "config.toml");
 
         let mut config = Self {
             modules: modules.clone(),
@@ -110,20 +110,20 @@ impl PluginConfig {
         };
 
         if modules.mechanics {
-            config.mechanics = load_section(&data_folder, "mechanics.json");
+            config.mechanics = load_section(&data_folder, "mechanics.toml");
         }
         if modules.recipes {
-            config.recipes = load_section(&data_folder, "recipes.json");
+            config.recipes = load_section(&data_folder, "recipes.toml");
         }
         if modules.enchantments {
-            config.enchantments = load_section(&data_folder, "enchantments.json");
+            config.enchantments = load_section(&data_folder, "enchantments.toml");
         }
 
         config
     }
 }
 
-/// Loads a single JSON section file from `data_folder`, merges it over
+/// Loads a single TOML section file from `data_folder`, merges it over
 /// `T::default()`, writes the merged result back to disk, and returns the
 /// typed value. Falls back to `T::default()` on any error.
 fn load_section<T>(data_folder: &Path, file_name: &str) -> T
@@ -132,13 +132,13 @@ where
 {
     let path = data_folder.join(file_name);
 
-    let defaults_json = serde_json::to_string(&T::default()).unwrap_or_else(|e| {
+    let defaults_toml = toml::to_string(&T::default()).unwrap_or_else(|e| {
         error!("Failed to serialize defaults for {file_name}: {e}");
         String::new()
     });
 
     let builder = config::Config::builder()
-        .add_source(File::from_str(&defaults_json, FileFormat::Json))
+        .add_source(File::from_str(&defaults_toml, FileFormat::Toml))
         .add_source(File::from(path.clone()).required(false));
 
     let cfg = match builder.build() {
@@ -157,7 +157,7 @@ where
         }
     };
 
-    let value: T = match serde_json::from_value(merged.clone()) {
+    let value: T = match merged.clone().try_into() {
         Ok(v) => v,
         Err(e) => {
             error!("Failed to parse merged config for {file_name}: {e}");
@@ -171,10 +171,7 @@ where
         error!("Failed to create config directory for {file_name}: {e}");
     }
 
-    if let Err(e) = fs::write(
-        &path,
-        serde_json::to_string_pretty(&merged).unwrap_or_default(),
-    ) {
+    if let Err(e) = fs::write(&path, toml::to_string_pretty(&merged).unwrap_or_default()) {
         error!("Failed to write config file {file_name}: {e}");
     }
 

@@ -6,10 +6,6 @@
 #![allow(clippy::must_use_candidate)]
 
 mod config;
-mod dialogs {
-    pub mod dialog;
-    pub mod nickname;
-}
 mod utils {
     pub mod block;
     pub mod command;

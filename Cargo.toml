@@ -13,8 +13,8 @@ pumpkin-plugin-api = "0.2"
 minimessage-impl = "0.1"
 tracing = "0.1"
 serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-config = { version = "0.15", default-features = false, features = ["json"] }
+config = { version = "0.15", default-features = false, features = ["toml"] }
+toml = "1"
 
 # The crates.io pumpkin-plugin-api 0.2.0 bundles an outdated v0.1 WIT that
 # mismatches the nightly server's event variant. Override with the git source

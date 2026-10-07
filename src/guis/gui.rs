@@ -1,17 +1,16 @@
 //! GUI builder utility for creating custom inventory-based menus.
 //!
 //! Provides a fluent [`GuiBuilder`] for constructing [`Gui`] instances with
-//! title, size, items, and interaction rules, plus a [`GuiSession`] helper for
-//! tracking which players have which GUI open.
+//! title, size, items, and interaction rules.
 //!
 //! ## Example
 //!
 //! ```rust,ignore
-//! use pumpkin_plugin_api::gui::Gui;
 //! use pumpkin_plugin_api::screens_wit::Screen;
-//! use crate::guis::gui::{GuiBuilder, GuiSession};
+//! use crate::guis::gui::GuiBuilder;
 //!
-//! let gui = GuiBuilder::new(Screen::Generic9x3, "<gold>My Menu")
+//! let gui = GuiBuilder::new(Screen::Generic9x3)
+//!     .title("<gold>My Menu")
 //!     .item(13, "minecraft:diamond", 1)
 //!     .allow_grab(false)
 //!     .allow_put(false)
@@ -67,7 +66,7 @@ pub struct GuiBuilder {
     /// The screen type (size/layout) of the GUI.
     screen: Screen,
     /// The title component displayed at the top of the GUI.
-    title: TextComponent,
+    title: Option<TextComponent>,
     /// Items to place in the GUI slots.
     items: Vec<(u32, ItemStack)>,
     /// Whether players can take items out of the GUI.
@@ -78,25 +77,33 @@ pub struct GuiBuilder {
 
 #[allow(dead_code)]
 impl GuiBuilder {
-    /// Creates a new builder for a GUI with the given screen type and title.
+    /// Creates a new builder for a GUI with the given screen type.
+    ///
+    /// No title is set by default; call [`GuiBuilder::title`] to set one.
+    #[must_use]
+    pub fn new(screen: Screen) -> Self {
+        Self {
+            screen,
+            title: None,
+            items: Vec::new(),
+            allow_grab: true,
+            allow_put: true,
+        }
+    }
+
+    /// Sets the GUI title.
     ///
     /// The `title` is parsed as a `MiniMessage` string if it contains `<` tags;
     /// otherwise it is treated as plain text.
     #[must_use]
-    pub fn new(screen: Screen, title: &str) -> Self {
+    pub fn title(mut self, title: &str) -> Self {
         let title = if title.contains('<') {
             crate::utils::text::parse_minimessage(title)
         } else {
             TextComponent::text(title)
         };
-
-        Self {
-            screen,
-            title,
-            items: Vec::new(),
-            allow_grab: true,
-            allow_put: true,
-        }
+        self.title = Some(title);
+        self
     }
 
     /// Sets whether players can take items out of the GUI.
@@ -227,9 +234,12 @@ impl GuiBuilder {
     }
 
     /// Builds the [`Gui`] instance with all configured items and settings.
+    ///
+    /// If no title was set via [`GuiBuilder::title`], an empty title is used.
     #[must_use]
     pub fn build(self) -> gui::Gui {
-        let gui = gui::Gui::new(self.screen, self.title);
+        let title = self.title.unwrap_or_else(|| TextComponent::text(""));
+        let gui = gui::Gui::new(self.screen, title);
         gui.set_allow_grab_items(self.allow_grab);
         gui.set_allow_put_items(self.allow_put);
         for (slot, stack) in self.items {

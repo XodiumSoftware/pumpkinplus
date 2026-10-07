@@ -42,7 +42,8 @@ use crate::GuiBuilder;
 #[must_use]
 #[allow(dead_code)]
 pub fn build_main_menu() -> gui::Gui {
-    GuiBuilder::new(Screen::Generic9x3, "<dark_gray><bold>Main Menu")
+    GuiBuilder::new(Screen::Generic9x3)
+        .title("<dark_gray><bold>Main Menu")
         .allow_grab(false)
         .allow_put(false)
         .lore_item(

@@ -8,6 +8,7 @@
 mod config;
 pub mod guis {
     pub mod gui;
+    pub mod main;
 }
 mod utils {
     pub mod block;

@@ -25,6 +25,39 @@ use pumpkin_plugin_api::screens_wit::Screen;
 use pumpkin_plugin_api::text::TextComponent;
 use pumpkin_plugin_api::{IntoItemKey, ItemStack, ItemStackExt};
 
+/// Extension trait providing slot-count lookup for [`Screen`] variants.
+///
+/// The WIT `Screen` enum doesn't expose how many slots each screen has, so
+/// this trait fills in the well-known values from vanilla Minecraft.
+trait ScreenSlots {
+    /// Returns the number of inventory slots in this screen.
+    fn slot_count(&self) -> u32;
+}
+
+impl ScreenSlots for Screen {
+    fn slot_count(&self) -> u32 {
+        match self {
+            Screen::Generic9x1 | Screen::Generic3x3 | Screen::Crafter3x3 => 9,
+            Screen::Generic9x2 => 18,
+            Screen::Generic9x3 | Screen::ShulkerBox => 27,
+            Screen::Generic9x4 => 36,
+            Screen::Generic9x5 => 45,
+            Screen::Generic9x6 => 54,
+            Screen::Anvil | Screen::Smithing | Screen::Loom => 4,
+            Screen::Beacon | Screen::Lectern => 1,
+            Screen::BlastFurnace
+            | Screen::Furnace
+            | Screen::Smoker
+            | Screen::Grindstone
+            | Screen::Merchant
+            | Screen::CartographyTable => 3,
+            Screen::BrewingStand | Screen::Hopper => 5,
+            Screen::Crafting => 10,
+            Screen::Enchantment | Screen::Stonecutter => 2,
+        }
+    }
+}
+
 /// A fluent builder for creating [`Gui`] instances.
 ///
 /// The builder allows setting the GUI type, title, items, and interaction
@@ -140,6 +173,56 @@ impl GuiBuilder {
         stack.set_lore(lore_components);
 
         self.items.push((slot, stack));
+        self
+    }
+
+    /// Fills every empty slot with a blank-named filler item.
+    ///
+    /// Slots that already have an item placed via [`item`](Self::item),
+    /// [`named_item`](Self::named_item), or [`lore_item`](Self::lore_item) are
+    /// left untouched. The filler's name is set to a single space (`" "`) so
+    /// hovering shows no tooltip — the typical pattern for menu filler panes.
+    ///
+    /// For full control over the filler's name, lore, or other item data,
+    /// use [`fill_empty_with`](Self::fill_empty_with).
+    ///
+    /// The number of slots is derived from the [`Screen`] type passed to
+    /// [`GuiBuilder::new`].
+    #[must_use]
+    pub fn fill_empty(self, item: impl IntoItemKey) -> Self {
+        let key = item.into_item_key();
+        self.fill_empty_with(move |_| {
+            let stack = ItemStack::of(&key, 1);
+            stack.set_custom_name(Some(TextComponent::text(" ")));
+            stack
+        })
+    }
+
+    /// Fills every empty slot with stacks produced by a builder closure.
+    ///
+    /// The closure is called once per empty slot, receiving the slot index
+    /// and returning a fresh [`ItemStack`]. Use this for full control over
+    /// the filler's name, lore, count, or other item data.
+    ///
+    /// # Example
+    ///
+    /// ```rust,ignore
+    /// .fill_empty_with(|_slot| {
+    ///     let stack = ItemStack::of(Item::GrayStainedGlassPane, 1);
+    ///     stack.set_custom_name(Some(TextComponent::text("Panel")));
+    ///     stack
+    /// })
+    /// ```
+    #[must_use]
+    pub fn fill_empty_with<F>(mut self, build: F) -> Self
+    where
+        F: Fn(u32) -> ItemStack,
+    {
+        for slot in 0..self.screen.slot_count() {
+            if !self.items.iter().any(|(s, _)| *s == slot) {
+                self.items.push((slot, build(slot)));
+            }
+        }
         self
     }
 

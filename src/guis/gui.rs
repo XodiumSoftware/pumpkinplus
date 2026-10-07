@@ -101,16 +101,11 @@ impl GuiBuilder {
 
     /// Sets the GUI title.
     ///
-    /// The `title` is parsed as a `MiniMessage` string if it contains `<` tags;
-    /// otherwise it is treated as plain text.
+    /// The `title` is parsed as a `MiniMessage` string. Plain text without tags
+    /// passes through unchanged.
     #[must_use]
     pub fn title(mut self, title: &str) -> Self {
-        let title = if title.contains('<') {
-            crate::utils::text::parse_minimessage(title)
-        } else {
-            TextComponent::text(title)
-        };
-        self.title = Some(title);
+        self.title = Some(crate::utils::text::parse_minimessage(title));
         self
     }
 
@@ -162,46 +157,31 @@ impl GuiBuilder {
 
     /// Places an item with a custom display name in the specified slot.
     ///
-    /// The `name` is parsed as `MiniMessage` if it contains `<` tags.
-    /// Places a single item (count 1); use [`stack`](Self::stack) with a
-    /// custom-built `ItemStack` to control the stack size.
+    /// The `name` is parsed as a `MiniMessage` string. Plain text without tags
+    /// passes through unchanged. Places a single item (count 1); use
+    /// [`stack`](Self::stack) with a custom-built `ItemStack` to control the
+    /// stack size.
     #[must_use]
     pub fn named_item(self, slot: u32, item: impl IntoItemKey, name: &str) -> Self {
         let stack = ItemStack::of(item, 1);
-        let name_component = if name.contains('<') {
-            crate::utils::text::parse_minimessage(name)
-        } else {
-            TextComponent::text(name)
-        };
-        stack.set_custom_name(Some(name_component));
+        stack.set_custom_name(Some(crate::utils::text::parse_minimessage(name)));
         self.stack(slot, stack)
     }
 
     /// Places an item with a custom display name and lore in the specified slot.
     ///
-    /// Both `name` and each line of `lore` are parsed as `MiniMessage` if they
-    /// contain `<` tags; otherwise they are treated as plain text.
-    /// Places a single item (count 1); use [`stack`](Self::stack) with a
-    /// custom-built `ItemStack` to control the stack size.
+    /// Both `name` and each line of `lore` are parsed as `MiniMessage` strings.
+    /// Plain text without tags passes through unchanged. Places a single item
+    /// (count 1); use [`stack`](Self::stack) with a custom-built `ItemStack` to
+    /// control the stack size.
     #[must_use]
     pub fn lore_item(self, slot: u32, item: impl IntoItemKey, name: &str, lore: &[&str]) -> Self {
         let stack = ItemStack::of(item, 1);
-        let name_component = if name.contains('<') {
-            crate::utils::text::parse_minimessage(name)
-        } else {
-            TextComponent::text(name)
-        };
-        stack.set_custom_name(Some(name_component));
+        stack.set_custom_name(Some(crate::utils::text::parse_minimessage(name)));
 
         let lore_components: Vec<TextComponent> = lore
             .iter()
-            .map(|line| {
-                if line.contains('<') {
-                    crate::utils::text::parse_minimessage(line)
-                } else {
-                    TextComponent::text(line)
-                }
-            })
+            .map(|line| crate::utils::text::parse_minimessage(line))
             .collect();
         stack.set_lore(lore_components);
 

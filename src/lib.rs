@@ -275,11 +275,17 @@ impl Plugin for PumpkinPlus {
     }
 
     fn on_load(&self, context: Context) -> pumpkin_plugin_api::Result<()> {
-        ConfigManager::load(&context);
+        let config = ConfigManager::load(&context);
 
-        Self::register_mechanics(&context);
-        Self::register_recipes(&context);
-        Self::register_enchantments(&context);
+        if config.modules.mechanics {
+            Self::register_mechanics(&context);
+        }
+        if config.modules.recipes {
+            Self::register_recipes(&context);
+        }
+        if config.modules.enchantments {
+            Self::register_enchantments(&context);
+        }
 
         info!("Pumpkin+ loaded. NICE TO CYA!");
         Ok(())

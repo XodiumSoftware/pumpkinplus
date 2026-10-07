@@ -4,6 +4,7 @@
 //! formatted strings into Pumpkin `TextComponent` trees.
 
 use std::borrow::Cow;
+use std::collections::HashMap;
 use std::str::FromStr;
 
 use minimessage_impl::parser::{Expression, Node, Parser};
@@ -15,12 +16,30 @@ use pumpkin_plugin_api::text::TextComponent;
 /// Parses a string containing `MiniMessage` tags (e.g. `<red>`, `<bold>`,
 /// `<click:open_url:...>`) and returns a styled `TextComponent`.
 ///
-/// Placeholder replacement must happen before parsing; this function only
-/// interprets `MiniMessage` markup. If the input fails to parse, the error is
-/// logged and the raw input is returned as a plain text component so a typo
-/// in the config never breaks message delivery.
+/// Text placeholders written as `{name}` (Adventure's interpolation syntax) are
+/// preserved literally — they are not resolved. Use [`parse_minimessage_with_args`]
+/// to substitute named placeholders with values.
+///
+/// If the input fails to parse, the error is logged and the raw input is
+/// returned as a plain text component so a typo in the config never breaks
+/// message delivery.
 #[must_use]
 pub fn parse_minimessage(input: &str) -> TextComponent {
+    parse_minimessage_with_args(input, &HashMap::new())
+}
+
+/// Parses a `MiniMessage` string, substituting `{name}` expressions with the
+/// corresponding values from `args`.
+///
+/// Each `{name}` placeholder found in the input is replaced with the matching
+/// value from `args`. Unknown placeholders are rendered as their literal source
+/// text (e.g. `{name}`) so typos are visible instead of silently dropped.
+///
+/// Placeholder values are inserted as literal text — `MiniMessage` tags inside
+/// an argument value are not re-parsed. This keeps the surrounding format's
+/// styling in control of the final rendering.
+#[must_use]
+pub fn parse_minimessage_with_args(input: &str, args: &HashMap<&str, &str>) -> TextComponent {
     let nodes: Vec<Node<'_>> = Parser::new(Tokenizer::new(input))
         .collect::<Result<Vec<_>, _>>()
         .unwrap_or_else(|err| {
@@ -30,20 +49,29 @@ pub fn parse_minimessage(input: &str) -> TextComponent {
 
     let mut root = TextComponent::text("");
     for node in &nodes {
-        root = root.add_child(node_to_component(node));
+        root = root.add_child(node_to_component(node, args));
     }
     root
 }
 
 /// Recursively converts a [`Node`] from `minimessage-impl` into a [`TextComponent`].
-fn node_to_component(node: &Node<'_>) -> TextComponent {
+fn node_to_component(node: &Node<'_>, args: &HashMap<&str, &str>) -> TextComponent {
     match node {
         Node::Text(text) => TextComponent::text(text.as_ref()),
 
-        Node::Expression(Expression::Unnamed | Expression::Named(_)) => {
-            // Expressions are only meaningful when formatting args are provided.
-            // We don't pass args, so these become literal text.
+        Node::Expression(Expression::Unnamed) => {
+            // Unnamed placeholders (`{}`, `{<index>}`) aren't supported — render
+            // as empty text.
             TextComponent::text("")
+        }
+
+        Node::Expression(Expression::Named(name)) => {
+            // Named placeholders (`{name}`) are looked up in `args`. Unknown
+            // names render as their literal source text so typos stay visible.
+            args.get(name.as_ref()).map_or_else(
+                || TextComponent::text(&format!("{{{name}}}")),
+                |value| TextComponent::text(value),
+            )
         }
 
         Node::Element {
@@ -94,7 +122,7 @@ fn node_to_component(node: &Node<'_>) -> TextComponent {
             }
 
             for child in children {
-                comp = comp.add_child(node_to_component(child));
+                comp = comp.add_child(node_to_component(child, args));
             }
 
             comp

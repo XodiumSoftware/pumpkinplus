@@ -21,8 +21,7 @@
 
 use crate::config::ConfigManager;
 use crate::mechanics::mechanic::Mechanic;
-use crate::utils::placeholders::replace_player_placeholders;
-use crate::utils::text::parse_minimessage;
+use crate::utils::placeholders::parse_with_player_component;
 use pumpkin_plugin_api::events::{
     EventData, EventHandler, EventPriority, PlayerDeathEvent, PlayerJoinEvent, PlayerLeaveEvent,
     PlayerLoginEvent,
@@ -59,10 +58,7 @@ impl EventHandler<PlayerJoinEvent> for Messages {
         if config.join_msg.is_empty() {
             return event;
         }
-        event.join_message = parse_minimessage(&replace_player_placeholders(
-            &config.join_msg,
-            &event.player,
-        ));
+        event.join_message = parse_with_player_component(&config.join_msg, &event.player);
         event
     }
 }
@@ -79,10 +75,7 @@ impl EventHandler<PlayerLeaveEvent> for Messages {
         if config.leave_msg.is_empty() {
             return event;
         }
-        event.leave_message = parse_minimessage(&replace_player_placeholders(
-            &config.leave_msg,
-            &event.player,
-        ));
+        event.leave_message = parse_with_player_component(&config.leave_msg, &event.player);
         event
     }
 }
@@ -99,10 +92,7 @@ impl EventHandler<PlayerLoginEvent> for Messages {
         if config.kick_msg.is_empty() {
             return event;
         }
-        event.kick_message = parse_minimessage(&replace_player_placeholders(
-            &config.kick_msg,
-            &event.player,
-        ));
+        event.kick_message = parse_with_player_component(&config.kick_msg, &event.player);
         event
     }
 }
@@ -119,10 +109,7 @@ impl EventHandler<PlayerDeathEvent> for Messages {
         if config.death_msg.is_empty() {
             return event;
         }
-        event.death_message = parse_minimessage(&replace_player_placeholders(
-            &config.death_msg,
-            &event.player,
-        ));
+        event.death_message = parse_with_player_component(&config.death_msg, &event.player);
         event
     }
 }

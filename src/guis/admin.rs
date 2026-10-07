@@ -24,6 +24,7 @@ use pumpkin_plugin_api::screens_wit::Screen;
 use pumpkin_plugin_api::text::TextComponent;
 
 use crate::GuiBuilder;
+use crate::guis::gui::ItemBuilder;
 
 /// Registry ID for the admin menu (used by click dispatch).
 pub const ADMIN_MENU_ID: &str = "admin_menu";
@@ -49,45 +50,49 @@ pub fn build_admin_menu() -> gui::Gui {
         .title("<dark_gray><bold>Admin Menu")
         .allow_grab(false)
         .allow_put(false)
-        .lore_item(
+        .item(
             1,
-            Item::Compass,
-            "<green><bold>Teleport",
-            &["<gray>Click to open the", "<gray>teleport menu."],
+            ItemBuilder::new(Item::Compass)
+                .title("<green><bold>Teleport")
+                .lore(&["<gray>Click to open the", "<gray>teleport menu."])
+                .on_click(|event| {
+                    event.player.send_system_message(
+                        TextComponent::text("Teleport menu not yet wired up."),
+                        false,
+                    );
+                    event
+                })
+                .build(),
         )
-        .on_click(1, |event| {
-            event.player.send_system_message(
-                TextComponent::text("Teleport menu not yet wired up."),
-                false,
-            );
-            event
-        })
-        .lore_item(
+        .item(
             2,
-            Item::Book,
-            "<yellow><bold>Server Info",
-            &["<gray>View rules, links,", "<gray>and other server info."],
+            ItemBuilder::new(Item::Book)
+                .title("<yellow><bold>Server Info")
+                .lore(&["<gray>View rules, links,", "<gray>and other server info."])
+                .on_click(|event| {
+                    event.player.send_system_message(
+                        TextComponent::text("Server info not yet wired up."),
+                        false,
+                    );
+                    event
+                })
+                .build(),
         )
-        .on_click(2, |event| {
-            event
-                .player
-                .send_system_message(TextComponent::text("Server info not yet wired up."), false);
-            event
-        })
-        .lore_item(
+        .item(
             3,
-            Item::Barrier,
-            "<red><bold>Close",
-            &["<gray>Click to close this menu."],
+            ItemBuilder::new(Item::Barrier)
+                .title("<red><bold>Close")
+                .lore(&["<gray>Click to close this menu."])
+                .on_click(|event| {
+                    // TODO: Close the inventory once the API exposes a close method.
+                    event.player.send_system_message(
+                        TextComponent::text("Close button pressed (close API pending)."),
+                        false,
+                    );
+                    event
+                })
+                .build(),
         )
-        .on_click(3, |event| {
-            // TODO: Close the inventory once the API exposes a close method.
-            event.player.send_system_message(
-                TextComponent::text("Close button pressed (close API pending)."),
-                false,
-            );
-            event
-        })
         .fill_empty(Item::BlackStainedGlassPane)
         .build()
 }

@@ -78,7 +78,7 @@ mod modules {
 }
 
 pub use config::*;
-pub use guis::gui::GuiBuilder;
+pub use guis::gui::{GuiBuilder, ItemBuilder};
 pub use modules::*;
 
 pub use modules::enchantments::enchantment::EnchantmentsConfig;

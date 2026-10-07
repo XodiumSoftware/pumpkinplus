@@ -7,8 +7,8 @@
 
 mod config;
 pub mod guis {
+    pub mod admin;
     pub mod gui;
-    pub mod main;
 }
 mod utils {
     pub mod block;
@@ -120,9 +120,12 @@ use crate::mechanics::world::openable::Openable;
 use crate::modules::enchantments::enchantment::Enchantment;
 use crate::modules::enchantments::utility::embertread::Embertread;
 use crate::modules::enchantments::vanilla::fortune::Fortune;
-use pumpkin_plugin_api::{Context, Plugin, PluginMetadata};
+use pumpkin_plugin_api::command::{Command, CommandError, CommandSender, ConsumedArgs};
+use pumpkin_plugin_api::commands::CommandHandler;
+use pumpkin_plugin_api::permission::{Permission, PermissionDefault, PermissionLevel};
+use pumpkin_plugin_api::{Context, Plugin, PluginMetadata, Server};
 use std::time::Instant;
-use tracing::info;
+use tracing::{error, info};
 
 pub const PLUGIN_ID: &str = env!("CARGO_PKG_NAME");
 
@@ -188,6 +191,43 @@ impl PumpkinPlus {
             enabled_enchantments, enchantment_total_ms
         );
     }
+
+    /// Registers the admin `/pumpkinplus` command, which opens the main menu GUI.
+    fn register_admin(context: &Context) {
+        let permission = Permission {
+            node: format!("{PLUGIN_ID}:command.{PLUGIN_ID}"),
+            description: format!("Opens the {PLUGIN_ID} admin menu."),
+            default: PermissionDefault::Op(PermissionLevel::Four),
+            children: vec![],
+        };
+        if let Err(e) = context.register_permission(&permission) {
+            error!("Failed to register permission '{}': {e}", permission.node);
+        }
+
+        let command = Command::new(
+            &[PLUGIN_ID.to_string(), "pp".to_string()],
+            "Open the admin menu",
+        )
+        .execute(AdminExecutor);
+        context.register_command(command, &permission.node);
+    }
+}
+
+/// Command executor that opens the main admin menu GUI.
+struct AdminExecutor;
+
+impl CommandHandler for AdminExecutor {
+    fn handle(
+        &self,
+        sender: CommandSender,
+        _server: Server,
+        _args: ConsumedArgs,
+    ) -> Result<i32, CommandError> {
+        let player = sender.as_player().ok_or(CommandError::PermissionDenied)?;
+        let gui = crate::guis::admin::build_admin_menu();
+        player.open_gui(gui);
+        Ok(1)
+    }
 }
 
 impl Plugin for PumpkinPlus {
@@ -214,6 +254,8 @@ impl Plugin for PumpkinPlus {
 
     fn on_load(&self, context: Context) -> pumpkin_plugin_api::Result<()> {
         let config = ConfigManager::load(&context);
+
+        Self::register_admin(&context);
 
         if config.modules.mechanics {
             Self::register_mechanics(&context);

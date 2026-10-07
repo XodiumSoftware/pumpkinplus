@@ -1,19 +1,20 @@
-//! Example main menu GUI.
+//! Admin menu GUI.
 //!
-//! Demonstrates how to use [`GuiBuilder`] to construct a simple menu-style GUI
-//! with styled items, lore, and interaction rules. This GUI is purely a visual
-//! example — click handling must be wired separately via
-//! `InventoryClickEvent` if you want buttons to do anything.
+//! Provides the main admin menu opened by the `/pumpkinplus` command. Built with
+//! [`GuiBuilder`] using styled items, lore, and interaction rules.
+//!
+//! Click handling must be wired separately via `InventoryClickEvent` if you
+//! want buttons to do anything.
 //!
 //! ## Example
 //!
 //! ```rust,ignore
 //! use pumpkin_plugin_api::player::Player;
-//! use crate::guis::main::build_main_menu;
+//! use crate::guis::admin::build_admin_menu;
 //!
 //! fn open_menu(player: &Player) {
-//!     let gui = build_main_menu();
-//!     player.open_gui(&gui);
+//!     let gui = build_admin_menu();
+//!     player.open_gui(gui);
 //! }
 //! ```
 
@@ -23,7 +24,7 @@ use pumpkin_plugin_api::screens_wit::Screen;
 
 use crate::GuiBuilder;
 
-/// Builds an example main menu GUI.
+/// Builds the admin menu GUI.
 ///
 /// Layout (9x3 chest screen, 27 slots):
 ///
@@ -36,14 +37,13 @@ use crate::GuiBuilder;
 /// - `11` — Teleport compass
 /// - `13` — Info book
 /// - `15` — Close barrier
-/// - All other slots — gray stained-glass panes as filler
+/// - All other slots — black stained-glass panes as filler
 ///
 /// Grabbing and placing items are disabled so the GUI behaves like a menu.
 #[must_use]
-#[allow(dead_code)]
-pub fn build_main_menu() -> gui::Gui {
+pub fn build_admin_menu() -> gui::Gui {
     GuiBuilder::new(Screen::Generic9x3)
-        .title("<dark_gray><bold>Main Menu")
+        .title("<dark_gray><bold>Admin Menu")
         .allow_grab(false)
         .allow_put(false)
         .lore_item(

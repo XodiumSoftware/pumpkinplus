@@ -24,7 +24,7 @@
 //!     .allow_put(false)
 //!     .build();
 //!
-//! player.open_gui(&gui);
+//! player.open_gui(gui);
 //! ```
 
 use pumpkin_plugin_api::gui;

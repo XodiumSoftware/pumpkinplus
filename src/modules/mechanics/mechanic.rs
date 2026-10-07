@@ -19,6 +19,7 @@ pub use crate::modules::mechanics::server::chat::ChatConfig;
 pub use crate::modules::mechanics::server::rules::RulesConfig;
 pub use crate::modules::mechanics::server::tablist::TablistConfig;
 pub use crate::modules::mechanics::world::openable::OpenableConfig;
+pub use crate::modules::mechanics::world::spawnprotection::SpawnProtectionConfig;
 use pumpkin_plugin_api::Context;
 use pumpkin_plugin_api::command::Command;
 use pumpkin_plugin_api::events::{EventHandler, EventPriority, FromIntoEvent};
@@ -112,6 +113,8 @@ pub struct MechanicsConfig {
     pub griefing: GriefingConfig,
     /// Mob silencing with amethyst shards.
     pub silence: SilenceConfig,
+    /// Spawn protection: keeps monsters out of the spawn area.
+    pub spawnprotection: SpawnProtectionConfig,
     /// Spawn egg drops from mob deaths.
     pub spawn_egg: SpawnEggConfig,
     /// Pet ownership transfer between players.

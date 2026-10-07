@@ -3,15 +3,23 @@
 //! Provides a fluent [`GuiBuilder`] for constructing [`Gui`] instances with
 //! title, size, items, and interaction rules.
 //!
+//! ## Item identifiers
+//!
+//! Item-taking methods accept any [`IntoItemKey`], which includes both the
+//! typed [`Item`] enum (preferred — compile-time checked) and string keys like
+//! `"minecraft:diamond"`. Prefer the enum when the item is a known vanilla
+//! item; fall back to strings only for custom/modded items.
+//!
 //! ## Example
 //!
 //! ```rust,ignore
 //! use pumpkin_plugin_api::screens_wit::Screen;
+//! use pumpkin_plugin_api::Item;
 //! use crate::guis::gui::GuiBuilder;
 //!
 //! let gui = GuiBuilder::new(Screen::Generic9x3)
 //!     .title("<gold>My Menu")
-//!     .item(13, "minecraft:diamond", 1)
+//!     .item(13, Item::Diamond)
 //!     .allow_grab(false)
 //!     .allow_put(false)
 //!     .build();
@@ -120,46 +128,64 @@ impl GuiBuilder {
         self
     }
 
+    /// Places a pre-built [`ItemStack`] in the specified slot.
+    ///
+    /// This is the low-level primitive that all other slot methods build on.
+    /// Use this when you need full control over the item's name, lore, stack
+    /// size, or other data.
+    ///
+    /// # Example
+    ///
+    /// ```rust,ignore
+    /// use pumpkin_plugin_api::Item;
+    /// use pumpkin_plugin_api::text::TextComponent;
+    ///
+    /// let stack = ItemStack::of(Item::Compass, 1);
+    /// stack.set_custom_name(Some(TextComponent::text("Menu")));
+    /// builder.stack(11, stack)
+    /// ```
+    #[must_use]
+    pub fn stack(mut self, slot: u32, stack: ItemStack) -> Self {
+        self.items.push((slot, stack));
+        self
+    }
+
     /// Places an item in the specified slot.
     ///
-    /// `slot` is the inventory index (0-based). `count` is clamped to the
-    /// item's maximum stack size by the server.
+    /// `slot` is the inventory index (0-based). Places a single item (count 1);
+    /// use [`stack`](Self::stack) with a custom-built `ItemStack` to control
+    /// the stack size.
     #[must_use]
-    pub fn item(mut self, slot: u32, item: impl IntoItemKey, count: u8) -> Self {
-        self.items.push((slot, ItemStack::of(item, count)));
-        self
+    pub fn item(self, slot: u32, item: impl IntoItemKey) -> Self {
+        self.stack(slot, ItemStack::of(item, 1))
     }
 
     /// Places an item with a custom display name in the specified slot.
     ///
     /// The `name` is parsed as `MiniMessage` if it contains `<` tags.
+    /// Places a single item (count 1); use [`stack`](Self::stack) with a
+    /// custom-built `ItemStack` to control the stack size.
     #[must_use]
-    pub fn named_item(mut self, slot: u32, item: impl IntoItemKey, count: u8, name: &str) -> Self {
-        let stack = ItemStack::of(item, count);
+    pub fn named_item(self, slot: u32, item: impl IntoItemKey, name: &str) -> Self {
+        let stack = ItemStack::of(item, 1);
         let name_component = if name.contains('<') {
             crate::utils::text::parse_minimessage(name)
         } else {
             TextComponent::text(name)
         };
         stack.set_custom_name(Some(name_component));
-        self.items.push((slot, stack));
-        self
+        self.stack(slot, stack)
     }
 
     /// Places an item with a custom display name and lore in the specified slot.
     ///
     /// Both `name` and each line of `lore` are parsed as `MiniMessage` if they
     /// contain `<` tags; otherwise they are treated as plain text.
+    /// Places a single item (count 1); use [`stack`](Self::stack) with a
+    /// custom-built `ItemStack` to control the stack size.
     #[must_use]
-    pub fn lore_item(
-        mut self,
-        slot: u32,
-        item: impl IntoItemKey,
-        count: u8,
-        name: &str,
-        lore: &[&str],
-    ) -> Self {
-        let stack = ItemStack::of(item, count);
+    pub fn lore_item(self, slot: u32, item: impl IntoItemKey, name: &str, lore: &[&str]) -> Self {
+        let stack = ItemStack::of(item, 1);
         let name_component = if name.contains('<') {
             crate::utils::text::parse_minimessage(name)
         } else {
@@ -179,8 +205,7 @@ impl GuiBuilder {
             .collect();
         stack.set_lore(lore_components);
 
-        self.items.push((slot, stack));
-        self
+        self.stack(slot, stack)
     }
 
     /// Fills every empty slot with a blank-named filler item.
@@ -196,13 +221,16 @@ impl GuiBuilder {
     /// The number of slots is derived from the [`Screen`] type passed to
     /// [`GuiBuilder::new`].
     #[must_use]
-    pub fn fill_empty(self, item: impl IntoItemKey) -> Self {
+    pub fn fill_empty(mut self, item: impl IntoItemKey) -> Self {
         let key = item.into_item_key();
-        self.fill_empty_with(move |_| {
-            let stack = ItemStack::of(&key, 1);
-            stack.set_custom_name(Some(TextComponent::text(" ")));
-            stack
-        })
+        for slot in 0..self.screen.slot_count() {
+            if !self.items.iter().any(|(s, _)| *s == slot) {
+                let stack = ItemStack::of(&key, 1);
+                stack.set_custom_name(Some(TextComponent::text(" ")));
+                self = self.stack(slot, stack);
+            }
+        }
+        self
     }
 
     /// Fills every empty slot with stacks produced by a builder closure.

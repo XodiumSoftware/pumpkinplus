@@ -49,21 +49,18 @@ pub fn build_main_menu() -> gui::Gui {
         .lore_item(
             11,
             Item::Compass,
-            1,
             "<green><bold>Teleport",
             &["<gray>Click to open the", "<gray>teleport menu."],
         )
         .lore_item(
             13,
             Item::Book,
-            1,
             "<yellow><bold>Server Info",
             &["<gray>View rules, links,", "<gray>and other server info."],
         )
         .lore_item(
             15,
             Item::Barrier,
-            1,
             "<red><bold>Close",
             &["<gray>Click to close this menu."],
         )

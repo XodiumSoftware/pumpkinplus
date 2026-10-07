@@ -25,7 +25,7 @@ use tracing::error;
 
 pub use crate::modules::enchantments::enchantment::EnchantmentsConfig;
 pub use crate::modules::mechanics::mechanic::MechanicsConfig;
-pub use crate::modules::recipes::recipe::RecipesConfig;
+pub use crate::modules::recipes::RecipesConfig;
 
 thread_local! {
     static CONFIG: RefCell<Option<PluginConfig>> = const { RefCell::new(None) };

@@ -185,13 +185,9 @@ Items are **pure builders** — Pumpkin has no custom-item registry, so there is
         ),
     ]
     ```
-    Potion brewing recipes are **not** supported by the Pumpkin API (`recipe.rs` docs say so) — don't scaffold them.
-4. Document recipes in `//!` docs as a table (output / pattern / ingredients), mirroring `chainmail.rs`.
-5. Wire the toggle into `src/modules/recipes/recipe.rs`: add `/// doc` + `pub {snake_name}: bool,` to `RecipesConfig` (alphabetical).
-6. Wire into `src/lib.rs`:
-    - Add `pub mod {name};` inside `mod modules { mod recipes { mod vanilla } }`, alphabetical.
-    - Add `use crate::modules::recipes::vanilla::{name}::{Name};`.
-    - Add `&{Name},` to the `recipes` vec inside `register_recipes`.
+    Potion brewing recipes are **not** supported by the Pumpkin API (`recipes.rs` docs say so) — don't scaffold them.
+4. Document recipes in `//!` docs as a table (output / pattern / ingredients).
+5. Recipes are config-driven: add the entry as TOML data in the admin-facing docs (and offer to write a sample `[[shaped]]`/`[[shapeless]]`/`[[cooking]]` block into `recipes.toml`). No Rust wiring needed beyond the schema defined in `src/modules/recipes.rs`.
 
 ## Verification
 

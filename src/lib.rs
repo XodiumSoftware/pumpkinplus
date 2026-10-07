@@ -42,19 +42,7 @@ mod modules {
         }
     }
 
-    pub mod recipes {
-        pub mod recipe;
-        pub mod vanilla {
-            pub mod chainmail;
-            pub mod diamond_recycle;
-            pub mod ice_breakdown;
-            pub mod nether_wart_block;
-            pub mod painting;
-            pub mod rotten_flesh;
-            pub mod wood_log;
-            pub mod wool_to_string;
-        }
-    }
+    pub mod recipes;
     pub mod mechanics {
         pub mod mechanic;
         pub mod entity {
@@ -109,7 +97,7 @@ pub use modules::mechanics::server::chat::ChatConfig;
 pub use modules::mechanics::server::rules::RulesConfig;
 pub use modules::mechanics::server::tablist::TablistConfig;
 pub use modules::mechanics::world::openable::OpenableConfig;
-pub use modules::recipes::recipe::RecipesConfig;
+pub use modules::recipes::RecipesConfig;
 
 use crate::mechanics::entity::bat::Bat;
 use crate::mechanics::entity::griefing::Griefing;
@@ -133,15 +121,6 @@ use crate::mechanics::world::openable::Openable;
 use crate::modules::enchantments::enchantment::Enchantment;
 use crate::modules::enchantments::utility::embertread::Embertread;
 use crate::modules::enchantments::vanilla::fortune::Fortune;
-use crate::modules::recipes::recipe::Recipe;
-use crate::modules::recipes::vanilla::chainmail::Chainmail;
-use crate::modules::recipes::vanilla::diamond_recycle::DiamondRecycle;
-use crate::modules::recipes::vanilla::ice_breakdown::IceBreakdown;
-use crate::modules::recipes::vanilla::nether_wart_block::NetherWartBlock;
-use crate::modules::recipes::vanilla::painting::Painting;
-use crate::modules::recipes::vanilla::rotten_flesh::RottenFlesh;
-use crate::modules::recipes::vanilla::wood_log::WoodLog;
-use crate::modules::recipes::vanilla::wool_to_string::WoolToString;
 use pumpkin_plugin_api::{Context, Plugin, PluginMetadata};
 use std::time::Instant;
 use tracing::info;
@@ -188,46 +167,12 @@ impl PumpkinPlus {
         );
     }
 
-    /// Registers all recipe packs.
+    /// Registers all config-defined recipes.
     fn register_recipes(context: &Context) {
-        let recipes: Vec<&dyn Recipe> = vec![
-            &Chainmail,
-            &DiamondRecycle,
-            &IceBreakdown,
-            &NetherWartBlock,
-            &Painting,
-            &RottenFlesh,
-            &WoodLog,
-            &WoolToString,
-        ];
-
-        let mut counts = crate::modules::recipes::recipe::RecipeCounts::default();
-        let mut packs_with_recipes = 0u32;
-        let mut recipe_total_ms = 0u128;
-
-        for recipe in recipes {
-            if !recipe.enabled() {
-                continue;
-            }
-            let pack_counts = recipe.counts();
-            if pack_counts.total() > 0 {
-                packs_with_recipes += 1;
-            }
-            counts += pack_counts;
-            let start = Instant::now();
-            recipe.register(context);
-            recipe_total_ms += start.elapsed().as_millis();
-        }
-
-        info!(
-            "Registered: {} recipe pack(s) producing {} recipe(s) ({} shaped, {} shapeless, {} cooking) | Took {}ms",
-            packs_with_recipes,
-            counts.total(),
-            counts.shaped,
-            counts.shapeless,
-            counts.cooking,
-            recipe_total_ms
-        );
+        let start = Instant::now();
+        crate::modules::recipes::register_all(context);
+        let total_ms = start.elapsed().as_millis();
+        info!("Recipe registration took {total_ms}ms");
     }
 
     /// Registers all enchantments (custom definitions and behavior overrides).

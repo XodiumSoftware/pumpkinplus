@@ -26,40 +26,38 @@ use crate::GuiBuilder;
 
 /// Builds the admin menu GUI.
 ///
-/// Layout (9x3 chest screen, 27 slots):
+/// Layout (hopper screen, 5 slots):
 ///
 /// ```text
-/// [0] [1] [2] [3] [4] [5] [6] [7] [8]
-/// [9] [10][11][12][13][14][15][16][17]
-/// [18][19][20][21][22][23][24][25][26]
+/// [0] [1] [2] [3] [4]
 /// ```
 ///
-/// - `11` — Teleport compass
-/// - `13` — Info book
-/// - `15` — Close barrier
+/// - `1` — Teleport compass
+/// - `2` — Info book
+/// - `3` — Close barrier
 /// - All other slots — black stained-glass panes as filler
 ///
 /// Grabbing and placing items are disabled so the GUI behaves like a menu.
 #[must_use]
 pub fn build_admin_menu() -> gui::Gui {
-    GuiBuilder::new(Screen::Generic9x3)
+    GuiBuilder::new(Screen::Hopper)
         .title("<dark_gray><bold>Admin Menu")
         .allow_grab(false)
         .allow_put(false)
         .lore_item(
-            11,
+            1,
             Item::Compass,
             "<green><bold>Teleport",
             &["<gray>Click to open the", "<gray>teleport menu."],
         )
         .lore_item(
-            13,
+            2,
             Item::Book,
             "<yellow><bold>Server Info",
             &["<gray>View rules, links,", "<gray>and other server info."],
         )
         .lore_item(
-            15,
+            3,
             Item::Barrier,
             "<red><bold>Close",
             &["<gray>Click to close this menu."],

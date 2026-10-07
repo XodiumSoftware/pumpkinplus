@@ -17,8 +17,7 @@
 
 [![Contributors][contributors_shield_url]][contributors_url]
 [![Issues][issues_shield_url]][issues_url]
-[![Releases][releases_shield_url]][releases_url]
-[![Docs][docs_shield_url]][docs_url]
+[![Deps][deps_shield_url]][deps_url]
 </div>
 
 ## Table of Contents
@@ -47,31 +46,15 @@
 <p align="right"><a href="#readme-top">▲</a></p>
 
 [code_of_conduct_url]: https://github.com/XodiumSoftware/pumpkinplus?tab=coc-ov-file
-
 [contributing_url]: https://github.com/XodiumSoftware/pumpkinplus/blob/main/CONTRIBUTING.md
-
 [contributors_shield_url]: https://img.shields.io/github/contributors/XodiumSoftware/pumpkinplus?style=for-the-badge&color=blue
-
 [contributors_url]: https://github.com/XodiumSoftware/pumpkinplus/graphs/contributors
-
-[docs_shield_url]: https://img.shields.io/badge/Docs-Click%20Me!-blue.svg?style=for-the-badge
-
-[docs_url]: https://github.com/XodiumSoftware/pumpkinplus/blob/main/GUIDE.md
-
+[deps_shield_url]: https://deps.rs/repo/github/XodiumSoftware/pumpkinplus/status.svg?style=for-the-badge
+[deps_url]: https://deps.rs/repo/github/XodiumSoftware/pumpkinplus
 [guide_url]: GUIDE.md
-
 [built_with_shield_url]: https://skillicons.dev/icons?i=rust,github,githubactions
-
 [built_with_url]: https://skillicons.dev
-
 [issues_shield_url]: https://img.shields.io/github/issues/XodiumSoftware/pumpkinplus?style=for-the-badge&color=yellow
-
 [issues_url]: https://github.com/XodiumSoftware/pumpkinplus/issues
-
 [license_url]: https://github.com/XodiumSoftware/pumpkinplus?tab=AGPL-3.0-1-ov-file
-
-[releases_shield_url]: https://img.shields.io/github/v/release/XodiumSoftware/pumpkinplus?style=for-the-badge&color=green
-
-[releases_url]: https://github.com/XodiumSoftware/pumpkinplus/releases
-
 [security_url]: https://github.com/XodiumSoftware/pumpkinplus?tab=security-ov-file

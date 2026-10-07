@@ -93,25 +93,9 @@ This file tracks stub modules and features that are blocked by missing Pumpkin p
 - [ ] Blocked: Player inventory addition APIs
 - **Behavior:** Teleport block drops and mob XP to player inventory
 
-## Stub Modules — Items
-
-### 11. Incendium Key (`src/modules/items/incendium_key.rs`)
-
-- [x] Partial: `ItemStack.set_custom_name()` works via data component API
-- [x] Partial: Gradient implemented using `TextComponent.gradient()`
-- [ ] Blocked: `ItemModel` component requires resource pack assets
-- **Behavior:** Custom trial key with gradient red-orange name, custom model
-
-### 12. Nullscape Key (`src/modules/items/nullscape_key.rs`)
-
-- [x] Partial: `ItemStack.set_custom_name()` works via data component API
-- [x] Partial: Gradient implemented using `TextComponent.gradient()`
-- [ ] Blocked: `ItemModel` component requires resource pack assets
-- **Behavior:** Custom trial key with gradient purple name, custom model
-
 ## Non-Portable Systems
 
-### 13. Custom Painting Variants (`IllyriaPlus` `src/paintings/`)
+### 11. Custom Painting Variants (`IllyriaPlus` `src/paintings/`)
 
 - [ ] **Not portable** — requires registry APIs that don't exist in Pumpkin
 - Blocked: No `RegistryEvents.PAINTING_VARIANT` equivalent
@@ -121,7 +105,7 @@ This file tracks stub modules and features that are blocked by missing Pumpkin p
 - **Behavior:** Register custom painting variants (e.g., Orthodox icons, Yapetto art)
 - **Note:** Only vanilla painting recipes can be stubbed (already done in `src/modules/recipes/vanilla/painting.rs`)
 
-### 14. Custom Banner Patterns (`IllyriaPlus` `src/banners/`)
+### 12. Custom Banner Patterns (`IllyriaPlus` `src/banners/`)
 
 - [ ] **Not portable** — requires registry APIs that don't exist in Pumpkin
 - Blocked: No `RegistryEvents.BANNER_PATTERN` equivalent
@@ -143,7 +127,7 @@ The following APIs need to be added to the Pumpkin plugin API to complete these 
 | Medium   | Player XP point manipulation                                 | XP                           |
 | Medium   | Book creation and opening APIs                               | Rules                        |
 | Medium   | Waypoint/locator color APIs                                  | Locator                      |
-| Medium   | `ItemStack` item model component (needs resource pack)       | Incendium Key, Nullscape Key |
+| Medium   | `ItemStack` item model component (needs resource pack)       | —                            |
 | Low      | Particle color/dust options                                  | Silence                      |
 | Low      | Generic tameable entity trait                                | Tameable                     |
 

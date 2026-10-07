@@ -45,11 +45,7 @@ mod modules {
             pub mod silk_touch;
         }
     }
-    pub mod items {
-        pub mod incendium_key;
-        pub mod item;
-        pub mod nullscape_key;
-    }
+
     pub mod recipes {
         pub mod recipe;
         pub mod vanilla {
@@ -98,7 +94,7 @@ pub use config::*;
 pub use modules::*;
 
 pub use modules::enchantments::enchantment::EnchantmentsConfig;
-pub use modules::items::item::Item;
+
 pub use modules::mechanics::entity::bat::BatConfig;
 pub use modules::mechanics::entity::griefing::GriefingConfig;
 pub use modules::mechanics::entity::husk::HuskConfig;

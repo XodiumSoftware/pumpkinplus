@@ -21,8 +21,12 @@
 use pumpkin_plugin_api::Item;
 use pumpkin_plugin_api::gui;
 use pumpkin_plugin_api::screens_wit::Screen;
+use pumpkin_plugin_api::text::TextComponent;
 
 use crate::GuiBuilder;
+
+/// Registry ID for the admin menu (used by click dispatch).
+pub const ADMIN_MENU_ID: &str = "admin_menu";
 
 /// Builds the admin menu GUI.
 ///
@@ -41,6 +45,7 @@ use crate::GuiBuilder;
 #[must_use]
 pub fn build_admin_menu() -> gui::Gui {
     GuiBuilder::new(Screen::Hopper)
+        .id(ADMIN_MENU_ID)
         .title("<dark_gray><bold>Admin Menu")
         .allow_grab(false)
         .allow_put(false)
@@ -50,18 +55,39 @@ pub fn build_admin_menu() -> gui::Gui {
             "<green><bold>Teleport",
             &["<gray>Click to open the", "<gray>teleport menu."],
         )
+        .on_click(1, |event| {
+            event.player.send_system_message(
+                TextComponent::text("Teleport menu not yet wired up."),
+                false,
+            );
+            event
+        })
         .lore_item(
             2,
             Item::Book,
             "<yellow><bold>Server Info",
             &["<gray>View rules, links,", "<gray>and other server info."],
         )
+        .on_click(2, |event| {
+            event
+                .player
+                .send_system_message(TextComponent::text("Server info not yet wired up."), false);
+            event
+        })
         .lore_item(
             3,
             Item::Barrier,
             "<red><bold>Close",
             &["<gray>Click to close this menu."],
         )
+        .on_click(3, |event| {
+            // TODO: Close the inventory once the API exposes a close method.
+            event.player.send_system_message(
+                TextComponent::text("Close button pressed (close API pending)."),
+                false,
+            );
+            event
+        })
         .fill_empty(Item::BlackStainedGlassPane)
         .build()
 }

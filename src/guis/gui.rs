@@ -31,6 +31,9 @@ use pumpkin_plugin_api::gui;
 use pumpkin_plugin_api::screens_wit::Screen;
 use pumpkin_plugin_api::text::TextComponent;
 use pumpkin_plugin_api::{IntoItemKey, ItemStack, ItemStackExt};
+use std::collections::HashMap;
+
+use crate::guis::registry::{GuiId, GuiSlotHandler};
 
 /// Extension trait providing slot-count lookup for [`Screen`] variants.
 ///
@@ -69,6 +72,11 @@ impl ScreenSlots for Screen {
 ///
 /// The builder allows setting the GUI type, title, items, and interaction
 /// permissions before constructing the final `Gui`.
+///
+/// Set an [`id`](Self::id) and register [`on_click`](Self::on_click) handlers
+/// to make specific slots act as buttons. Handlers are stored in the global
+/// [`registry`](crate::guis::registry) on `build()`, and routed to players
+/// via the plugin's `InventoryClickEvent` handler.
 #[allow(dead_code)]
 pub struct GuiBuilder {
     /// The screen type (size/layout) of the GUI.
@@ -81,6 +89,10 @@ pub struct GuiBuilder {
     allow_grab: bool,
     /// Whether players can put items into the GUI.
     allow_put: bool,
+    /// Optional registry ID. Required for click dispatch.
+    id: Option<GuiId>,
+    /// Per-slot click handlers, registered in the global registry on `build()`.
+    click_handlers: HashMap<i16, GuiSlotHandler>,
 }
 
 #[allow(dead_code)]
@@ -96,7 +108,50 @@ impl GuiBuilder {
             items: Vec::new(),
             allow_grab: true,
             allow_put: true,
+            id: None,
+            click_handlers: HashMap::new(),
         }
+    }
+
+    /// Assigns a unique identifier to this GUI.
+    ///
+    /// The ID is used by the click [`registry`](crate::guis::registry) to
+    /// associate click events from a player with the GUI's slot handlers.
+    /// Required for [`on_click`](Self::on_click) handlers to fire.
+    #[must_use]
+    pub fn id(mut self, id: GuiId) -> Self {
+        self.id = Some(id);
+        self
+    }
+
+    /// Registers a click handler for a specific slot.
+    ///
+    /// The handler receives the full `InventoryClickEvent` so it can read the
+    /// clicked slot, click type, and the player who clicked. Clicks on tracked
+    /// GUIs are cancelled by default; cancel further behavior manually by
+    /// setting `event.cancelled = true` (usually not needed).
+    ///
+    /// Handlers are stored in the global registry on `build()` and require
+    /// the GUI to have an [`id`](Self::id) set. Players must be tracked via
+    /// [`registry::open`] for the handlers to fire.
+    ///
+    /// [`registry::open`]: crate::guis::registry::open
+    #[must_use]
+    pub fn on_click<F>(mut self, slot: u32, handler: F) -> Self
+    where
+        F: Fn(
+                pumpkin_plugin_api::events::EventData<
+                    pumpkin_plugin_api::events::InventoryClickEvent,
+                >,
+            ) -> pumpkin_plugin_api::events::EventData<
+                pumpkin_plugin_api::events::InventoryClickEvent,
+            > + Send
+            + Sync
+            + 'static,
+    {
+        #[allow(clippy::cast_possible_truncation)]
+        self.click_handlers.insert(slot as i16, Box::new(handler));
+        self
     }
 
     /// Sets the GUI title.
@@ -244,8 +299,15 @@ impl GuiBuilder {
     /// Builds the [`Gui`] instance with all configured items and settings.
     ///
     /// If no title was set via [`GuiBuilder::title`], an empty title is used.
+    ///
+    /// If an `id` is set via [`GuiBuilder::id`], any registered `on_click`
+    /// handlers are stored in the global registry. Rebuilding the same GUI
+    /// replaces its handlers (safe to call on every command invocation).
     #[must_use]
     pub fn build(self) -> gui::Gui {
+        if let Some(id) = self.id {
+            crate::guis::registry::register_gui(id, self.click_handlers);
+        }
         let title = self.title.unwrap_or_else(|| TextComponent::text(""));
         let gui = gui::Gui::new(self.screen, title);
         gui.set_allow_grab_items(self.allow_grab);

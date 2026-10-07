@@ -9,6 +9,7 @@ mod config;
 pub mod guis {
     pub mod admin;
     pub mod gui;
+    pub mod registry;
 }
 mod utils {
     pub mod block;
@@ -122,6 +123,9 @@ use crate::modules::enchantments::utility::embertread::Embertread;
 use crate::modules::enchantments::vanilla::fortune::Fortune;
 use pumpkin_plugin_api::command::{Command, CommandError, CommandSender, ConsumedArgs};
 use pumpkin_plugin_api::commands::CommandHandler;
+use pumpkin_plugin_api::events::{
+    EventData, EventHandler, EventPriority, InventoryClickEvent, InventoryCloseEvent,
+};
 use pumpkin_plugin_api::permission::{Permission, PermissionDefault, PermissionLevel};
 use pumpkin_plugin_api::{Context, Plugin, PluginMetadata, Server};
 use std::time::Instant;
@@ -211,6 +215,24 @@ impl PumpkinPlus {
         .execute(AdminExecutor);
         context.register_command(command, &permission.node);
     }
+
+    /// Registers global GUI event handlers for click dispatch and session cleanup.
+    fn register_gui_handlers(context: &Context) {
+        context
+            .register_event_handler::<InventoryClickEvent, _>(
+                GuiClickDispatcher,
+                EventPriority::Highest,
+                true,
+            )
+            .expect("failed to register InventoryClickEvent handler");
+        context
+            .register_event_handler::<InventoryCloseEvent, _>(
+                GuiCloseDispatcher,
+                EventPriority::Highest,
+                true,
+            )
+            .expect("failed to register InventoryCloseEvent handler");
+    }
 }
 
 /// Command executor that opens the main admin menu GUI.
@@ -225,8 +247,36 @@ impl CommandHandler for AdminExecutor {
     ) -> Result<i32, CommandError> {
         let player = sender.as_player().ok_or(CommandError::PermissionDenied)?;
         let gui = crate::guis::admin::build_admin_menu();
+        // Track the session so clicks route back to the right handlers.
+        crate::guis::registry::open(&player, crate::guis::admin::ADMIN_MENU_ID);
         player.open_gui(gui);
         Ok(1)
+    }
+}
+
+/// Dispatches `InventoryClickEvent`s to slot handlers in the GUI registry.
+struct GuiClickDispatcher;
+
+impl EventHandler<InventoryClickEvent> for GuiClickDispatcher {
+    fn handle(
+        &self,
+        _server: Server,
+        event: EventData<InventoryClickEvent>,
+    ) -> EventData<InventoryClickEvent> {
+        crate::guis::registry::dispatch_click(event)
+    }
+}
+
+/// Clears GUI sessions when a player closes an inventory.
+struct GuiCloseDispatcher;
+
+impl EventHandler<InventoryCloseEvent> for GuiCloseDispatcher {
+    fn handle(
+        &self,
+        _server: Server,
+        event: EventData<InventoryCloseEvent>,
+    ) -> EventData<InventoryCloseEvent> {
+        crate::guis::registry::dispatch_close(event)
     }
 }
 
@@ -256,6 +306,7 @@ impl Plugin for PumpkinPlus {
         let config = ConfigManager::load(&context);
 
         Self::register_admin(&context);
+        Self::register_gui_handlers(&context);
 
         if config.modules.mechanics {
             Self::register_mechanics(&context);

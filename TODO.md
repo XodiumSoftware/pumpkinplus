@@ -4,24 +4,13 @@ This file tracks stub modules and features that are blocked by missing Pumpkin p
 
 ## Stub Modules — Entity
 
-### 1. Bat Mechanic (`src/modules/mechanics/entity/bat.rs`)
-
-- [ ] Blocked: `EntityDeathEvent` needs entity type, killer reference, drops list
-- [ ] Blocked: Game rule API (`SPAWN_PHANTOMS` check)
-- **Behavior:** Drop phantom membranes on bat death (0-1 + Looting bonus)
-
-### 2. Husk Mechanic (`src/modules/mechanics/entity/husk.rs`)
-
-- [ ] Blocked: `EntityDeathEvent` needs entity type, killer reference, drops list
-- **Behavior:** Drop sand on husk death (0-2, bonus for camel riders, +Looting)
-
-### 3. Spawn Egg Mechanic (`src/modules/mechanics/entity/spawn_egg.rs`)
+### 1. Spawn Egg Mechanic (`src/modules/mechanics/entity/spawn_egg.rs`)
 
 - [ ] Blocked: `EntityDeathEvent` needs entity type, drops list
 - [ ] Blocked: Entity type to spawn egg item conversion
 - **Behavior:** 0.1% chance to drop matching spawn egg on entity death
 
-### 4. Tameable Mechanic (`src/modules/mechanics/entity/tameable.rs`)
+### 2. Tameable Mechanic (`src/modules/mechanics/entity/tameable.rs`)
 
 - [ ] Partial: Event fires and lead check works
 - [ ] Blocked: No `get_leashed_entities()` API
@@ -30,7 +19,7 @@ This file tracks stub modules and features that are blocked by missing Pumpkin p
 - [ ] Blocked: No generic tameable check (only wolf/cat have `is_tamed`)
 - **Behavior:** Transfer pet ownership between players using lead
 
-### 5. Silence Mechanic (`src/modules/mechanics/entity/silence.rs`)
+### 3. Silence Mechanic (`src/modules/mechanics/entity/silence.rs`)
 
 - [ ] Partial: Event fires and amethyst shard check works
 - [ ] Blocked: No monster marker interface (need entity type whitelist)
@@ -118,18 +107,18 @@ This file tracks stub modules and features that are blocked by missing Pumpkin p
 
 The following APIs need to be added to the Pumpkin plugin API to complete these modules:
 
-| Priority | API                                                          | Modules Blocked              |
-| -------- | ------------------------------------------------------------ | ---------------------------- |
-| High     | Anvil events and view APIs (`InventoryOpen`, `PrepareAnvil`) | Anvil                        |
-| High     | `EntityDeathEvent` with entity type, killer, drops list      | Bat, Husk, Spawn Egg, Tether |
-| High     | `World.drop_item(pos, item)`                                 | Head, XP                     |
-| High     | `Entity.set_silent()` / leash APIs                           | Silence, Tameable            |
-| Medium   | Player XP point manipulation                                 | XP                           |
-| Medium   | Book creation and opening APIs                               | Rules                        |
-| Medium   | Waypoint/locator color APIs                                  | Locator                      |
-| Medium   | `ItemStack` item model component (needs resource pack)       | —                            |
-| Low      | Particle color/dust options                                  | Silence                      |
-| Low      | Generic tameable entity trait                                | Tameable                     |
+| Priority | API                                                          | Modules Blocked   |
+| -------- | ------------------------------------------------------------ | ----------------- |
+| High     | Anvil events and view APIs (`InventoryOpen`, `PrepareAnvil`) | Anvil             |
+| High     | `EntityDeathEvent` with entity type, killer, drops list      | Spawn Egg, Tether |
+| High     | `World.drop_item(pos, item)`                                 | Head, XP          |
+| High     | `Entity.set_silent()` / leash APIs                           | Silence, Tameable |
+| Medium   | Player XP point manipulation                                 | XP                |
+| Medium   | Book creation and opening APIs                               | Rules             |
+| Medium   | Waypoint/locator color APIs                                  | Locator           |
+| Medium   | `ItemStack` item model component (needs resource pack)       | —                 |
+| Low      | Particle color/dust options                                  | Silence           |
+| Low      | Generic tameable entity trait                                | Tameable          |
 
 ## Implementation Notes
 

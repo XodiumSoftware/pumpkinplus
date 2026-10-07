@@ -46,9 +46,7 @@ mod modules {
     pub mod mechanics {
         pub mod mechanic;
         pub mod entity {
-            pub mod bat;
             pub mod griefing;
-            pub mod husk;
             pub mod silence;
             pub mod spawn_egg;
             pub mod tameable;
@@ -79,9 +77,7 @@ pub use modules::*;
 
 pub use modules::enchantments::enchantment::EnchantmentsConfig;
 
-pub use modules::mechanics::entity::bat::BatConfig;
 pub use modules::mechanics::entity::griefing::GriefingConfig;
-pub use modules::mechanics::entity::husk::HuskConfig;
 pub use modules::mechanics::entity::silence::SilenceConfig;
 pub use modules::mechanics::entity::spawn_egg::SpawnEggConfig;
 pub use modules::mechanics::entity::tameable::TameableConfig;
@@ -99,9 +95,7 @@ pub use modules::mechanics::server::tablist::TablistConfig;
 pub use modules::mechanics::world::openable::OpenableConfig;
 pub use modules::recipes::RecipesConfig;
 
-use crate::mechanics::entity::bat::Bat;
 use crate::mechanics::entity::griefing::Griefing;
-use crate::mechanics::entity::husk::Husk;
 use crate::mechanics::entity::silence::Silence;
 use crate::mechanics::entity::spawn_egg::SpawnEgg;
 use crate::mechanics::entity::tameable::Tameable;
@@ -133,9 +127,7 @@ impl PumpkinPlus {
     /// Registers all mechanics and their commands/permissions.
     fn register_mechanics(context: &Context) {
         let mechanics: Vec<&dyn Mechanic> = vec![
-            &Bat,
             &Griefing,
-            &Husk,
             &Silence,
             &SpawnEgg,
             &Tameable,

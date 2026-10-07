@@ -3,9 +3,7 @@
 //! Each gameplay feature is implemented as a module implementing the [`Mechanic`] trait.
 //! Mechanics can register event handlers, commands, and permission nodes.
 
-pub use crate::modules::mechanics::entity::bat::BatConfig;
 pub use crate::modules::mechanics::entity::griefing::GriefingConfig;
-pub use crate::modules::mechanics::entity::husk::HuskConfig;
 pub use crate::modules::mechanics::entity::silence::SilenceConfig;
 pub use crate::modules::mechanics::entity::spawn_egg::SpawnEggConfig;
 pub use crate::modules::mechanics::entity::tameable::TameableConfig;
@@ -108,14 +106,10 @@ pub trait Mechanic {
 pub struct MechanicsConfig {
     /// Custom anvil operations (disenchant, cost bypass).
     pub anvil: AnvilConfig,
-    /// Bat death phantom membrane drops.
-    pub bat: BatConfig,
     /// Item condensing commands.
     pub condense: CondenseConfig,
     /// Mob griefing prevention.
     pub griefing: GriefingConfig,
-    /// Husk death sand drops.
-    pub husk: HuskConfig,
     /// Mob silencing with amethyst shards.
     pub silence: SilenceConfig,
     /// Spawn egg drops from mob deaths.

@@ -6,6 +6,9 @@
 #![allow(clippy::must_use_candidate)]
 
 mod config;
+pub mod guis {
+    pub mod gui;
+}
 mod utils {
     pub mod block;
     pub mod command;
@@ -73,6 +76,7 @@ mod modules {
 }
 
 pub use config::*;
+pub use guis::gui::GuiBuilder;
 pub use modules::*;
 
 pub use modules::enchantments::enchantment::EnchantmentsConfig;

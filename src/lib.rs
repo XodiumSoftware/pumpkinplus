@@ -47,6 +47,12 @@ mod modules {
     pub mod bridges {
         pub mod appleskin;
         pub mod bridge;
+        pub mod jade {
+            pub mod bridge;
+            pub mod buf;
+            pub mod nbt;
+            pub mod providers;
+        }
         pub mod xaeromap;
     }
     pub mod mechanics {
@@ -126,6 +132,7 @@ use crate::mechanics::world::openable::Openable;
 use crate::mechanics::world::spawnprotection::SpawnProtection;
 use crate::modules::bridges::appleskin::AppleSkin;
 use crate::modules::bridges::bridge::Bridge;
+use crate::modules::bridges::jade::bridge::Jade;
 use crate::modules::bridges::xaeromap::XaeroMap;
 use crate::modules::enchantments::enchantment::Enchantment;
 use crate::modules::enchantments::utility::embertread::Embertread;
@@ -176,9 +183,9 @@ impl PumpkinPlus {
         );
     }
 
-    /// Registers all client-mod bridges (`AppleSkin`, Xaero's Map, …).
+    /// Registers all client-mod bridges (`AppleSkin`, Xaero's Map, Jade).
     fn register_bridges(context: &Context) {
-        let bridges: Vec<&dyn Bridge> = vec![&AppleSkin, &XaeroMap];
+        let bridges: Vec<&dyn Bridge> = vec![&AppleSkin, &Jade, &XaeroMap];
 
         let enabled_bridges = bridges.iter().filter(|b| b.enabled()).count();
         let mut bridge_total_ms = 0u128;

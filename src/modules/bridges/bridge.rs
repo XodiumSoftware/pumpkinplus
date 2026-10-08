@@ -29,6 +29,7 @@
 //!    (server → client) and `PlayerCustomPayloadEvent` (client → server).
 
 pub use crate::modules::bridges::appleskin::AppleSkinConfig;
+pub use crate::modules::bridges::jade::bridge::JadeConfig;
 pub use crate::modules::bridges::xaeromap::XaeroMapConfig;
 use pumpkin_plugin_api::Context;
 use pumpkin_plugin_api::events::{EventHandler, EventPriority, FromIntoEvent};
@@ -80,6 +81,8 @@ pub trait Bridge {
 pub struct BridgesConfig {
     /// `AppleSkin` saturation/exhaustion/gamerule sync.
     pub appleskin: AppleSkinConfig,
+    /// Jade (WAILA) block/entity data providers.
+    pub jade: JadeConfig,
     /// Xaero's World Map / Minimap world id sync.
     pub xaeromap: XaeroMapConfig,
 }

@@ -18,11 +18,13 @@ mod utils {
 mod mirror_types {
     pub mod entity_type;
     pub mod gamemode;
+    pub mod hand;
     pub mod interaction;
     mod macros;
 }
 
 pub use mirror_types::gamemode::GameMode;
+pub use mirror_types::hand::Hand as MirrorHand;
 pub use mirror_types::interaction::InteractAction;
 
 mod modules {

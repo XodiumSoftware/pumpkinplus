@@ -30,6 +30,16 @@
 //! | `knock_gamemodes`      | `["Survival", "Adventure"]`   | Gamemodes allowed to knock                                       |
 //! | `knock_actions`        | `["LeftClickBlock"]`          | Actions that trigger knock                                       |
 //! | `knock_sneaking_required` | `true`                     | Whether the player must be sneaking to knock                     |
+//!
+//! ## Permissions
+//!
+//! | Node | Default | Description |
+//! |------|---------|-------------|
+//! | `pumpkinplus:openable.sync`  | allow | Allows triggering double-door sync |
+//! | `pumpkinplus:openable.knock` | allow | Allows knocking on openable blocks |
+//!
+//! Both nodes default to `allow`, so players can use the mechanics out of the
+//! box. To restrict them, deny the node via a permissions-management plugin.
 
 use crate::config::ConfigManager;
 use crate::mechanics::mechanic::Mechanic;
@@ -37,9 +47,16 @@ use crate::utils::block::{is_door, is_openable, toggle_open_property};
 use crate::{GameMode, InteractAction};
 use pumpkin_plugin_api::common::Hand;
 use pumpkin_plugin_api::events::{EventData, EventHandler, EventPriority, PlayerInteractEvent};
+use pumpkin_plugin_api::permission::{Permission, PermissionDefault};
 use pumpkin_plugin_api::world::{BlockFlags, BlockPos, World, block_state_to_info};
 use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};
+
+/// Permission node required to trigger double-door sync.
+pub const PERM_SYNC: &str = concat!(env!("CARGO_PKG_NAME"), ":openable.sync");
+
+/// Permission node required to knock on openable blocks.
+pub const PERM_KNOCK: &str = concat!(env!("CARGO_PKG_NAME"), ":openable.knock");
 
 /// Handles openable block synchronization and door knocking.
 #[derive(Default)]
@@ -48,6 +65,23 @@ pub struct Openable;
 impl Mechanic for Openable {
     fn enabled(&self) -> bool {
         ConfigManager::get().is_some_and(|cm| cm.mechanics.openable.enabled)
+    }
+
+    fn perms(&self) -> Vec<Permission> {
+        vec![
+            Permission {
+                node: PERM_SYNC.into(),
+                description: "Allows the player to trigger double-door sync".into(),
+                default: PermissionDefault::Allow,
+                children: Vec::new(),
+            },
+            Permission {
+                node: PERM_KNOCK.into(),
+                description: "Allows the player to knock on openable blocks".into(),
+                default: PermissionDefault::Allow,
+                children: Vec::new(),
+            },
+        ]
     }
 
     fn events(&self, context: &Context) {
@@ -72,10 +106,16 @@ impl EventHandler<PlayerInteractEvent> for Openable {
         let action = InteractAction::from(event.action);
 
         if config.knock_enabled && action.matches_config(&config.knock_actions) {
+            if !event.player.has_permission(PERM_KNOCK) {
+                return event;
+            }
             return handle_knock(event, &config);
         }
 
         if config.sync_enabled && action.matches_config(&config.sync_actions) {
+            if !event.player.has_permission(PERM_SYNC) {
+                return event;
+            }
             return handle_sync(event, &config);
         }
 

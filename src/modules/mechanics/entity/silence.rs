@@ -22,11 +22,19 @@
 //! | `Entity.is_silent()` | ✅ Available | Can read current silent state |
 //! | `LivingEntity` check | ✅ Available | Can use `entity.as_living()` to verify entity is alive |
 //!
+//! ## Permissions
+//!
+//! | Node | Default | Description |
+//! |------|---------|-------------|
+//! | `pumpkinplus:silence.use` | allow | Allows silencing mobs with an amethyst shard |
+//!
 //! ## Configuration
 //!
-//! | Field     | Default | Description                     |
-//! |-----------|---------|---------------------------------|
-//! | `enabled` | `false` | Whether this module is active   |
+//! | Field        | Default                    | Description                                    |
+//! |--------------|----------------------------|------------------------------------------------|
+//! | `enabled`    | `false`                    | Whether this module is active                  |
+//! | `tool_item`  | `"minecraft:amethyst_shard"` | Registry key of the item used to toggle silence |
+//! | `hand`       | `["Right"]`                | Hands the tool item can be held in             |
 //!
 //! `IllyriaPlus` behavior reference:
 //! - On `PlayerInteractEntityEvent`: if holding amethyst shard and target is
@@ -34,15 +42,19 @@
 //! - Show red dust when silencing, green dust when un-silencing
 //! - Consume one shard in survival/adventure modes
 
+use crate::MirrorHand;
 use crate::config::ConfigManager;
 use crate::mechanics::mechanic::Mechanic;
-use pumpkin_plugin_api::common::Hand;
 use pumpkin_plugin_api::events::{
     EventData, EventHandler, EventPriority, PlayerInteractEntityEvent,
 };
+use pumpkin_plugin_api::permission::{Permission, PermissionDefault};
 use pumpkin_plugin_api::{Context, Item, ItemStackExt, Server};
 use serde::{Deserialize, Serialize};
 use tracing::debug;
+
+/// Permission node required to silence mobs with the configured tool item.
+pub const PERM_SILENCE: &str = concat!(env!("CARGO_PKG_NAME"), ":silence.use");
 
 /// Handles mob silencing with amethyst shards.
 ///
@@ -53,6 +65,15 @@ pub struct Silence;
 impl Mechanic for Silence {
     fn enabled(&self) -> bool {
         ConfigManager::get().is_some_and(|cm| cm.mechanics.silence.enabled)
+    }
+
+    fn perms(&self) -> Vec<Permission> {
+        vec![Permission {
+            node: PERM_SILENCE.into(),
+            description: "Allows toggling mob silence with the configured tool item.".into(),
+            default: PermissionDefault::Allow,
+            children: Vec::new(),
+        }]
     }
 
     fn events(&self, context: &Context) {
@@ -74,12 +95,25 @@ impl EventHandler<PlayerInteractEntityEvent> for Silence {
             return event;
         }
 
-        // Check if holding an amethyst shard
-        let Some(item) = event.player.get_item_in_hand(Hand::Right) else {
+        let Some(tool) = Item::from_registry_key(&config.tool_item) else {
             return event;
         };
 
-        if !item.is_item(Item::AmethystShard) {
+        let holding_tool = [MirrorHand::Right, MirrorHand::Left]
+            .into_iter()
+            .filter(|h| h.matches_config(&config.hand))
+            .any(|h| {
+                event
+                    .player
+                    .get_item_in_hand(h.into())
+                    .is_some_and(|stack| stack.is_item(tool))
+            });
+
+        if !holding_tool {
+            return event;
+        }
+
+        if !event.player.has_permission(PERM_SILENCE) {
             return event;
         }
 
@@ -97,9 +131,10 @@ impl EventHandler<PlayerInteractEntityEvent> for Silence {
         // For now, log debug info to verify the event fires correctly.
 
         debug!(
-            "Silence: player {} interacted with entity {} while holding amethyst shard",
+            "Silence: player {} interacted with entity {} while holding {}",
             event.player.get_name(),
-            event.entity_id
+            event.entity_id,
+            config.tool_item,
         );
 
         event
@@ -107,8 +142,24 @@ impl EventHandler<PlayerInteractEntityEvent> for Silence {
 }
 
 /// Configuration for the silence mechanics module.
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SilenceConfig {
     /// Whether this module is active.
     pub enabled: bool,
+    /// Registry key of the item held in the main hand to trigger the silence toggle.
+    /// Defaults to `minecraft:amethyst_shard`.
+    pub tool_item: String,
+    /// Which hands the tool item can be held in to trigger the toggle.
+    /// Use variant names like "Left" or "Right". Leave empty to allow either hand.
+    pub hand: Vec<MirrorHand>,
+}
+
+impl Default for SilenceConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            tool_item: "minecraft:amethyst_shard".to_string(),
+            hand: vec![MirrorHand::Right],
+        }
+    }
 }

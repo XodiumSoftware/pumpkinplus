@@ -8,7 +8,6 @@
 mod config;
 mod utils {
     pub mod block;
-    pub mod command;
     pub mod entity;
     pub mod macros;
     pub mod placeholders;

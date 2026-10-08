@@ -23,16 +23,15 @@
 //! - Nicknames are persisted on the player's entity via `PersistentDataHolder`.
 //! - On join, the stored nickname is applied to the player's display name and tab list name.
 
-use crate::utils::command::default_permission;
 use crate::utils::text::parse_minimessage;
-use crate::{PLUGIN_ID, config::ConfigManager, mechanics::mechanic::Mechanic};
+use crate::{config::ConfigManager, mechanics::mechanic::Mechanic};
 use pumpkin_plugin_api::{
     Context, PersistentDataHolder, Server,
     command::{Command, CommandError, CommandNode, CommandSender, ConsumedArgs},
     command_wit::{Arg, ArgumentType, StringType},
     commands::CommandHandler,
     events::{EventData, EventHandler, EventPriority, PlayerJoinEvent},
-    permission::Permission,
+    permission::{Permission, PermissionDefault},
     player::Player,
     text::TextComponent,
 };
@@ -42,6 +41,9 @@ use serde::{Deserialize, Serialize};
 pub const DATA_NAMESPACE: &str = "pumpkinplus";
 /// Persistent data key storing a player's nickname.
 pub const NICKNAME_KEY: &str = "nickname";
+
+/// Permission node required to use the `/nickname` command.
+pub const PERM_NICKNAME: &str = concat!(env!("CARGO_PKG_NAME"), ":command.nickname");
 
 /// Handles player nicknames.
 #[derive(Default)]
@@ -68,11 +70,12 @@ impl Mechanic for Nickname {
     }
 
     fn perms(&self) -> Vec<Permission> {
-        vec![default_permission(
-            PLUGIN_ID,
-            "nickname",
-            "Allows using the /nickname and /nick commands.",
-        )]
+        vec![Permission {
+            node: PERM_NICKNAME.into(),
+            description: "Allows using the /nickname and /nick commands.".into(),
+            default: PermissionDefault::Allow,
+            children: Vec::new(),
+        }]
     }
 
     fn events(&self, context: &Context) {
@@ -87,9 +90,13 @@ impl CommandHandler for NicknameExecutor {
     fn handle(
         &self,
         sender: CommandSender,
-        _server: Server,
+        server: Server,
         args: ConsumedArgs,
     ) -> Result<i32, CommandError> {
+        if !sender.has_permission(&server, PERM_NICKNAME) {
+            return Err(CommandError::PermissionDenied);
+        }
+
         let player = sender.as_player().ok_or(CommandError::PermissionDenied)?;
 
         let nickname = match args.get_value("name") {

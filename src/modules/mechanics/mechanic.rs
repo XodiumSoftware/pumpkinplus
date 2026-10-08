@@ -45,9 +45,10 @@ pub trait Mechanic {
 
     /// Returns the permission nodes required by this mechanic.
     ///
-    /// Permissions are paired with commands by index when registering. If there
-    /// are fewer permissions than commands, remaining commands are registered
-    /// without a permission requirement. Returns an empty set by default.
+    /// All permissions returned here are registered with the server so permission
+    /// plugins can grant/deny them. Enforcement happens inside each command's
+    /// [`CommandHandler`] via `sender.has_permission(server, node)`.
+    /// Returns an empty set by default.
     fn perms(&self) -> Vec<Permission> {
         Vec::new()
     }
@@ -75,25 +76,23 @@ pub trait Mechanic {
 
     /// Registers this mechanic's event handlers and commands with the server.
     ///
-    /// Calls [`Mechanic::events`](Mechanic::events), then registers each command from
-    /// [`Mechanic::cmds`] paired with its corresponding permission from [`Mechanic::perms`]
-    /// by index. Commands without a paired permission use an empty permission string.
+    /// Calls [`Mechanic::events`](Mechanic::events), registers each permission node
+    /// from [`Mechanic::perms`] with the server, then registers each command from
+    /// [`Mechanic::cmds`]. Commands are registered without a server-side permission
+    /// gate; they self-enforce their permissions inside [`CommandHandler::handle`]
+    /// via `sender.has_permission(server, node)`.
     fn register(&self, context: &Context) {
         if !self.enabled() {
             return;
         }
         self.events(context);
-        let perms = self.perms();
-        for perm in &perms {
-            if let Err(e) = context.register_permission(perm) {
+        for perm in self.perms() {
+            if let Err(e) = context.register_permission(&perm) {
                 error!("Failed to register permission '{}': {e}", perm.node);
             }
         }
-
-        let perm_nodes: Vec<String> = perms.into_iter().map(|p| p.node).collect();
-        for (i, cmd) in self.cmds().into_iter().enumerate() {
-            let perm = perm_nodes.get(i).cloned().unwrap_or_default();
-            context.register_command(cmd, &perm);
+        for cmd in self.cmds() {
+            context.register_command(cmd, "");
         }
     }
 }

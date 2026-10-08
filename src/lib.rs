@@ -51,7 +51,19 @@ mod modules {
             pub mod bridge;
             pub mod buf;
             pub mod nbt;
-            pub mod providers;
+            pub mod provider;
+            pub mod providers {
+                pub mod beehive;
+                pub mod brewing_stand;
+                pub mod command_block;
+                pub mod entity_health;
+                pub mod hopper_lock;
+                pub mod mob_breeding;
+                pub mod mob_growth;
+                pub mod trial_spawner_cooldown;
+                pub mod waxed;
+                pub mod zombie_villager;
+            }
         }
         pub mod xaeromap;
     }

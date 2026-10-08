@@ -47,7 +47,7 @@ use crate::config::ConfigManager;
 use crate::modules::bridges::bridge::Bridge;
 use crate::modules::bridges::jade::buf::{Buf, BufReader};
 use crate::modules::bridges::jade::nbt::NbtCompound;
-use crate::modules::bridges::jade::providers::{JadeBlockProvider, JadeEntityProvider};
+use crate::modules::bridges::jade::provider::{JadeBlockProvider, JadeEntityProvider};
 use pumpkin_plugin_api::events::{
     EventData, EventHandler, EventPriority, PlayerCustomPayloadEvent,
 };
@@ -84,16 +84,32 @@ impl Bridge for Jade {
 impl Jade {
     /// All block providers in handshake order.
     fn block_providers() -> Vec<Box<dyn JadeBlockProvider>> {
-        // TODO: populate as providers are ported. For now this bridge
-        // will still handshake with an empty list, which Jade treats as
-        // "server provides no block extensions" — a valid working state.
-        Vec::new()
+        use crate::modules::bridges::jade::providers::{
+            beehive::Beehive, brewing_stand::BrewingStand, command_block::CommandBlock,
+            hopper_lock::HopperLock, trial_spawner_cooldown::TrialSpawnerCooldown,
+        };
+        vec![
+            Box::new(Beehive),
+            Box::new(BrewingStand),
+            Box::new(CommandBlock),
+            Box::new(HopperLock),
+            Box::new(TrialSpawnerCooldown),
+        ]
     }
 
     /// All entity providers in handshake order.
     fn entity_providers() -> Vec<Box<dyn JadeEntityProvider>> {
-        // TODO: populate as providers are ported.
-        Vec::new()
+        use crate::modules::bridges::jade::providers::{
+            entity_health::EntityHealth, mob_breeding::MobBreeding, mob_growth::MobGrowth,
+            waxed::Waxed, zombie_villager::ZombieVillager,
+        };
+        vec![
+            Box::new(EntityHealth),
+            Box::new(MobBreeding),
+            Box::new(MobGrowth),
+            Box::new(Waxed),
+            Box::new(ZombieVillager),
+        ]
     }
 
     /// Builds the server handshake payload: empty config + empty shearable
@@ -182,13 +198,15 @@ impl Jade {
                 continue;
             };
             let tag = response.get_or_insert_with(|| {
-                NbtCompound::new()
+                let mut t = NbtCompound::new();
+                let _ = t
                     .put_int("x", pos.x)
                     .put_int("y", pos.y)
-                    .put_int("z", pos.z)
+                    .put_int("z", pos.z);
                 // TODO(block-id): populate "BlockId" from the Block at `pos`
                 // once the typed accessor is exposed. Jade uses this for the
                 // client-side icon.
+                t
             });
             let _wrote = provider.write(&world, pos, tag);
         }
@@ -241,8 +259,11 @@ impl Jade {
             let Some(provider) = providers.get(idx) else {
                 continue;
             };
-            let tag =
-                response.get_or_insert_with(|| NbtCompound::new().put_int("EntityId", entity_id));
+            let tag = response.get_or_insert_with(|| {
+                let mut t = NbtCompound::new();
+                let _ = t.put_int("EntityId", entity_id);
+                t
+            });
             let _wrote = provider.write(&entity, tag);
         }
 

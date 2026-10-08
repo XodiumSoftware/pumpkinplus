@@ -5,10 +5,10 @@
 //!
 //! ## Commands
 //!
-//! | Command | Aliases | Description |
-//! |---------|---------|-------------|
-//! | `/condense` | `cn` | Condense all applicable items into blocks |
-//! | `/uncondense` | `ucn` | Uncondense all blocks into items |
+//! | Command | Aliases | Permission                          | Description |
+//!|---------|---------|-------------------------------------|-------------|
+//! | `/condense` | `cn` | `pumpkinplus:command.condense`     | Condense all applicable items into blocks |
+//! | `/uncondense` | `ucn` | `pumpkinplus:command.uncondense` | Uncondense all blocks into items |
 //!
 //! ## Condensable Items
 //!
@@ -66,6 +66,7 @@ use crate::config::ConfigManager;
 use crate::mechanics::mechanic::Mechanic;
 use pumpkin_plugin_api::command::{Command, CommandError, CommandSender};
 use pumpkin_plugin_api::commands::CommandHandler;
+use pumpkin_plugin_api::permission::{Permission, PermissionDefault};
 use pumpkin_plugin_api::player::Player;
 use pumpkin_plugin_api::text::TextComponent;
 use pumpkin_plugin_api::{Item, ItemStack, ItemStackExt, Server};
@@ -75,6 +76,12 @@ use std::collections::HashMap;
 /// Number of items needed to condense into one block.
 const CONDENSE_AMOUNT: u8 = 9;
 
+/// Permission node required to use the `/condense` command.
+pub const PERM_CONDENSE: &str = concat!(env!("CARGO_PKG_NAME"), ":command.condense");
+
+/// Permission node required to use the `/uncondense` command.
+pub const PERM_UNCONDENSE: &str = concat!(env!("CARGO_PKG_NAME"), ":command.uncondense");
+
 /// Handles item condensing and uncondensing.
 #[derive(Default)]
 pub struct Condense;
@@ -82,6 +89,23 @@ pub struct Condense;
 impl Mechanic for Condense {
     fn enabled(&self) -> bool {
         ConfigManager::get().is_some_and(|cm| cm.mechanics.condense.enabled)
+    }
+
+    fn perms(&self) -> Vec<Permission> {
+        vec![
+            Permission {
+                node: PERM_CONDENSE.into(),
+                description: "Allows using the /condense and /cn commands.".into(),
+                default: PermissionDefault::Allow,
+                children: Vec::new(),
+            },
+            Permission {
+                node: PERM_UNCONDENSE.into(),
+                description: "Allows using the /uncondense and /ucn commands.".into(),
+                default: PermissionDefault::Allow,
+                children: Vec::new(),
+            },
+        ]
     }
 
     fn cmds(&self) -> Vec<Command> {
@@ -109,9 +133,18 @@ impl CommandHandler for CondenseExecutor {
     fn handle(
         &self,
         sender: CommandSender,
-        _server: Server,
+        server: Server,
         _args: pumpkin_plugin_api::command::ConsumedArgs,
     ) -> Result<i32, CommandError> {
+        let required_perm = if self.reverse {
+            PERM_UNCONDENSE
+        } else {
+            PERM_CONDENSE
+        };
+        if !sender.has_permission(&server, required_perm) {
+            return Err(CommandError::PermissionDenied);
+        }
+
         let player = sender.as_player().ok_or(CommandError::PermissionDenied)?;
         let total = condense_inventory(&player, self.reverse);
 

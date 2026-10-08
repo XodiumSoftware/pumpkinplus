@@ -44,6 +44,11 @@ mod modules {
     }
 
     pub mod recipes;
+    pub mod bridges {
+        pub mod appleskin;
+        pub mod bridge;
+        pub mod xaeromap;
+    }
     pub mod mechanics {
         pub mod mechanic;
         pub mod entity {
@@ -77,6 +82,9 @@ mod modules {
 pub use config::*;
 pub use modules::*;
 
+pub use modules::bridges::appleskin::AppleSkinConfig;
+pub use modules::bridges::bridge::BridgesConfig;
+pub use modules::bridges::xaeromap::XaeroMapConfig;
 pub use modules::enchantments::enchantment::EnchantmentsConfig;
 
 pub use modules::mechanics::entity::griefing::GriefingConfig;
@@ -116,6 +124,9 @@ use crate::mechanics::server::rules::Rules;
 use crate::mechanics::server::tablist::Tablist;
 use crate::mechanics::world::openable::Openable;
 use crate::mechanics::world::spawnprotection::SpawnProtection;
+use crate::modules::bridges::appleskin::AppleSkin;
+use crate::modules::bridges::bridge::Bridge;
+use crate::modules::bridges::xaeromap::XaeroMap;
 use crate::modules::enchantments::enchantment::Enchantment;
 use crate::modules::enchantments::utility::embertread::Embertread;
 use crate::modules::enchantments::vanilla::fortune::Fortune;
@@ -162,6 +173,23 @@ impl PumpkinPlus {
         info!(
             "Registered: {} mechanic(s) | Took {}ms",
             enabled_mechanics, mechanic_total_ms
+        );
+    }
+
+    /// Registers all client-mod bridges (`AppleSkin`, Xaero's Map, …).
+    fn register_bridges(context: &Context) {
+        let bridges: Vec<&dyn Bridge> = vec![&AppleSkin, &XaeroMap];
+
+        let enabled_bridges = bridges.iter().filter(|b| b.enabled()).count();
+        let mut bridge_total_ms = 0u128;
+        for bridge in bridges {
+            let start = Instant::now();
+            bridge.register(context);
+            bridge_total_ms += start.elapsed().as_millis();
+        }
+        info!(
+            "Registered: {} bridge(s) | Took {}ms",
+            enabled_bridges, bridge_total_ms
         );
     }
 
@@ -224,6 +252,9 @@ impl Plugin for PumpkinPlus {
         }
         if config.modules.enchantments {
             Self::register_enchantments(&context);
+        }
+        if config.modules.bridges {
+            Self::register_bridges(&context);
         }
 
         info!("Pumpkin+ loaded. NICE TO CYA!");

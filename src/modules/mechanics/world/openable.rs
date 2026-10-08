@@ -33,32 +33,13 @@
 
 use crate::config::ConfigManager;
 use crate::mechanics::mechanic::Mechanic;
-use crate::utils::block::toggle_open_property;
+use crate::utils::block::{is_door, is_openable, toggle_open_property};
 use crate::{GameMode, InteractAction};
 use pumpkin_plugin_api::common::Hand;
 use pumpkin_plugin_api::events::{EventData, EventHandler, EventPriority, PlayerInteractEvent};
-use pumpkin_plugin_api::world::{BlockFlags, BlockPos, BlockStateInfo, World, block_state_to_info};
+use pumpkin_plugin_api::world::{BlockFlags, BlockPos, World, block_state_to_info};
 use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};
-
-/// Checks whether the block described by `info` is an openable structure
-/// (door, trapdoor, or fence gate).
-///
-/// Uses name-based suffix matching instead of the typed [`BlockType`] registry
-/// so that custom/modded openables are detected without hardcoding.
-#[must_use]
-fn is_openable(info: &BlockStateInfo) -> bool {
-    let name = &info.name;
-    name.ends_with("_door") || name.ends_with("_trapdoor") || name.ends_with("_fence_gate")
-}
-
-/// Checks whether the block described by `info` is a door specifically.
-///
-/// Doors support double-block sync; trapdoors and fence gates do not.
-#[must_use]
-fn is_door(info: &BlockStateInfo) -> bool {
-    info.name.ends_with("_door")
-}
 
 /// Handles openable block synchronization and door knocking.
 #[derive(Default)]

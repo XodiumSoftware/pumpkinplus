@@ -53,6 +53,7 @@ mod modules {
         }
         pub mod world {
             pub mod openable;
+            pub mod spawnprotection;
         }
         pub mod player {
             pub mod anvil;
@@ -93,6 +94,7 @@ pub use modules::mechanics::server::chat::ChatConfig;
 pub use modules::mechanics::server::rules::RulesConfig;
 pub use modules::mechanics::server::tablist::TablistConfig;
 pub use modules::mechanics::world::openable::OpenableConfig;
+pub use modules::mechanics::world::spawnprotection::SpawnProtectionConfig;
 pub use modules::recipes::RecipesConfig;
 
 use crate::mechanics::entity::griefing::Griefing;
@@ -112,6 +114,7 @@ use crate::mechanics::server::chat::Chat;
 use crate::mechanics::server::rules::Rules;
 use crate::mechanics::server::tablist::Tablist;
 use crate::mechanics::world::openable::Openable;
+use crate::mechanics::world::spawnprotection::SpawnProtection;
 use crate::modules::enchantments::enchantment::Enchantment;
 use crate::modules::enchantments::utility::embertread::Embertread;
 use crate::modules::enchantments::vanilla::fortune::Fortune;
@@ -144,6 +147,7 @@ impl PumpkinPlus {
             &Rules,
             &Tablist,
             &Openable,
+            &SpawnProtection,
         ];
         let enabled_mechanics = mechanics.iter().filter(|m| m.enabled()).count();
 

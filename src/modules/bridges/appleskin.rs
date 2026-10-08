@@ -228,10 +228,20 @@ impl EventHandler<PlayerChangedWorldEvent> for AppleSkin {
         _server: Server,
         event: pumpkin_plugin_api::events::EventData<PlayerChangedWorldEvent>,
     ) -> pumpkin_plugin_api::events::EventData<PlayerChangedWorldEvent> {
+        // The new world may have a different natural_health_regeneration
+        // value; resend on behalf of the new world.
         Self::send_natural_regen_state(&event.player);
         event
     }
 }
+
+// TODO(pumpkin-api): The Pumpkin plugin API does not currently expose an event
+// for world gamerule changes (no `WorldGameRuleChangeEvent` analogue in
+// `event.wit`), so we cannot push `natural_health_regeneration` updates when an
+// operator toggles the rule mid-game like the Bukkit implementation can.
+// Workaround would be polling in `tick()`, or upstream a feature request to
+// Pumpkin. Either way, the client will eventually self-correct on world change
+// or relog.
 
 impl EventHandler<PlayerJoinEvent> for AppleSkin {
     fn handle(

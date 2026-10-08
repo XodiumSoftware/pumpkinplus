@@ -184,3 +184,65 @@ fn map_named_color(color: NamedColor) -> pumpkin_plugin_api::common::NamedColor 
         NamedColor::White => PNC::White,
     }
 }
+
+/// Parses a `MiniMessage`-style color descriptor into an [`RgbColor`].
+///
+/// Accepts any of:
+/// - A named color: `red`, `dark_aqua`, ...
+/// - A bare or prefixed hex triplet: `FF8800`, `#FF8800`
+/// - A `MiniMessage`-wrapped variant of either: `<red>`, `<#FF8800>`, `<color:#FF8800>`, `<colour:#FF8800>`, `<c:#FF8800>`
+///
+/// Returns `None` if the descriptor is blank or unrecognized.
+#[must_use]
+pub fn parse_color_arg(input: &str) -> Option<RgbColor> {
+    use minimessage_impl::style::color::Color;
+
+    let trimmed = input.trim();
+    if trimmed.is_empty() {
+        return None;
+    }
+
+    // Strip `<...>` wrapping so `<red>`, `<#FF8800>`, and `<color:#FF8800>`
+    // all reduce to a bare descriptor we can parse below.
+    let unwrapped = trimmed
+        .strip_prefix('<')
+        .and_then(|s| s.strip_suffix('>'))
+        .map_or(trimmed, |inner| inner.trim());
+
+    // Split on `:` to handle `<color:#FF8800>` / `<c:#FF8800>` aliases.
+    let descriptor = match unwrapped.split_once(':') {
+        Some(("color" | "colour" | "c", value)) => value.trim(),
+        _ => unwrapped,
+    };
+
+    if let Ok(named) = NamedColor::from_str(descriptor) {
+        return Some(named_color_to_rgb(named));
+    }
+
+    Color::from_str(descriptor)
+        .ok()
+        .map(|Color(r, g, b)| RgbColor { r, g, b })
+}
+
+/// Converts a `MiniMessage` [`NamedColor`] to its vanilla RGB value.
+fn named_color_to_rgb(color: NamedColor) -> RgbColor {
+    let (r, g, b) = match color {
+        NamedColor::Black => (0x00, 0x00, 0x00),
+        NamedColor::DarkBlue => (0x00, 0x00, 0xAA),
+        NamedColor::DarkGreen => (0x00, 0xAA, 0x00),
+        NamedColor::DarkAqua => (0x00, 0xAA, 0xAA),
+        NamedColor::DarkRed => (0xAA, 0x00, 0x00),
+        NamedColor::DarkPurple => (0xAA, 0x00, 0xAA),
+        NamedColor::Gold => (0xFF, 0xAA, 0x00),
+        NamedColor::Gray => (0xAA, 0xAA, 0xAA),
+        NamedColor::DarkGray => (0x55, 0x55, 0x55),
+        NamedColor::Blue => (0x55, 0x55, 0xFF),
+        NamedColor::Green => (0x55, 0xFF, 0x55),
+        NamedColor::Aqua => (0x55, 0xFF, 0xFF),
+        NamedColor::Red => (0xFF, 0x55, 0x55),
+        NamedColor::LightPurple => (0xFF, 0x55, 0xFF),
+        NamedColor::Yellow => (0xFF, 0xFF, 0x55),
+        NamedColor::White => (0xFF, 0xFF, 0xFF),
+    };
+    RgbColor { r, g, b }
+}

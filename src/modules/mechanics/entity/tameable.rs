@@ -21,25 +21,37 @@
 //! | `Mob.set_leash_holder(entity)` | Re-leash the pet to the new owner |
 //! | Generic tameable check | Currently only `wolf-data`/`cat-data` have `is-tamed`; need generic `Tameable` trait |
 //!
+//! ## Permissions
+//!
+//! | Node | Default | Description |
+//! |------|---------|-------------|
+//! | `pumpkinplus:tameable.transfer` | allow | Allows transferring pet ownership with a lead |
+//!
 //! ## Configuration
 //!
-//! | Field     | Default | Description                     |
-//! |-----------|---------|---------------------------------|
-//! | `enabled` | `false` | Whether this module is active   |
+//! | Field        | Default    | Description                                          |
+//! |--------------|------------|------------------------------------------------------|
+//! | `enabled`    | `false`    | Whether this module is active                        |
+//! | `tool_item`  | `"minecraft:lead"` | Registry key of the item used to transfer ownership |
+//! | `hand`       | `["Right"]` | Hands the tool item can be held in                   |
 //!
 //! `IllyriaPlus` behavior reference:
 //! - On `PlayerInteractEntityEvent`: if source holds lead and target is a player,
 //!   find source's leashed tamed pet, transfer ownership to target, re-leash to target.
 
+use crate::MirrorHand;
 use crate::config::ConfigManager;
 use crate::mechanics::mechanic::Mechanic;
-use pumpkin_plugin_api::common::Hand;
 use pumpkin_plugin_api::events::{
     EventData, EventHandler, EventPriority, PlayerInteractEntityEvent,
 };
+use pumpkin_plugin_api::permission::{Permission, PermissionDefault};
+use pumpkin_plugin_api::wit::pumpkin::plugin::event::EntityInteractionAction;
 use pumpkin_plugin_api::{Context, Item, ItemStackExt, Server};
 use serde::{Deserialize, Serialize};
-use tracing::debug;
+
+/// Permission node required to transfer pet ownership with a lead.
+pub const PERM_TAMEABLE_TRANSFER: &str = concat!(env!("CARGO_PKG_NAME"), ":tameable.transfer");
 
 /// Handles pet ownership transfer between players.
 ///
@@ -50,6 +62,15 @@ pub struct Tameable;
 impl Mechanic for Tameable {
     fn enabled(&self) -> bool {
         ConfigManager::get().is_some_and(|cm| cm.mechanics.tameable.enabled)
+    }
+
+    fn perms(&self) -> Vec<Permission> {
+        vec![Permission {
+            node: PERM_TAMEABLE_TRANSFER.into(),
+            description: "Allows transferring pet ownership with a lead.".into(),
+            default: PermissionDefault::Allow,
+            children: Vec::new(),
+        }]
     }
 
     fn events(&self, context: &Context) {
@@ -71,17 +92,29 @@ impl EventHandler<PlayerInteractEntityEvent> for Tameable {
             return event;
         }
 
-        // Only trigger on right-click (interact), not attack or interact-at
-        // Note: `EntityInteractionAction` is not re-exported by `pumpkin-plugin-api`,
-        // so we compare against the raw WIT discriminant values or rely on context.
-        // For now, assume the event only fires for `Interact` (right-click) actions.
+        if event.action != EntityInteractionAction::Interact {
+            return event;
+        }
 
-        // Check if source is holding a lead
-        let Some(item) = event.player.get_item_in_hand(Hand::Right) else {
+        let Some(tool) = Item::from_registry_key(&config.tool_item) else {
             return event;
         };
 
-        if !item.is_item(Item::Lead) {
+        let holding_tool = [MirrorHand::Right, MirrorHand::Left]
+            .into_iter()
+            .filter(|h| h.matches_config(&config.hand))
+            .any(|h| {
+                event
+                    .player
+                    .get_item_in_hand(h.into())
+                    .is_some_and(|stack| stack.is_item(tool))
+            });
+
+        if !holding_tool {
+            return event;
+        }
+
+        if !event.player.has_permission(PERM_TAMEABLE_TRANSFER) {
             return event;
         }
 
@@ -95,22 +128,30 @@ impl EventHandler<PlayerInteractEntityEvent> for Tameable {
         //    b. Transfer ownership to target (needs `set_owner` API)
         //    c. Re-leash to target (needs `set_leash_holder` API)
         //    d. Cancel event to prevent default interaction
-        //
-        // For now, log debug info to verify the event fires correctly.
-
-        debug!(
-            "Tameable: player {} interacted with entity {} while holding lead",
-            event.player.get_name(),
-            event.entity_id
-        );
 
         event
     }
 }
 
 /// Configuration for the tameable mechanics module.
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TameableConfig {
     /// Whether this module is active.
     pub enabled: bool,
+    /// Registry key of the item held to trigger the ownership transfer.
+    /// Defaults to `minecraft:lead`.
+    pub tool_item: String,
+    /// Which hands the tool item can be held in to trigger the transfer.
+    /// Use variant names like "Left" or "Right". Leave empty to allow either hand.
+    pub hand: Vec<MirrorHand>,
+}
+
+impl Default for TameableConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            tool_item: "minecraft:lead".to_string(),
+            hand: vec![MirrorHand::Right],
+        }
+    }
 }

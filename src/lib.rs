@@ -60,12 +60,12 @@ mod modules {
             pub mod enderchest;
             pub mod head;
             pub mod locator;
-            pub mod messages;
             pub mod nickname;
             pub mod xp;
         }
         pub mod server {
             pub mod chat;
+            pub mod messages;
             pub mod rules;
             pub mod tablist;
         }
@@ -86,10 +86,10 @@ pub use modules::mechanics::player::condense::CondenseConfig;
 pub use modules::mechanics::player::enderchest::EnderchestConfig;
 pub use modules::mechanics::player::head::HeadConfig;
 pub use modules::mechanics::player::locator::LocatorConfig;
-pub use modules::mechanics::player::messages::MessagesConfig;
 pub use modules::mechanics::player::nickname::NicknameConfig;
 pub use modules::mechanics::player::xp::XpConfig;
 pub use modules::mechanics::server::chat::ChatConfig;
+pub use modules::mechanics::server::messages::MessagesConfig;
 pub use modules::mechanics::server::rules::RulesConfig;
 pub use modules::mechanics::server::tablist::TablistConfig;
 pub use modules::mechanics::world::openable::OpenableConfig;
@@ -106,10 +106,10 @@ use crate::mechanics::player::condense::Condense;
 use crate::mechanics::player::enderchest::Enderchest;
 use crate::mechanics::player::head::Head;
 use crate::mechanics::player::locator::Locator;
-use crate::mechanics::player::messages::Messages;
 use crate::mechanics::player::nickname::Nickname;
 use crate::mechanics::player::xp::Xp;
 use crate::mechanics::server::chat::Chat;
+use crate::mechanics::server::messages::Messages;
 use crate::mechanics::server::rules::Rules;
 use crate::mechanics::server::tablist::Tablist;
 use crate::mechanics::world::openable::Openable;

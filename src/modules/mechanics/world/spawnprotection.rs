@@ -14,9 +14,14 @@
 //! ## Radius note
 //!
 //! Unlike Bukkit, the Pumpkin plugin API does not currently expose the server's
-//! `spawn-protection` setting from `server.properties`. This module therefore
-//! uses its own `radius` config field (default `16`, matching the vanilla
-//! default).
+//! `spawn-protection` setting from `server.properties`. The value lives on the
+//! Rust server core (`Server.basic_config.spawn_protection`) but has no WIT
+//! host function, so WASM plugins cannot read it. This module therefore uses
+//! its own `radius` config field (default `16`, matching the vanilla default).
+//!
+//! **TODO:** Once the upstream API exposes the server's spawn-protection
+//! radius (e.g. via `Context.get_server_config()` or a `Server` extension),
+//! remove the `radius` config field and read it directly here.
 //!
 //! ## Not yet implemented
 //!

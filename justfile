@@ -1,7 +1,8 @@
 # pumpkinplus task runner
 # Install `just` once: https://github.com/casey/just
 
-set windows-shell := ["powershell.exe", "-NoProfile", "-Command"]
+[windows]
+set shell := ["powershell.exe", "-NoProfile", "-Command"]
 
 _default:
     @just --list
@@ -22,12 +23,12 @@ fetch-server:
     #!/usr/bin/env bash
     set -euo pipefail
     mkdir -p .server
-    latest=$(curl -fsSL "{{_api_url}}" | grep -o '"published_at": *"[^"]*"' | cut -d'"' -f4)
-    if [[ -f "{{_version_file}}" ]] && [[ "$(cat {{_version_file}})" == "$latest" ]]; then echo "Pumpkin nightly is up to date ($latest)"; else echo "Fetching latest Pumpkin nightly binary: {{_asset}}"; curl -fsSL "{{_url}}" -o ".server/{{_asset}}"; chmod +x ".server/{{_asset}}"; echo "$latest" > "{{_version_file}}"; echo "Downloaded .server/{{_asset}}"; fi
+    latest=$(curl -fsSL "{{ _api_url }}" | grep -o '"published_at": *"[^"]*"' | cut -d'"' -f4)
+    if [[ -f "{{ _version_file }}" ]] && [[ "$(cat {{ _version_file }})" == "$latest" ]]; then echo "Pumpkin nightly is up to date ($latest)"; else echo "Fetching latest Pumpkin nightly binary: {{ _asset }}"; curl -fsSL "{{ _url }}" -o ".server/{{ _asset }}"; chmod +x ".server/{{ _asset }}"; echo "$latest" > "{{ _version_file }}"; echo "Downloaded .server/{{ _asset }}"; fi
 
 [windows]
 fetch-server:
-    New-Item -ItemType Directory -Force -Path .server | Out-Null; $latest = (Invoke-RestMethod -Uri "{{_api_url}}").published_at; $versionFile = "{{_version_file}}"; if ((Test-Path $versionFile) -and ((Get-Content $versionFile -Raw).Trim() -eq $latest)) { Write-Host "Pumpkin nightly is up to date ($latest)" } else { Write-Host "Fetching latest Pumpkin nightly binary: {{_asset}}"; Invoke-RestMethod -Uri "{{_url}}" -OutFile ".server/{{_asset}}"; Set-Content -Path $versionFile -Value $latest; Write-Host "Downloaded .server/{{_asset}}" }
+    New-Item -ItemType Directory -Force -Path .server | Out-Null; $latest = (Invoke-RestMethod -Uri "{{ _api_url }}").published_at; $versionFile = "{{ _version_file }}"; if ((Test-Path $versionFile) -and ((Get-Content $versionFile -Raw).Trim() -eq $latest)) { Write-Host "Pumpkin nightly is up to date ($latest)" } else { Write-Host "Fetching latest Pumpkin nightly binary: {{ _asset }}"; Invoke-RestMethod -Uri "{{ _url }}" -OutFile ".server/{{ _asset }}"; Set-Content -Path $versionFile -Value $latest; Write-Host "Downloaded .server/{{ _asset }}" }
 
 # Lint with pedantic lints enabled and warnings as errors
 lint:

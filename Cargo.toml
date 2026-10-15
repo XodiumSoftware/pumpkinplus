@@ -9,18 +9,12 @@ description = "Minecraft Pumpkin plugin that enhances the base gameplay"
 crate-type = ["cdylib"]
 
 [dependencies]
-pumpkin-plugin-api = "0.2"
+pumpkin-plugin-api = "0.2.0+26.3-26.51"
 minimessage-impl = "0.1"
 tracing = "0.1"
 serde = { version = "1.0", features = ["derive"] }
 config = { version = "0.15", default-features = false, features = ["toml"] }
 toml = "1"
-
-# The crates.io pumpkin-plugin-api 0.2.0 bundles an outdated v0.1 WIT that
-# mismatches the nightly server's event variant. Override with the git source
-# so cargo builds use the current WIT interface from the Pumpkin monorepo.
-[patch.crates-io]
-pumpkin-plugin-api = { git = "https://github.com/Pumpkin-MC/Pumpkin", branch = "master" }
 
 [profile.release]
 lto = true

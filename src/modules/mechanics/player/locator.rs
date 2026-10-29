@@ -118,7 +118,7 @@ impl CommandHandler for LocatorExecutor {
             return Ok(1);
         }
 
-        let Some(color) = parse_color_arg(&color_input) else {
+        let Some(_color) = parse_color_arg(&color_input) else {
             player.send_system_message(
                 parse_minimessage(&format!(
                     "<red>Unknown color:</red> {color_input}. Try a name like <gold>red</gold> or a hex like <gold>#FF8800</gold>."
@@ -130,7 +130,6 @@ impl CommandHandler for LocatorExecutor {
 
         // TODO: Once `Player.set_waypoint_color()` is available, pass `color`
         // instead of just acknowledging the command.
-        let _color = color;
         player.send_system_message(
             parse_minimessage(&format!(
                 "<yellow>Locator color updated to:</yellow> {color_input}"

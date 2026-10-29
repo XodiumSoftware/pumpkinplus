@@ -207,7 +207,7 @@ impl Jade {
                 // client-side icon.
                 t
             });
-            let _wrote = provider.write(&world, pos, tag);
+            provider.write(&world, pos, tag);
         }
 
         // Note: we reply only if at least one provider actually wrote
@@ -226,9 +226,7 @@ impl Jade {
         // Leading: entity_id VarInt + partIndex VarInt + 3× f32 hit_vec.
         let entity_id = r.read_var_int();
         let _part_index = r.read_var_int();
-        let _hx = r.read_f32();
-        let _hy = r.read_f32();
-        let _hz = r.read_f32();
+        r.skip(4 + 4 + 4);
 
         // Optional accessor NBT — TODO, same as block path.
 
@@ -263,7 +261,7 @@ impl Jade {
                 t.put_int("EntityId", entity_id);
                 t
             });
-            let _wrote = provider.write(&entity, tag);
+            provider.write(&entity, tag);
         }
 
         if let Some(tag) = response {

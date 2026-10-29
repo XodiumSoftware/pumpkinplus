@@ -121,15 +121,6 @@ impl<'a> BufReader<'a> {
         result
     }
 
-    /// Reads a big-endian `f32`.
-    pub(crate) fn read_f32(&mut self) -> f32 {
-        let mut buf = [0u8; 4];
-        for b in &mut buf {
-            *b = self.read_u8();
-        }
-        f32::from_be_bytes(buf)
-    }
-
     /// Reads a big-endian `i64`.
     pub(crate) fn read_packed_i64(&mut self) -> i64 {
         let mut buf = [0u8; 8];

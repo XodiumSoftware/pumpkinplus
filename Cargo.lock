@@ -262,7 +262,8 @@ dependencies = [
 [[package]]
 name = "pumpkin-plugin-api"
 version = "0.2.1+26.3-26.51"
-source = "git+https://github.com/Pumpkin-MC/Pumpkin?branch=master#eba538f284c5af0b7a3e0c701c7ded3435858f59"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "20a6a0d01590c31f1c55082acac8d23e83b136b056bc44ce2aaff1b18094f5ed"
 dependencies = [
  "postcard",
  "serde_json",

@@ -82,32 +82,6 @@ impl NbtCompound {
         self
     }
 
-    /// Appends a `TAG_Long` field.
-    #[allow(dead_code)]
-    pub(crate) fn put_long(&mut self, name: &str, value: i64) -> &mut Self {
-        self.entries.push((name.to_owned(), TagValue::Long(value)));
-        self
-    }
-
-    /// Appends a `TAG_Float` field.
-    ///
-    /// Currently unused — every Jade provider writes its float payload as bytes,
-    /// not as a raw NBT `TAG_Float`. Kept on the builder for parity with the
-    /// NBT spec.
-    #[allow(dead_code)]
-    pub(crate) fn put_float(&mut self, name: &str, value: f32) -> &mut Self {
-        self.entries.push((name.to_owned(), TagValue::Float(value)));
-        self
-    }
-
-    /// Appends a `TAG_Double` field.
-    #[allow(dead_code)]
-    pub(crate) fn put_double(&mut self, name: &str, value: f64) -> &mut Self {
-        self.entries
-            .push((name.to_owned(), TagValue::Double(value)));
-        self
-    }
-
     /// Appends a `TAG_Byte_Array` field — the shape every Jade provider
     /// uses for its key → encoded payload.
     pub(crate) fn put_byte_array(&mut self, name: &str, value: Vec<u8>) -> &mut Self {

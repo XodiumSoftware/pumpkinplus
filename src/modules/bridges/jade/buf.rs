@@ -139,6 +139,14 @@ impl<'a> BufReader<'a> {
         i64::from_be_bytes(buf)
     }
 
+    /// Advances the read position by `n` bytes.
+    ///
+    /// Used to skip fields in request payloads that the server does not yet
+    /// parse.
+    pub(crate) fn skip(&mut self, n: usize) {
+        self.pos = self.pos.saturating_add(n).min(self.bytes.len());
+    }
+
     /// Returns `true` if at least one more byte is readable.
     ///
     /// Reserved for future use: skipping optional trailing accessor NBT when

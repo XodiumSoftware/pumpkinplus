@@ -29,7 +29,7 @@ impl JadeBlockProvider for BrewingStand {
         let mut buf = Buf::new();
         buf.write_var_int(fuel);
         buf.write_var_int(brew_time);
-        let _ = tag.put_byte_array(self.key(), buf.into_vec());
+        tag.put_byte_array(self.key(), buf.into_vec());
         true
     }
 }

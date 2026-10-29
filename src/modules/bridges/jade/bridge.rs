@@ -167,11 +167,7 @@ impl Jade {
         let pos = decode_block_pos(packed_pos);
 
         // Skip face (u8) + hit-vec (3× f32) + miss flag (u8).
-        let _ = r.read_u8();
-        let _ = r.read_f32();
-        let _ = r.read_f32();
-        let _ = r.read_f32();
-        let _ = r.read_bool();
+        r.skip(1 + 4 + 4 + 4 + 1);
 
         // ItemStack in NMS stream codec — TODO, see above.
         // For now we assume the stack is empty (VarInt count = 0), which is
@@ -203,8 +199,7 @@ impl Jade {
             };
             let tag = response.get_or_insert_with(|| {
                 let mut t = NbtCompound::new();
-                let _ = t
-                    .put_int("x", pos.x)
+                t.put_int("x", pos.x)
                     .put_int("y", pos.y)
                     .put_int("z", pos.z);
                 // TODO(block-id): populate "BlockId" from the Block at `pos`
@@ -265,7 +260,7 @@ impl Jade {
             };
             let tag = response.get_or_insert_with(|| {
                 let mut t = NbtCompound::new();
-                let _ = t.put_int("EntityId", entity_id);
+                t.put_int("EntityId", entity_id);
                 t
             });
             let _wrote = provider.write(&entity, tag);

@@ -41,7 +41,7 @@ impl JadeBlockProvider for HopperLock {
 
         let mut buf = Buf::new();
         buf.write_bool(locked);
-        let _ = tag.put_byte_array(self.key(), buf.into_vec());
+        tag.put_byte_array(self.key(), buf.into_vec());
         true
     }
 }

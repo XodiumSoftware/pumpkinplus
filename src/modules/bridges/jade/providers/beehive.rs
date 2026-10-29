@@ -36,7 +36,7 @@ impl JadeBlockProvider for Beehive {
 
         let mut buf = Buf::new();
         buf.write_byte(signed.to_be_bytes()[0]);
-        let _ = tag.put_byte_array(self.key(), buf.into_vec());
+        tag.put_byte_array(self.key(), buf.into_vec());
         true
     }
 }

@@ -33,7 +33,7 @@ impl JadeEntityProvider for MobGrowth {
 
         let mut buf = Buf::new();
         buf.write_var_int(remaining);
-        let _ = tag.put_byte_array(self.key(), buf.into_vec());
+        tag.put_byte_array(self.key(), buf.into_vec());
         true
     }
 }

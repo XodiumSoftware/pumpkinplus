@@ -25,7 +25,7 @@ impl JadeEntityProvider for EntityHealth {
 
         let mut buf = Buf::new();
         buf.write_f32(absorption);
-        let _ = tag.put_byte_array(self.key(), buf.into_vec());
+        tag.put_byte_array(self.key(), buf.into_vec());
         true
     }
 }

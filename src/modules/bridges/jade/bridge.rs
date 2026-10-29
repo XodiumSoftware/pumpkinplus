@@ -39,9 +39,10 @@
 //!
 //! ## Configuration
 //!
-//! | Field     | Default | Description                     |
-//! |-----------|---------|---------------------------------|
-//! | `enabled` | `false` | Whether this bridge is active   |
+//! | Field              | Default | Description                                   |
+//! |--------------------|---------|-----------------------------------------------|
+//! | `enabled`          | `false` | Whether this bridge is active                   |
+//! | `providers.*`      | `true`  | Per-provider enable toggles under `[jade.providers]` |
 
 use crate::config::ConfigManager;
 use crate::modules::bridges::bridge::Bridge;
@@ -55,6 +56,7 @@ use pumpkin_plugin_api::player::Player;
 use pumpkin_plugin_api::wit::pumpkin::plugin::common::BlockPos;
 use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 /// Channel for client → server "I support Jade".
 const CLIENT_HANDSHAKE_CHANNEL: &str = "jade:client_handshake";
@@ -88,13 +90,14 @@ impl Jade {
             beehive::Beehive, brewing_stand::BrewingStand, command_block::CommandBlock,
             hopper_lock::HopperLock, trial_spawner_cooldown::TrialSpawnerCooldown,
         };
-        vec![
+        let providers: Vec<Box<dyn JadeBlockProvider>> = vec![
             Box::new(Beehive),
             Box::new(BrewingStand),
             Box::new(CommandBlock),
             Box::new(HopperLock),
             Box::new(TrialSpawnerCooldown),
-        ]
+        ];
+        providers.into_iter().filter(|p| p.enabled()).collect()
     }
 
     /// All entity providers in handshake order.
@@ -103,13 +106,14 @@ impl Jade {
             entity_health::EntityHealth, mob_breeding::MobBreeding, mob_growth::MobGrowth,
             waxed::Waxed, zombie_villager::ZombieVillager,
         };
-        vec![
+        let providers: Vec<Box<dyn JadeEntityProvider>> = vec![
             Box::new(EntityHealth),
             Box::new(MobBreeding),
             Box::new(MobGrowth),
             Box::new(Waxed),
             Box::new(ZombieVillager),
-        ]
+        ];
+        providers.into_iter().filter(|p| p.enabled()).collect()
     }
 
     /// Builds the server handshake payload: empty config + empty shearable
@@ -325,8 +329,36 @@ fn len(n: usize) -> i32 {
 }
 
 /// Configuration for the Jade bridge.
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
 pub struct JadeConfig {
     /// Whether this bridge is active.
     pub enabled: bool,
+    /// Per-provider enable toggles.
+    ///
+    /// Keys match the last segment of each provider's advertised key with
+    /// `.` replaced by `_` (e.g. `beehive`, `mob_spawner_cooldown`).
+    /// All providers default to `true` when the map entry is missing.
+    pub providers: HashMap<String, bool>,
+}
+
+impl Default for JadeConfig {
+    fn default() -> Self {
+        let providers = HashMap::from([
+            ("beehive".to_string(), true),
+            ("brewing_stand".to_string(), true),
+            ("command_block".to_string(), true),
+            ("hopper_lock".to_string(), true),
+            ("mob_spawner_cooldown".to_string(), true),
+            ("entity_health".to_string(), true),
+            ("mob_breeding".to_string(), true),
+            ("mob_growth".to_string(), true),
+            ("waxed".to_string(), true),
+            ("zombie_villager".to_string(), true),
+        ]);
+        Self {
+            enabled: false,
+            providers,
+        }
+    }
 }

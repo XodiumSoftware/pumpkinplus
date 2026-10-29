@@ -21,6 +21,10 @@ impl JadeBlockProvider for TrialSpawnerCooldown {
         "minecraft:mob_spawner.cooldown"
     }
 
+    fn enabled_key(&self) -> &'static str {
+        "mob_spawner_cooldown"
+    }
+
     fn write(&self, _world: &World, _pos: BlockPos, _tag: &mut NbtCompound) -> bool {
         // Always decline to write: no cooldown data is available.
         false

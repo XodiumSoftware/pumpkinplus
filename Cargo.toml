@@ -9,7 +9,7 @@ description = "Minecraft Pumpkin plugin that enhances the base gameplay"
 crate-type = ["cdylib"]
 
 [dependencies]
-pumpkin-plugin-api = "0.2.0+26.3-26.51"
+pumpkin-plugin-api = { git = "https://github.com/Pumpkin-MC/Pumpkin", branch = "master" }
 minimessage-impl = "0.1"
 tracing = "0.1"
 serde = { version = "1.0", features = ["derive"] }

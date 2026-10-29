@@ -35,7 +35,7 @@ use crate::modules::bridges::jade::nbt::NbtCompound;
 /// allocation; the result is leaked once per provider type.
 static ENABLED_KEYS: Mutex<Vec<(&'static str, &'static str)>> = Mutex::new(Vec::new());
 
-/// Converts an UpperCamelCase identifier (e.g. `Beehive`) to `snake_case`
+/// Converts an `UpperCamelCase` identifier (e.g. `Beehive`) to `snake_case`
 /// (e.g. `beehive`).
 fn to_snake_case(s: &str) -> String {
     let mut out = String::new();

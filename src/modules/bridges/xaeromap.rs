@@ -131,13 +131,12 @@ impl Default for XaeroMapConfig {
 /// Generates a new random-ish `i32` id for first-run defaults.
 ///
 /// No CSPRNG is needed here — the id only has to be unique across servers,
-/// not unpredictable. Hashing the current system time (plus process id for
-/// extra entropy) gives a stable value for this process that's effectively
-/// impossible to collide across real deployments.
+/// not unpredictable. Hashing high-resolution system time gives a value
+/// that's effectively impossible to collide across real deployments. The
+/// generated id is persisted in `bridges.toml` after the first run.
 fn generate_id() -> i32 {
     let mut hasher = DefaultHasher::new();
     SystemTime::now().hash(&mut hasher);
-    std::process::id().hash(&mut hasher);
     #[allow(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
     {
         (hasher.finish() & u64::from(u32::MAX)) as u32 as i32

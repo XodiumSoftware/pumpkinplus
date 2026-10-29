@@ -1,40 +1,31 @@
 //! Silence module — toggle mob silent state using an amethyst shard.
 //!
-//! When a player right-clicks a mob while holding an amethyst shard, the mob's
-//! silent state is toggled (silent ↔ audible). A dust particle effect is shown:
-//! red when silencing, green when un-silencing. The shard is consumed in
-//! non-creative gamemodes.
+//! When a player right-clicks a living, non-player, non-monster entity while
+//! holding an amethyst shard (or the configured item), the mob's silent state is
+//! toggled. A dust particle effect is shown around the target: red when
+//! silencing, green when un-silencing. The shard is consumed in survival and
+//! adventure gamemodes.
 //!
-//! ## Status
+//! ## Implementation notes
 //!
-//! **Stub module** — Core logic is implemented but particle colors and
-//! monster detection are limited by missing Pumpkin plugin APIs.
-//!
-//! ## Missing / Limited APIs
-//!
-//! The following Pumpkin plugin APIs affect full implementation:
-//!
-//! | API | Status | Purpose |
-//! |-----|--------|---------|
-//! | `Entity.get_type()` | ⚠️ Partial | Can check entity type, but no `Monster` marker interface — must whitelist hostile mobs |
-//! | `Particle.DUST` color | ❌ Missing | WIT `particle` enum has `dust` but no color/dust-options support |
-//! | `Entity.set_silent()` | ✅ Available | Can toggle silent state |
-//! | `Entity.is_silent()` | ✅ Available | Can read current silent state |
-//! | `LivingEntity` check | ✅ Available | Can use `entity.as_living()` to verify entity is alive |
+//! Pumpkin's high-level `World::spawn_particle` call does not carry dust color
+//! data, so colored particles are sent with the raw Java `c-particle` packet.
+//! For non-Java players the mechanic falls back to a plain `Dust` particle so
+//! the visual still fires, just without the red/green tint.
 //!
 //! ## Permissions
 //!
 //! | Node | Default | Description |
 //! |------|---------|-------------|
-//! | `pumpkinplus:silence.use` | allow | Allows silencing mobs with an amethyst shard |
+//! | `pumpkinplus:silence.use` | allow | Allows silencing mobs with the configured tool item |
 //!
 //! ## Configuration
 //!
-//! | Field        | Default                    | Description                                    |
-//! |--------------|----------------------------|------------------------------------------------|
-//! | `enabled`    | `false`                    | Whether this module is active                  |
-//! | `tool_item`  | `"minecraft:amethyst_shard"` | Registry key of the item used to toggle silence |
-//! | `hand`       | `["Right"]`                | Hands the tool item can be held in             |
+//! | Field       | Default                       | Description                                    |
+//! |-------------|-------------------------------|------------------------------------------------|
+//! | `enabled`   | `false`                       | Whether this module is active                  |
+//! | `tool_item` | `"minecraft:amethyst_shard"`  | Registry key of the item used to toggle silence |
+//! | `hand`      | `["Right"]`                   | Hands the tool item can be held in             |
 //!
 //! `IllyriaPlus` behavior reference:
 //! - On `PlayerInteractEntityEvent`: if holding amethyst shard and target is
@@ -42,23 +33,33 @@
 //! - Show red dust when silencing, green dust when un-silencing
 //! - Consume one shard in survival/adventure modes
 
-use crate::MirrorHand;
-use crate::config::ConfigManager;
-use crate::mechanics::mechanic::Mechanic;
+use pumpkin_plugin_api::common::Position;
 use pumpkin_plugin_api::events::{
     EventData, EventHandler, EventPriority, PlayerInteractEntityEvent,
 };
+use pumpkin_plugin_api::java_packets::{CParticle, ClientboundPacket};
 use pumpkin_plugin_api::permission::{Permission, PermissionDefault};
+use pumpkin_plugin_api::wit::pumpkin::plugin::event::EntityInteractionAction;
+use pumpkin_plugin_api::world::{EntityType, Particle};
 use pumpkin_plugin_api::{Context, Item, ItemStackExt, Server};
 use serde::{Deserialize, Serialize};
 use tracing::debug;
 
+use crate::config::ConfigManager;
+use crate::mechanics::mechanic::Mechanic;
+use crate::{GameMode, MirrorHand};
+
 /// Permission node required to silence mobs with the configured tool item.
 pub const PERM_SILENCE: &str = concat!(env!("CARGO_PKG_NAME"), ":silence.use");
 
+/// Number of dust particles spawned around the target entity.
+const PARTICLE_COUNT: i32 = 10;
+/// Maximum speed of the spawned dust particles.
+const PARTICLE_MAX_SPEED: f32 = 0.01;
+/// Offset of the spawned dust particle cloud.
+const PARTICLE_OFFSET: Position = (0.5, 0.6, 0.5);
+
 /// Handles mob silencing with amethyst shards.
-///
-/// See module-level docs for the current implementation status and API limitations.
 #[derive(Default)]
 pub struct Silence;
 
@@ -85,7 +86,7 @@ impl EventHandler<PlayerInteractEntityEvent> for Silence {
     fn handle(
         &self,
         _server: Server,
-        event: EventData<PlayerInteractEntityEvent>,
+        mut event: EventData<PlayerInteractEntityEvent>,
     ) -> EventData<PlayerInteractEntityEvent> {
         let config: SilenceConfig = ConfigManager::get()
             .map(|cm| cm.mechanics.silence)
@@ -95,50 +96,173 @@ impl EventHandler<PlayerInteractEntityEvent> for Silence {
             return event;
         }
 
+        if event.action != EntityInteractionAction::Interact {
+            return event;
+        }
+
         let Some(tool) = Item::from_registry_key(&config.tool_item) else {
             return event;
         };
 
-        let holding_tool = [MirrorHand::Right, MirrorHand::Left]
+        let tool_match = [MirrorHand::Right, MirrorHand::Left]
             .into_iter()
             .filter(|h| h.matches_config(&config.hand))
-            .any(|h| {
+            .find_map(|h| {
                 event
                     .player
                     .get_item_in_hand(h.into())
-                    .is_some_and(|stack| stack.is_item(tool))
+                    .filter(|stack| stack.is_item(tool))
+                    .map(|stack| (h, stack))
             });
 
-        if !holding_tool {
+        let Some((hand, stack)) = tool_match else {
             return event;
-        }
+        };
 
         if !event.player.has_permission(PERM_SILENCE) {
             return event;
         }
 
-        // TODO: Full implementation blocked by missing APIs:
-        //
-        // 1. Get target entity from `event.entity_id` and convert to living entity
-        // 2. Check if entity is a player (skip)
-        // 3. Check if entity is a monster (needs entity type whitelist — no `Monster` marker)
-        // 4. Toggle silent state:
-        //    a. entity.set_silent(!entity.is_silent())
-        //    b. Spawn dust particle (red/green colors not available in WIT particle enum)
-        //    c. Consume item if not creative (use `player.get_gamemode()` and `item.set_count()`)
-        //    d. Cancel event to prevent default interaction
-        //
-        // For now, log debug info to verify the event fires correctly.
+        let Ok(target_id) = u32::try_from(event.entity_id) else {
+            return event;
+        };
+
+        let world = event.player.get_world();
+        let Some(entity) = world
+            .get_entities()
+            .into_iter()
+            .find(|e| e.get_id() == target_id)
+        else {
+            return event;
+        };
+
+        if !entity.is_living()
+            || entity.get_type() == EntityType::Player
+            || is_monster(entity.get_type())
+        {
+            return event;
+        }
+
+        let now_silent = !entity.is_silent();
+        entity.set_silent(now_silent);
+
+        let pos = entity.get_position();
+
+        if let Some(java) = event.player.as_java() {
+            // Java clients get a properly colored dust particle via the raw
+            // c-particle packet; the high-level WIT spawn_particle call cannot
+            // carry dust option bytes.
+            let (red, green, blue) = if now_silent {
+                (1.0_f32, 0.0_f32, 0.0_f32)
+            } else {
+                (0.0_f32, 1.0_f32, 0.0_f32)
+            };
+            let mut data = Vec::with_capacity(16);
+            data.extend_from_slice(&red.to_be_bytes());
+            data.extend_from_slice(&green.to_be_bytes());
+            data.extend_from_slice(&blue.to_be_bytes());
+            data.extend_from_slice(&1.0_f32.to_be_bytes());
+
+            let packet = ClientboundPacket::CParticle(CParticle {
+                force_spawn: false,
+                important: true,
+                position: pos,
+                offset: PARTICLE_OFFSET,
+                max_speed: PARTICLE_MAX_SPEED,
+                particle_count: PARTICLE_COUNT,
+                particle_id: i32::from(Particle::Dust as u8),
+                data,
+            });
+            java.send_packet(&packet);
+        } else {
+            // Non-Java players see a generic dust cloud without color data.
+            event.player.spawn_particles(
+                Particle::Dust,
+                pos,
+                PARTICLE_COUNT as u32,
+                PARTICLE_OFFSET,
+                PARTICLE_MAX_SPEED,
+            );
+        }
+
+        let gamemode = GameMode::from(event.player.get_gamemode());
+        if matches!(gamemode, GameMode::Survival | GameMode::Adventure) {
+            let count = stack.get_count();
+            if count > 1 {
+                stack.set_count(count - 1);
+                event.player.set_item_in_hand(hand.into(), Some(stack));
+            } else {
+                event.player.set_item_in_hand(hand.into(), None);
+            }
+        }
+
+        event.cancelled = true;
 
         debug!(
-            "Silence: player {} interacted with entity {} while holding {}",
+            "Silence: player {} toggled silent={} for entity {} ({:?})",
             event.player.get_name(),
+            now_silent,
             event.entity_id,
-            config.tool_item,
+            entity.get_type(),
         );
 
         event
     }
+}
+
+/// Returns `true` for hostile monster entity types that should not be silenced.
+///
+/// Pumpkin does not expose a `Monster` marker trait, so we match the vanilla
+/// hostile mob set directly. Neutral or passive mobs (wolves, iron golems, bees,
+/// etc.) are left silenceable.
+fn is_monster(entity_type: EntityType) -> bool {
+    matches!(
+        entity_type,
+        EntityType::Blaze
+            | EntityType::Bogged
+            | EntityType::Breeze
+            | EntityType::CamelHusk
+            | EntityType::CaveSpider
+            | EntityType::Creeper
+            | EntityType::Drowned
+            | EntityType::ElderGuardian
+            | EntityType::EnderDragon
+            | EntityType::Enderman
+            | EntityType::Endermite
+            | EntityType::Evoker
+            | EntityType::EvokerFangs
+            | EntityType::Ghast
+            | EntityType::Giant
+            | EntityType::Guardian
+            | EntityType::Hoglin
+            | EntityType::Husk
+            | EntityType::Illusioner
+            | EntityType::MagmaCube
+            | EntityType::Phantom
+            | EntityType::Piglin
+            | EntityType::PiglinBrute
+            | EntityType::Pillager
+            | EntityType::PolarBear
+            | EntityType::Ravager
+            | EntityType::Shulker
+            | EntityType::Silverfish
+            | EntityType::Skeleton
+            | EntityType::Slime
+            | EntityType::Stray
+            | EntityType::Strider
+            | EntityType::Vex
+            | EntityType::Vindicator
+            | EntityType::Warden
+            | EntityType::Witch
+            | EntityType::Wither
+            | EntityType::WitherSkeleton
+            | EntityType::Zoglin
+            | EntityType::Zombie
+            | EntityType::ZombieHorse
+            | EntityType::ZombieNautilus
+            | EntityType::ZombieVillager
+            | EntityType::ZombifiedPiglin
+    )
 }
 
 /// Configuration for the silence mechanics module.
@@ -146,7 +270,7 @@ impl EventHandler<PlayerInteractEntityEvent> for Silence {
 pub struct SilenceConfig {
     /// Whether this module is active.
     pub enabled: bool,
-    /// Registry key of the item held in the main hand to trigger the silence toggle.
+    /// Registry key of the item held to trigger the silence toggle.
     /// Defaults to `minecraft:amethyst_shard`.
     pub tool_item: String,
     /// Which hands the tool item can be held in to trigger the toggle.

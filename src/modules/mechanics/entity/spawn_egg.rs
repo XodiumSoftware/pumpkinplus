@@ -85,8 +85,6 @@ impl EventHandler<EntityDeathEvent> for SpawnEgg {
         //       world.dropItem(entity.location(), ItemStack(egg));
         //   }
 
-        let _ = event.entity_id;
-
         event
     }
 }

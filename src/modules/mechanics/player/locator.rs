@@ -127,10 +127,10 @@ impl CommandHandler for LocatorExecutor {
             );
             return Ok(0);
         };
-        let _ = color;
 
         // TODO: Once `Player.set_waypoint_color()` is available, pass `color`
         // instead of just acknowledging the command.
+        let _color = color;
         player.send_system_message(
             parse_minimessage(&format!(
                 "<yellow>Locator color updated to:</yellow> {color_input}"

@@ -1,5 +1,6 @@
 //! Block state manipulation helpers.
 
+//use pumpkin_plugin_api::common::Position;
 use pumpkin_plugin_api::world::{BlockStateInfo, resolve_block_state};
 
 /// Checks whether the block described by `info` is an openable structure
@@ -42,3 +43,13 @@ pub fn toggle_open_property(info: &BlockStateInfo) -> Option<u16> {
 
     resolve_block_state(&info.name, &properties)
 }
+
+// /// Returns the center of `pos` as a floating-point [`Position`].
+// #[must_use]
+// pub fn block_center(pos: BlockPos) -> Position {
+//     (
+//         f64::from(pos.x) + 0.5,
+//         f64::from(pos.y) + 0.5,
+//         f64::from(pos.z) + 0.5,
+//     )
+// }

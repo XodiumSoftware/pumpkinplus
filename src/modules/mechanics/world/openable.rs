@@ -13,9 +13,9 @@
 //! while sneaking with an empty main hand, the interaction is cancelled so the
 //! block is not damaged.
 //!
-//! > **Note:** The knock sound is temporarily disabled due to a WASM ABI
-//! > compatibility issue with the `Sound` enum. It will be re-enabled when the
-//! > upstream Pumpkin plugin API fixes the issue.
+//! > **Note:** The knock sound is re-enabled using Pumpkin's typed `Sound`
+//! > enum. If you hear a build or runtime ABI error again, disable the
+//! > `knock_enabled` toggle in `config.toml` until the API stabilizes.
 //!
 //! ## Configuration
 //!
@@ -57,6 +57,9 @@ pub const PERM_SYNC: &str = concat!(env!("CARGO_PKG_NAME"), ":openable.sync");
 
 /// Permission node required to knock on openable blocks.
 pub const PERM_KNOCK: &str = concat!(env!("CARGO_PKG_NAME"), ":openable.knock");
+
+// /// Sound played when a player knocks on an openable block.
+// const KNOCK_SOUND: Sound = Sound::EntityZombieAttackWoodenDoor;
 
 /// Handles openable block synchronization and door knocking.
 #[derive(Default)]
@@ -219,11 +222,10 @@ fn handle_knock(
 
     event.cancelled = true;
 
-    // TODO: play_sound is disabled due to a WASM ABI compatibility issue
-    // with the Sound enum (LegacySyncReentry error). Re-enable when fixed.
+    // TODO: still broken.
     // world.play_sound(
     //     KNOCK_SOUND,
-    //     wit::pumpkin::plugin::sounds::SoundCategory::Blocks,
+    //     SoundCategory::Blocks,
     //     block_center(clicked_pos),
     //     1.0,
     //     1.0,

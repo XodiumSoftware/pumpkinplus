@@ -11,10 +11,10 @@ crate-type = ["cdylib"]
 [dependencies]
 pumpkin-plugin-api = "0.2.1+26.3-26.51"
 minimessage-impl = "0.1.2"
-tracing = "0.1"
-serde = { version = "1.0", features = ["derive"] }
-config = { version = "0.15", default-features = false, features = ["toml"] }
-toml = "1"
+tracing = "0.1.44"
+serde = { version = "1.0.229", features = ["derive"] }
+config = { version = "0.15.27", default-features = false, features = ["toml"] }
+toml = "1.2.0"
 
 [profile.release]
 lto = true

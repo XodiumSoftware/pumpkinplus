@@ -84,9 +84,9 @@ impl NbtCompound {
 
     /// Appends a `TAG_Byte_Array` field — the shape every Jade provider
     /// uses for its key → encoded payload.
-    pub(crate) fn put_byte_array(&mut self, name: &str, value: Vec<u8>) -> &mut Self {
+    pub(crate) fn put_byte_array(&mut self, name: &str, value: &[u8]) -> &mut Self {
         self.entries
-            .push((name.to_owned(), TagValue::ByteArray(value)));
+            .push((name.to_owned(), TagValue::ByteArray(value.to_vec())));
         self
     }
 

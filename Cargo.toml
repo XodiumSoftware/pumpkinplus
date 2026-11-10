@@ -14,7 +14,7 @@ minimessage-impl = "0.1.2"
 tracing = "0.1.44"
 serde = { version = "1.0.229", features = ["derive"] }
 config = { version = "0.15.27", default-features = false, features = ["toml"] }
-toml = "1.2.0"
+toml = "1.2.1"
 
 [profile.release]
 lto = true

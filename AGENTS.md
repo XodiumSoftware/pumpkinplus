@@ -136,8 +136,7 @@ src/
     │   ├── messages.rs       # Join/leave/kick messages
     │   └── tablist.rs        # Tab list header/footer
     └── world/
-        ├── openable.rs       # Double door sync
-        └── spawnprotection.rs # Spawn protection area
+        └── openable.rs       # Double door sync
 ```
 
 ### Key Conventions

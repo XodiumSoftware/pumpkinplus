@@ -42,7 +42,6 @@ mod modules {
     /// World/block-related mechanics.
     pub(crate) mod world {
         pub(crate) mod openable;
-        pub(crate) mod spawnprotection;
     }
     /// Player-related mechanics.
     pub(crate) mod player {
@@ -80,7 +79,6 @@ use crate::modules::server::chat::Chat;
 use crate::modules::server::messages::Messages;
 use crate::modules::server::tablist::Tablist;
 use crate::modules::world::openable::Openable;
-use crate::modules::world::spawnprotection::SpawnProtection;
 use pumpkin_plugin_api::Context;
 use pumpkin_plugin_api::{Plugin, PluginMetadata};
 use std::time::Instant;
@@ -111,7 +109,6 @@ impl PumpkinPlus {
             &Chat,
             &Tablist,
             &Openable,
-            &SpawnProtection,
         ];
         let enabled_modules = modules.iter().filter(|m| m.enabled()).count();
 

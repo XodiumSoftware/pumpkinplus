@@ -86,16 +86,15 @@ kick_msg  = ""
 
 ### Configuration Options
 
-| Module            | Description                                                        | Default  |
-| ----------------- | ------------------------------------------------------------------ | -------- |
-| `chat`            | Chat format and word filtering                                     | Disabled |
-| `enderchest`      | Open personal enderchest by right-clicking air with an ender chest | Disabled |
-| `griefing`        | Cancel block-change and explosion events from configured mobs      | Disabled |
-| `messages`        | Custom join/leave/kick messages                                    | Disabled |
-| `nickname`        | Set a persistent nickname via `/nickname` or `/nick`               | Disabled |
-| `openable`        | Synchronize double doors and sneaky door-knocking                  | Disabled |
-| `spawnprotection` | Keep hostile mobs from spawning in the spawn protection area       | Disabled |
-| `tablist`         | Custom tab-list header/footer with live placeholders               | Disabled |
+| Module       | Description                                                        | Default  |
+| ------------ | ------------------------------------------------------------------ | -------- |
+| `chat`       | Chat format and word filtering                                     | Disabled |
+| `enderchest` | Open personal enderchest by right-clicking air with an ender chest | Disabled |
+| `griefing`   | Cancel block-change and explosion events from configured mobs      | Disabled |
+| `messages`   | Custom join/leave/kick messages                                    | Disabled |
+| `nickname`   | Set a persistent nickname via `/nickname` or `/nick`               | Disabled |
+| `openable`   | Synchronize double doors and sneaky door-knocking                  | Disabled |
+| `tablist`    | Custom tab-list header/footer with live placeholders               | Disabled |
 
 ### Placeholders
 
@@ -150,14 +149,6 @@ When enabled:
 
 - Right-clicking one door of a double-door pair toggles both doors together.
 - Sneaking and left-clicking a door with an empty main hand cancels the interaction so the door is not damaged. (A knock sound is planned but disabled until the Pumpkin API exports the `Sound` enum.)
-
-### SpawnProtection Module
-
-When enabled, cancels hostile-mob spawns inside the spawn protection area. The protected area is a square of `(2 * radius + 1)` blocks centered on the world spawn point, matching vanilla Minecraft's Chebyshev distance check.
-
-- `radius` — Spawn protection radius in blocks (default `16`, matching the vanilla default). Set to `0` or a negative value to disable protection at runtime without turning off the module.
-
-> **Note:** The Pumpkin plugin API does not currently expose the server's `spawn-protection` setting, so this module uses its own `radius` value. Damage protection for players/villagers and chunk-load monster despawning are not yet implemented — those require API support for entity lookup in the relevant events.
 
 ### Tablist Module
 

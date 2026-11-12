@@ -155,11 +155,9 @@ impl Plugin for PumpkinPlus {
     }
 
     fn on_load(&self, context: Context) -> pumpkin_plugin_api::Result<()> {
-        let config = ConfigManager::load(&context);
+        ConfigManager::load(&context);
 
-        if config.modules.mechanics {
-            Self::register_mechanics(&context);
-        }
+        Self::register_mechanics(&context);
 
         info!("Pumpkin+ loaded. NICE TO CYA!");
         Ok(())

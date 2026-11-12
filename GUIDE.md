@@ -63,25 +63,11 @@ Build the plugin yourself using Rust.
 
 ## Configuration
 
-Configuration lives in a TOML file in the plugin's data folder:
+Configuration lives in a single `config.toml` file in the plugin's data folder. It is created on first run with sensible defaults and holds one `[section]` per mechanic.
 
-| File             | Purpose                                                       |
-| ---------------- | ------------------------------------------------------------- |
-| `config.toml`    | Master on/off toggle for the mechanics module group           |
-| `mechanics.toml` | Per-mechanic settings (`chat`, `enderchest`, `messages`, ...) |
+> **Note:** All gameplay mechanics are disabled by default. Enable the modules you want in `config.toml` and restart the server.
 
-Both files are created on first run with sensible defaults. Setting the master toggle in `config.toml` to `false` disables the entire group and skips loading its own file.
-
-> **Note:** All gameplay mechanics are disabled by default. Enable the modules you want in `mechanics.toml` and restart the server.
-
-### `config.toml`
-
-```toml
-[modules]
-mechanics = true
-```
-
-### `mechanics.toml` (excerpt)
+### `config.toml` (excerpt)
 
 ```toml
 [chat]
@@ -127,8 +113,8 @@ Messages, nicknames, and the tab-list header/footer also support [MiniMessage](h
 
 1. Place `pumpkinplus.wasm` in your Pumpkin server's `plugins/` directory
 2. Start the server
-3. The plugin will load and create `config.toml` plus the per-group TOML files in the plugin data folder
-4. Stop the server and edit the TOML files as needed
+3. The plugin will load and create `config.toml` in the plugin data folder
+4. Stop the server and edit the TOML file as needed
 5. Restart the server
 
 ## Usage
@@ -205,8 +191,7 @@ There are currently no experimental modules. All shipped mechanics are fully wir
 
 ### Commands not working
 
-- Ensure the module is enabled in `mechanics.toml`
-- Ensure the `mechanics` master toggle in `config.toml` is `true`
+- Ensure the module is enabled in `config.toml`
 - Check that you have the required permission node
 - Verify the plugin loaded successfully in server logs
 

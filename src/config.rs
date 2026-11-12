@@ -1,16 +1,12 @@
 //! Configuration management system.
 //!
-//! The plugin configuration is split across multiple TOML files inside the
-//! plugin's data folder:
+//! The plugin configuration lives in a single `config.toml` file inside the
+//! plugin's data folder. It holds the per-module configs (see
+//! [`MechanicsConfig`]), each with its own `enabled` flag.
 //!
-//! | File                | Purpose                                            |
-//! |---------------------|----------------------------------------------------|
-//! | `config.toml`       | Master toggles for each module group               |
-//! | `mechanics.toml`    | Per-mechanic settings under `MechanicsConfig`      |
-//!
-//! Each file is merged layered onto its typed defaults using the
+//! The file is merged onto its typed defaults using the
 //! [`config`](https://crates.io/crates/config) crate, so missing keys fall back
-//! to defaults and extra keys in user files are preserved when re-saved.
+//! to defaults and extra keys in the user's file are preserved when re-saved.
 
 use config::{File, FileFormat};
 use pumpkin_plugin_api::Context;
@@ -27,32 +23,12 @@ thread_local! {
     static CONFIG: RefCell<Option<PluginConfig>> = const { RefCell::new(None) };
 }
 
-/// Master module group toggles stored in `config.toml`.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(default)]
-pub(crate) struct ModuleToggles {
-    /// Master toggle for all mechanic modules.
-    pub mechanics: bool,
-}
-
-impl Default for ModuleToggles {
-    fn default() -> Self {
-        Self { mechanics: true }
-    }
-}
-
-/// Top-level plugin configuration.
-///
-/// The `modules` field is read from `config.toml` and controls whether each
-/// module group's own file is even consulted. The remaining fields hold the
-/// fully-merged per-group configurations loaded from their own TOML files.
+/// Top-level plugin configuration, loaded from `config.toml`.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub(crate) struct PluginConfig {
-    /// Master toggles for each module group (from `config.toml`).
-    pub modules: ModuleToggles,
-    /// All mechanic module configs (from `mechanics.toml`).
-    #[serde(skip)]
+    /// All module configs, flattened into the top level of `config.toml`.
+    #[serde(flatten)]
     pub mechanics: MechanicsConfig,
 }
 
@@ -61,8 +37,8 @@ pub(crate) struct PluginConfig {
 pub(crate) struct ConfigManager;
 
 impl ConfigManager {
-    /// Loads `config.toml` plus all enabled module group configs, stores the
-    /// merged result globally, and persists merged files back to disk.
+    /// Loads `config.toml`, stores the merged result globally, and persists the
+    /// merged file back to disk.
     ///
     /// Call this once in `Plugin::on_load` after all modules are ready.
     pub(crate) fn load(context: &Context) -> PluginConfig {
@@ -80,34 +56,22 @@ impl ConfigManager {
 
 impl PluginConfig {
     fn load(context: &Context) -> Self {
-        let data_folder = PathBuf::from(context.get_data_folder());
-
-        let modules: ModuleToggles = load_section(&data_folder, "config.toml");
-
-        let mut config = Self {
-            modules: modules.clone(),
-            mechanics: MechanicsConfig::default(),
-        };
-
-        if modules.mechanics {
-            config.mechanics = load_section(&data_folder, "mechanics.toml");
-        }
-
-        config
+        load_config_file(&PathBuf::from(context.get_data_folder()))
     }
 }
 
-/// Loads a single TOML section file from `data_folder`, merges it over
-/// `T::default()`, writes the merged result back to disk, and returns the
-/// typed value. Falls back to `T::default()` on any error.
-fn load_section<T>(data_folder: &Path, file_name: &str) -> T
+/// Loads `config.toml` from `data_folder`, merges it over `T::default()`,
+/// writes the merged result back to disk, and returns the typed value. Falls
+/// back to `T::default()` on any error.
+fn load_config_file<T>(data_folder: &Path) -> T
 where
     T: Default + Serialize + for<'de> Deserialize<'de>,
 {
-    let path = data_folder.join(file_name);
+    const FILE_NAME: &str = "config.toml";
+    let path = data_folder.join(FILE_NAME);
 
     let defaults_toml = toml::to_string(&T::default()).unwrap_or_else(|e| {
-        error!("Failed to serialize defaults for {file_name}: {e}");
+        error!("Failed to serialize defaults for {FILE_NAME}: {e}");
         String::new()
     });
 
@@ -118,7 +82,7 @@ where
     let cfg = match builder.build() {
         Ok(c) => c,
         Err(e) => {
-            error!("Failed to build config for {file_name}: {e}");
+            error!("Failed to build config for {FILE_NAME}: {e}");
             return T::default();
         }
     };
@@ -126,7 +90,7 @@ where
     let merged: Value = match cfg.try_deserialize() {
         Ok(v) => v,
         Err(e) => {
-            error!("Failed to deserialize merged config for {file_name}: {e}");
+            error!("Failed to deserialize merged config for {FILE_NAME}: {e}");
             return T::default();
         }
     };
@@ -134,7 +98,7 @@ where
     let value: T = match merged.clone().try_into() {
         Ok(v) => v,
         Err(e) => {
-            error!("Failed to parse merged config for {file_name}: {e}");
+            error!("Failed to parse merged config for {FILE_NAME}: {e}");
             T::default()
         }
     };
@@ -142,11 +106,11 @@ where
     if let Some(parent) = path.parent()
         && let Err(e) = fs::create_dir_all(parent)
     {
-        error!("Failed to create config directory for {file_name}: {e}");
+        error!("Failed to create config directory for {FILE_NAME}: {e}");
     }
 
     if let Err(e) = fs::write(&path, toml::to_string_pretty(&merged).unwrap_or_default()) {
-        error!("Failed to write config file {file_name}: {e}");
+        error!("Failed to write config file {FILE_NAME}: {e}");
     }
 
     value

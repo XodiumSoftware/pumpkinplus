@@ -62,7 +62,7 @@ cargo clippy --all-targets --all-features --target wasm32-wasip2 -- -W clippy::p
 
 1. **Registration**: Via `register_plugin!(PumpkinPlus)` macro
 2. **`on_load`**:
-    - Initializes `ConfigManager` (loads/creates `config.toml` and the per-group TOML files)
+    - Initializes `ConfigManager` (loads/creates `config.toml`)
     - Registers all module configs
     - Calls `Module::register` for each enabled module
 3. **`on_unload`**: Logs farewell message
@@ -85,12 +85,11 @@ Modules are plain structs (not singletons) instantiated with `Default::default()
 
 **`ConfigManager`** (`src/config.rs`) — TOML-backed config using the [`config`](https://crates.io/crates/config) crate:
 
-- Master toggles live in `{data_folder}/config.toml` under a `[modules]` section
-- Each module group has its own file: `mechanics.toml`
-- On first load: creates all files with module defaults
+- The whole configuration lives in a single `{data_folder}/config.toml` file
+- Each mechanic gets its own `[section]` with an `enabled` flag
+- On first load: creates the file with module defaults
 - On subsequent loads: merges user values with defaults and preserves extra fields
-- All module configs live in a single `PluginConfig` struct in memory; modules access their section via `ConfigManager::get().map(|cm| cm.section)`
-- Setting a master toggle to `false` skips loading that group's file entirely
+- All module configs live in a single `PluginConfig` struct in memory; modules access their section via `ConfigManager::get().map(|cm| cm.{section})`
 
 ### Active Modules
 

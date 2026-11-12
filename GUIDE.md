@@ -70,11 +70,6 @@ Configuration lives in a single `config.toml` file in the plugin's data folder. 
 ### `config.toml` (excerpt)
 
 ```toml
-[chat]
-enabled     = false
-chat_format = ""
-chat_filter = []
-
 [messages]
 enabled   = false
 join_msg  = ""
@@ -88,7 +83,6 @@ kick_msg  = ""
 
 | Module       | Description                                                        | Default  |
 | ------------ | ------------------------------------------------------------------ | -------- |
-| `chat`       | Chat format and word filtering                                     | Disabled |
 | `enderchest` | Open personal enderchest by right-clicking air with an ender chest | Disabled |
 | `griefing`   | Cancel block-change and explosion events from configured mobs      | Disabled |
 | `messages`   | Custom join/leave/kick messages                                    | Disabled |
@@ -100,8 +94,7 @@ kick_msg  = ""
 
 | Placeholder | Available in                       | Description                   |
 | ----------- | ---------------------------------- | ----------------------------- |
-| `{player}`  | `messages.*`, `chat_format`        | Player's display name         |
-| `{message}` | `chat_format`                      | Original chat message         |
+| `{player}`  | `messages.*`                       | Player's display name         |
 | `{online}`  | `tablist.header`, `tablist.footer` | Number of online players      |
 | `{tps}`     | `tablist.header`, `tablist.footer` | Server TPS (ticks per second) |
 | `{mspt}`    | `tablist.header`, `tablist.footer` | Milliseconds per tick         |
@@ -119,13 +112,6 @@ Messages, nicknames, and the tab-list header/footer also support [MiniMessage](h
 ## Usage
 
 Once installed, the plugin runs automatically. Available features depend on enabled modules.
-
-### Chat Module
-
-When enabled, formats chat messages and/or filters blocked words.
-
-- `chat_format` — Message format. Use `{player}` and `{message}`.
-- `chat_filter` — Case-insensitive list of substrings; messages containing any entry are cancelled.
 
 ### Enderchest Module
 

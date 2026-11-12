@@ -1,22 +1,12 @@
 //! Placeholder replacement helpers for player- and server-facing strings.
 //!
-//! The placeholder vocabulary mirrors the tables documented in the message, chat,
-//! and tablist modules.
+//! The placeholder vocabulary mirrors the tables documented in the message and
+//! tablist modules.
 
 use pumpkin_plugin_api::{Server, player::Player, text::TextComponent};
 use tracing::warn;
 
 use crate::utils::text::parse_minimessage;
-
-/// Replaces a set of `key` → `value` placeholders in `text`.
-#[must_use]
-pub(crate) fn replace_placeholders(text: &str, replacements: &[(&str, &str)]) -> String {
-    replacements
-        .iter()
-        .fold(text.to_string(), |acc, (key, value)| {
-            acc.replace(key, value)
-        })
-}
 
 /// Replaces `{player}` with the player's current display name.
 #[must_use]

@@ -53,7 +53,6 @@ mod modules {
     }
     /// Server-wide mechanics.
     pub(crate) mod server {
-        pub(crate) mod chat;
         pub(crate) mod messages;
         pub(crate) mod tablist;
     }
@@ -73,7 +72,6 @@ use crate::modules::player::head::Head;
 use crate::modules::player::locator::Locator;
 use crate::modules::player::nickname::Nickname;
 use crate::modules::player::xp::Xp;
-use crate::modules::server::chat::Chat;
 use crate::modules::server::messages::Messages;
 use crate::modules::server::tablist::Tablist;
 use crate::modules::world::openable::Openable;
@@ -104,7 +102,6 @@ impl PumpkinPlus {
             &Nickname,
             &Messages,
             &Xp,
-            &Chat,
             &Tablist,
             &Openable,
         ];

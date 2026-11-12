@@ -96,7 +96,6 @@ Modules are plain structs (not singletons) instantiated with `Default::default()
 | Module     | File                             | Description                                                                   |
 | ---------- | -------------------------------- | ----------------------------------------------------------------------------- |
 | `Messages` | `src/modules/server/messages.rs` | Custom join/leave/kick messages                                               |
-| `Chat`     | `src/modules/server/chat.rs`     | Chat format/filter                                                            |
 | `Tablist`  | `src/modules/server/tablist.rs`  | Dynamic tab list header/footer with `{player}`, `{online}`, `{tps}`, `{mspt}` |
 | `Locator`  | `src/modules/player/locator.rs`  | Locator bar personalization (`/locator` command, stub)                        |
 
@@ -105,7 +104,6 @@ Modules are plain structs (not singletons) instantiated with `Default::default()
 | Placeholder | Available in       | Description                   |
 | ----------- | ------------------ | ----------------------------- |
 | `{player}`  | All message fields | Player's display name         |
-| `{message}` | `chat_format`      | Original chat message         |
 | `{online}`  | `header`, `footer` | Number of online players      |
 | `{tps}`     | `header`, `footer` | Server TPS (ticks per second) |
 | `{mspt}`    | `header`, `footer` | Milliseconds per tick         |
@@ -132,7 +130,6 @@ src/
     │   ├── nickname.rs       # Nicknames
     │   └── xp.rs             # XP to bottle
     ├── server/
-    │   ├── chat.rs           # Chat format/filter
     │   ├── messages.rs       # Join/leave/kick messages
     │   └── tablist.rs        # Tab list header/footer
     └── world/

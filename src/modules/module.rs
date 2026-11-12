@@ -15,7 +15,6 @@ pub(crate) use crate::modules::player::head::HeadConfig;
 pub(crate) use crate::modules::player::locator::LocatorConfig;
 pub(crate) use crate::modules::player::nickname::NicknameConfig;
 pub(crate) use crate::modules::player::xp::XpConfig;
-pub(crate) use crate::modules::server::chat::ChatConfig;
 pub(crate) use crate::modules::server::messages::MessagesConfig;
 pub(crate) use crate::modules::server::tablist::TablistConfig;
 pub(crate) use crate::modules::world::openable::OpenableConfig;
@@ -127,8 +126,6 @@ pub(crate) struct MechanicsConfig {
     pub nickname: NicknameConfig,
     /// XP to bottle conversion.
     pub xp: XpConfig,
-    /// Chat formatting and filtering.
-    pub chat: ChatConfig,
     /// Tab list header/footer.
     pub tablist: TablistConfig,
     /// Double-door synchronization.

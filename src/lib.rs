@@ -10,9 +10,7 @@ mod config;
 mod utils {
     pub(crate) mod block;
     pub(crate) mod entity;
-    pub(crate) mod macros;
     pub(crate) mod placeholders;
-    pub(crate) mod player;
     pub(crate) mod text;
 }
 

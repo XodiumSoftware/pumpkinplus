@@ -134,7 +134,6 @@ src/
     ├── server/
     │   ├── chat.rs           # Chat format/filter
     │   ├── messages.rs       # Join/leave/kick messages
-    │   ├── rules.rs          # Server rules book
     │   └── tablist.rs        # Tab list header/footer
     └── world/
         ├── openable.rs       # Double door sync

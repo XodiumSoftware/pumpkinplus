@@ -58,7 +58,6 @@ mod modules {
     pub(crate) mod server {
         pub(crate) mod chat;
         pub(crate) mod messages;
-        pub(crate) mod rules;
         pub(crate) mod tablist;
     }
 }
@@ -79,7 +78,6 @@ use crate::modules::player::nickname::Nickname;
 use crate::modules::player::xp::Xp;
 use crate::modules::server::chat::Chat;
 use crate::modules::server::messages::Messages;
-use crate::modules::server::rules::Rules;
 use crate::modules::server::tablist::Tablist;
 use crate::modules::world::openable::Openable;
 use crate::modules::world::spawnprotection::SpawnProtection;
@@ -111,7 +109,6 @@ impl PumpkinPlus {
             &Messages,
             &Xp,
             &Chat,
-            &Rules,
             &Tablist,
             &Openable,
             &SpawnProtection,

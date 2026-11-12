@@ -7,7 +7,6 @@
 //! |---------------------|----------------------------------------------------|
 //! | `config.toml`       | Master toggles for each module group               |
 //! | `mechanics.toml`    | Per-mechanic settings under `MechanicsConfig`      |
-//! | `enchantments.toml` | Per-enchantment toggles under `EnchantmentsConfig` |
 //! | `recipes.toml`      | Per-recipe pack toggles under `RecipesConfig`      |
 //!
 //! Each file is merged layered onto its typed defaults using the
@@ -23,7 +22,6 @@ use std::path::{Path, PathBuf};
 use toml::Value;
 use tracing::error;
 
-pub(crate) use crate::modules::enchantments::enchantment::EnchantmentsConfig;
 pub(crate) use crate::modules::mechanics::mechanic::MechanicsConfig;
 pub(crate) use crate::modules::recipes::RecipesConfig;
 
@@ -36,8 +34,6 @@ thread_local! {
 #[serde(default)]
 #[allow(clippy::struct_excessive_bools)]
 pub(crate) struct ModuleToggles {
-    /// Master toggle for all enchantment modules.
-    pub enchantments: bool,
     /// Master toggle for all mechanic modules.
     pub mechanics: bool,
     /// Master toggle for all recipe pack modules.
@@ -47,7 +43,6 @@ pub(crate) struct ModuleToggles {
 impl Default for ModuleToggles {
     fn default() -> Self {
         Self {
-            enchantments: true,
             mechanics: true,
             recipes: true,
         }
@@ -70,9 +65,6 @@ pub(crate) struct PluginConfig {
     /// Custom recipe pack toggles (from `recipes.toml`).
     #[serde(skip)]
     pub recipes: RecipesConfig,
-    /// Vanilla enchantment behavior override toggles (from `enchantments.toml`).
-    #[serde(skip)]
-    pub enchantments: EnchantmentsConfig,
 }
 
 /// Loads and provides access to the plugin configuration.
@@ -107,7 +99,6 @@ impl PluginConfig {
             modules: modules.clone(),
             mechanics: MechanicsConfig::default(),
             recipes: RecipesConfig::default(),
-            enchantments: EnchantmentsConfig::default(),
         };
 
         if modules.mechanics {
@@ -115,9 +106,6 @@ impl PluginConfig {
         }
         if modules.recipes {
             config.recipes = load_section(&data_folder, "recipes.toml");
-        }
-        if modules.enchantments {
-            config.enchantments = load_section(&data_folder, "enchantments.toml");
         }
 
         config

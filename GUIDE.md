@@ -63,26 +63,24 @@ Build the plugin yourself using Rust.
 
 ## Configuration
 
-Configuration is split across four TOML files in the plugin's data folder:
+Configuration is split across three TOML files in the plugin's data folder:
 
-| File                | Purpose                                                       |
-| ------------------- | ------------------------------------------------------------- |
-| `config.toml`       | Master on/off toggles for each module group                   |
-| `mechanics.toml`    | Per-mechanic settings (`chat`, `enderchest`, `messages`, ...) |
-| `enchantments.toml` | Per-enchantment toggles (`embertread`, `fortune`, ...)        |
-| `recipes.toml`      | Per-recipe pack toggles (`chainmail`, `rotten_flesh`, ...)    |
+| File             | Purpose                                                       |
+| ---------------- | ------------------------------------------------------------- |
+| `config.toml`    | Master on/off toggles for each module group                   |
+| `mechanics.toml` | Per-mechanic settings (`chat`, `enderchest`, `messages`, ...) |
+| `recipes.toml`   | Per-recipe pack toggles (`chainmail`, `rotten_flesh`, ...)    |
 
-All four files are created on first run with sensible defaults. Setting a master toggle in `config.toml` to `false` disables that entire group and skips loading its own file.
+All three files are created on first run with sensible defaults. Setting a master toggle in `config.toml` to `false` disables that entire group and skips loading its own file.
 
-> **Note:** All gameplay mechanics, recipe packs, and enchantments are disabled by default. Enable the modules you want in their TOML file and restart the server.
+> **Note:** All gameplay mechanics and recipe packs are disabled by default. Enable the modules you want in their TOML file and restart the server.
 
 ### `config.toml`
 
 ```toml
 [modules]
-enchantments = true
-mechanics    = true
-recipes      = true
+mechanics = true
+recipes   = true
 ```
 
 ### `mechanics.toml` (excerpt)
@@ -100,15 +98,6 @@ leave_msg = ""
 kick_msg  = ""
 
 # ... one [section] per mechanic
-```
-
-### `enchantments.toml`
-
-```toml
-embertread      = false
-feather_falling = false
-fortune         = false
-silk_touch      = false
 ```
 
 ### `recipes.toml`
@@ -163,29 +152,16 @@ Each entry's `ingredient`/`keys` fields accept three shapes:
 
 ### Configuration Options
 
-| Module       | Description                                                        | Default  |
-| ------------ | ------------------------------------------------------------------ | -------- |
-| `chat`       | Chat format and word filtering                                     | Disabled |
-| `enderchest` | Open personal enderchest by right-clicking air with an ender chest | Disabled |
-| `griefing`   | Cancel block-change and explosion events from configured mobs      | Disabled |
-| `messages`   | Custom join/leave/kick messages                                    | Disabled |
-| `nickname`   | Set a persistent nickname via `/nickname` or `/nick`               | Disabled |
-| `openable`    | Synchronize double doors and sneaky door-knocking                  | Disabled |
-| `spawnprotection` | Keep hostile mobs from spawning in the spawn protection area   | Disabled |
-| `tablist`     | Custom tab-list header/footer with live placeholders               | Disabled |
-
-### Enchantments
-
-| Config File Field | Description                                                                              | Default  |
-| ----------------- | ---------------------------------------------------------------------------------------- | -------- |
-| `embertread`      | Cancel contact and fire damage when wearing boots with the Embertread custom enchantment | Disabled |
-| `feather_falling` | Cancel farmland trampling when wearing Feather Falling boots                             | Disabled |
-| `fortune`         | Auto-replant mature crops when broken with a Fortune hoe                                 | Disabled |
-| `silk_touch`      | Drop spawners and budding amethyst when broken with Silk Touch pickaxes                  | Disabled |
-
-These toggles live in `enchantments.toml`.
-
-`embertread` registers a new custom enchantment; the other enchantments change the behavior of existing vanilla enchantments.
+| Module            | Description                                                        | Default  |
+| ----------------- | ------------------------------------------------------------------ | -------- |
+| `chat`            | Chat format and word filtering                                     | Disabled |
+| `enderchest`      | Open personal enderchest by right-clicking air with an ender chest | Disabled |
+| `griefing`        | Cancel block-change and explosion events from configured mobs      | Disabled |
+| `messages`        | Custom join/leave/kick messages                                    | Disabled |
+| `nickname`        | Set a persistent nickname via `/nickname` or `/nick`               | Disabled |
+| `openable`        | Synchronize double doors and sneaky door-knocking                  | Disabled |
+| `spawnprotection` | Keep hostile mobs from spawning in the spawn protection area       | Disabled |
+| `tablist`         | Custom tab-list header/footer with live placeholders               | Disabled |
 
 ### Recipe Packs
 
@@ -286,19 +262,6 @@ Each recipe pack can be enabled independently in `recipes.toml`:
 | RottenFlesh     | `rotten_flesh`      | Cook rotten flesh into leather via furnace, smoker, and campfire                                                                       |
 | WoodLog         | `wood_log`          | Convert wood/hyphae blocks back into 4 logs/stems                                                                                      |
 | WoolToString    | `wool_to_string`    | Convert any wool block into 4 string                                                                                                   |
-
-### Enchantments
-
-Each enchantment can be enabled independently in `enchantments.toml`. Some
-entries register brand new custom enchantments, while others change how
-existing vanilla enchantments behave.
-
-| Enchantment    | Config Field      | Type             | Description                                                                   |
-| -------------- | ----------------- | ---------------- | ----------------------------------------------------------------------------- |
-| Embertread     | `embertread`      | Custom           | Cancel contact and fire damage when wearing Embertread boots                  |
-| FeatherFalling | `feather_falling` | Vanilla override | Cancel farmland trampling when wearing Feather Falling boots                  |
-| Fortune        | `fortune`         | Vanilla override | Auto-replant mature crops when broken with a hoe carrying at least Fortune II |
-| SilkTouch      | `silk_touch`      | Vanilla override | Drop spawners and budding amethyst when broken with a Silk Touch pickaxe      |
 
 ## Commands & Permissions
 

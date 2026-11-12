@@ -73,18 +73,9 @@ This file tracks stub modules and features that are blocked by missing Pumpkin p
 - [ ] Blocked: No `Player.open_book()` without item requirement
 - **Behavior:** `/rules` command opens written book with server rules
 
-## Stub Modules — Enchantments
-
-### 10. Tether Enchantment (`src/modules/enchantments/utility/tether.rs`)
-
-- [ ] Blocked: Custom enchantment registration API
-- [ ] Blocked: `BlockDropItemEvent` and `EntityDeathEvent` APIs
-- [ ] Blocked: Player inventory addition APIs
-- **Behavior:** Teleport block drops and mob XP to player inventory
-
 ## Non-Portable Systems
 
-### 11. Custom Painting Variants (`IllyriaPlus` `src/paintings/`)
+### 10. Custom Painting Variants (`IllyriaPlus` `src/paintings/`)
 
 - [ ] **Not portable** — requires registry APIs that don't exist in Pumpkin
 - Blocked: No `RegistryEvents.PAINTING_VARIANT` equivalent

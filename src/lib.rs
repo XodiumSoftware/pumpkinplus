@@ -31,22 +31,6 @@ pub(crate) use mirror_types::interaction::InteractAction;
 
 /// All feature modules, grouped by category.
 mod modules {
-    /// Enchantment definitions and behavior overrides.
-    pub(crate) mod enchantments {
-        pub(crate) mod enchantment;
-        pub(crate) mod utility {
-            pub(crate) mod embertread;
-            pub(crate) mod nimbus;
-            pub(crate) mod tether;
-            pub(crate) mod vinemine;
-        }
-        pub(crate) mod vanilla {
-            pub(crate) mod feather_falling;
-            pub(crate) mod fortune;
-            pub(crate) mod silk_touch;
-        }
-    }
-
     pub(crate) mod recipes;
     /// Server-side gameplay mechanics.
     pub(crate) mod mechanics {
@@ -104,9 +88,6 @@ use crate::mechanics::server::rules::Rules;
 use crate::mechanics::server::tablist::Tablist;
 use crate::mechanics::world::openable::Openable;
 use crate::mechanics::world::spawnprotection::SpawnProtection;
-use crate::modules::enchantments::enchantment::Enchantment;
-use crate::modules::enchantments::utility::embertread::Embertread;
-use crate::modules::enchantments::vanilla::fortune::Fortune;
 use pumpkin_plugin_api::Context;
 use pumpkin_plugin_api::{Plugin, PluginMetadata};
 use std::time::Instant;
@@ -162,23 +143,6 @@ impl PumpkinPlus {
         let total_ms = start.elapsed().as_millis();
         info!("Recipe registration took {total_ms}ms");
     }
-
-    /// Registers all enchantments (custom definitions and behavior overrides).
-    fn register_enchantments(context: &Context) {
-        let enchantments: Vec<&dyn Enchantment> = vec![&Embertread, &Fortune];
-
-        let enabled_enchantments = enchantments.iter().filter(|e| e.enabled()).count();
-        let mut enchantment_total_ms = 0u128;
-        for enchantment in enchantments {
-            let start = Instant::now();
-            enchantment.register(context);
-            enchantment_total_ms += start.elapsed().as_millis();
-        }
-        info!(
-            "Registered: {} enchantment(s) | Took {}ms",
-            enabled_enchantments, enchantment_total_ms
-        );
-    }
 }
 
 impl Plugin for PumpkinPlus {
@@ -211,9 +175,6 @@ impl Plugin for PumpkinPlus {
         }
         if config.modules.recipes {
             Self::register_recipes(&context);
-        }
-        if config.modules.enchantments {
-            Self::register_enchantments(&context);
         }
 
         info!("Pumpkin+ loaded. NICE TO CYA!");

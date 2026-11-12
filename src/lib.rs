@@ -31,7 +31,6 @@ pub(crate) use mirror_types::interaction::InteractAction;
 
 /// All feature modules, grouped by category.
 mod modules {
-    pub(crate) mod recipes;
     /// Server-side gameplay mechanics.
     pub(crate) mod mechanics {
         pub(crate) mod mechanic;
@@ -68,7 +67,7 @@ mod modules {
 }
 
 pub(crate) use config::ConfigManager;
-pub(crate) use modules::{mechanics, recipes};
+pub(crate) use modules::mechanics;
 
 use crate::mechanics::entity::griefing::Griefing;
 use crate::mechanics::entity::silence::Silence;
@@ -135,14 +134,6 @@ impl PumpkinPlus {
             enabled_mechanics, mechanic_total_ms
         );
     }
-
-    /// Registers all config-defined recipes.
-    fn register_recipes(context: &Context) {
-        let start = Instant::now();
-        recipes::register_all(context);
-        let total_ms = start.elapsed().as_millis();
-        info!("Recipe registration took {total_ms}ms");
-    }
 }
 
 impl Plugin for PumpkinPlus {
@@ -172,9 +163,6 @@ impl Plugin for PumpkinPlus {
 
         if config.modules.mechanics {
             Self::register_mechanics(&context);
-        }
-        if config.modules.recipes {
-            Self::register_recipes(&context);
         }
 
         info!("Pumpkin+ loaded. NICE TO CYA!");

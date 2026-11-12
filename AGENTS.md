@@ -86,7 +86,7 @@ Modules are plain structs (not singletons) instantiated with `Default::default()
 **`ConfigManager`** (`src/config.rs`) — TOML-backed config using the [`config`](https://crates.io/crates/config) crate:
 
 - Master toggles live in `{data_folder}/config.toml` under a `[modules]` section
-- Each module group has its own file: `mechanics.toml`, `recipes.toml`
+- Each module group has its own file: `mechanics.toml`
 - On first load: creates all files with module defaults
 - On subsequent loads: merges user values with defaults and preserves extra fields
 - All module configs live in a single `PluginConfig` struct in memory; modules access their section via `ConfigManager::get().map(|cm| cm.section)`

@@ -63,24 +63,22 @@ Build the plugin yourself using Rust.
 
 ## Configuration
 
-Configuration is split across three TOML files in the plugin's data folder:
+Configuration lives in a TOML file in the plugin's data folder:
 
 | File             | Purpose                                                       |
 | ---------------- | ------------------------------------------------------------- |
-| `config.toml`    | Master on/off toggles for each module group                   |
+| `config.toml`    | Master on/off toggle for the mechanics module group           |
 | `mechanics.toml` | Per-mechanic settings (`chat`, `enderchest`, `messages`, ...) |
-| `recipes.toml`   | Per-recipe pack toggles (`chainmail`, `rotten_flesh`, ...)    |
 
-All three files are created on first run with sensible defaults. Setting a master toggle in `config.toml` to `false` disables that entire group and skips loading its own file.
+Both files are created on first run with sensible defaults. Setting the master toggle in `config.toml` to `false` disables the entire group and skips loading its own file.
 
-> **Note:** All gameplay mechanics and recipe packs are disabled by default. Enable the modules you want in their TOML file and restart the server.
+> **Note:** All gameplay mechanics are disabled by default. Enable the modules you want in `mechanics.toml` and restart the server.
 
 ### `config.toml`
 
 ```toml
 [modules]
 mechanics = true
-recipes   = true
 ```
 
 ### `mechanics.toml` (excerpt)
@@ -100,56 +98,6 @@ kick_msg  = ""
 # ... one [section] per mechanic
 ```
 
-### `recipes.toml`
-
-Recipes are fully config-driven. The file starts with a default set of vanilla-plus
-recipes (chainmail, ice breakdown, etc.) which you can edit, delete individual
-entries from, or extend with your own:
-
-```toml
-[[shaped]]
-id = "chainmail_helmet"
-pattern = ["AAA", "A A"]
-keys = { A = "minecraft:iron_bars" }
-result = { item = "minecraft:chainmail_helmet", count = 1 }
-
-[[shapeless]]
-id = "blue_ice_breakdown"
-ingredients = ["minecraft:blue_ice"]
-result = { item = "minecraft:packed_ice", count = 9 }
-
-[[cooking]]
-id = "rotten_flesh_furnace"
-type = "smelting"  # smelting | blasting | smoking | campfire
-ingredient = "minecraft:rotten_flesh"
-result = { item = "minecraft:leather", count = 1 }
-experience = 0.1
-cooking_time = 200
-```
-
-To disable a single recipe, delete its `[[...]]` block. To disable all recipes,
-set `modules.recipes = false` in `config.toml`.
-
-#### Ingredient values
-
-Each entry's `ingredient`/`keys` fields accept three shapes:
-
-| Shape                                               | Meaning                                   |
-| --------------------------------------------------- | ----------------------------------------- |
-| `"minecraft:diamond"`                               | A single item id                          |
-| `"#minecraft:logs"`                                 | A tag (the `#` is stripped automatically) |
-| `["minecraft:oak_log", "minecraft:birch_log", ...]` | One of these items                        |
-
-#### Optional fields
-
-| Field          | Type   | Default  | Description                                                                          |
-| -------------- | ------ | -------- | ------------------------------------------------------------------------------------ |
-| `category`     | string | `"misc"` | Recipe book category (`misc`, `building`, `blocks`, `equipment`, `food`, `redstone`) |
-| `group`        | string | `""`     | Grouping name — same-group recipes collapse in the recipe book                       |
-| `cooking_time` | int    | per type | Ticks. Defaults: smelting 200, blasting/smoking 100, campfire 600                    |
-| `experience`   | float  | `0.0`    | XP awarded per craft (cooking only)                                                  |
-| `result.count` | int    | `1`      | Output stack size (1–64)                                                             |
-
 ### Configuration Options
 
 | Module            | Description                                                        | Default  |
@@ -162,25 +110,6 @@ Each entry's `ingredient`/`keys` fields accept three shapes:
 | `openable`        | Synchronize double doors and sneaky door-knocking                  | Disabled |
 | `spawnprotection` | Keep hostile mobs from spawning in the spawn protection area       | Disabled |
 | `tablist`         | Custom tab-list header/footer with live placeholders               | Disabled |
-
-### Recipe Packs
-
-The default `recipes.toml` ships the vanilla-plus recipes that were previously
-hardcoded in the plugin:
-
-| Recipe pack (by `id` prefix)  | Description                                                                                                                            |
-| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `chainmail_*`                 | Craft chainmail armor pieces using iron bars                                                                                           |
-| `diamond_recycle_*`           | Smelt diamond tools/armor back into diamonds                                                                                           |
-| `*_ice_breakdown`             | Break blue ice into packed ice and packed ice into ice                                                                                 |
-| `nether_wart_block_breakdown` | Break nether wart blocks back into nether warts                                                                                        |
-| `painting_*_stonecutting`     | Placeholder shapeless recipes for painting variants (requires upstream stonecutter / data-component support to match vanilla behavior) |
-| `rotten_flesh_*`              | Cook rotten flesh into leather via furnace, smoker, and campfire                                                                       |
-| `*_from_wood`                 | Convert wood/hyphae blocks back into 4 logs/stems                                                                                      |
-| `wool_to_string`              | Convert any wool block into 4 string                                                                                                   |
-
-To disable a pack, delete its entries from `recipes.toml`. There's no per-pack
-toggle anymore — config file content _is_ the toggle.
 
 ### Placeholders
 
@@ -247,21 +176,6 @@ When enabled, cancels hostile-mob spawns inside the spawn protection area. The p
 ### Tablist Module
 
 When enabled, sets a custom header and footer for every player's tab list. The header/footer are refreshed on player join/leave and periodically so `{tps}` and `{mspt}` stay current. Header and footer support MiniMessage formatting tags.
-
-### Recipes
-
-Each recipe pack can be enabled independently in `recipes.toml`:
-
-| Recipe Pack     | Config Field        | Description                                                                                                                            |
-| --------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| Chainmail       | `chainmail`         | Craft chainmail armor pieces using iron bars                                                                                           |
-| DiamondRecycle  | `diamond_recycle`   | Smelt diamond tools/armor back into diamonds                                                                                           |
-| IceBreakdown    | `ice_breakdown`     | Break blue ice into packed ice and packed ice into ice                                                                                 |
-| NetherWartBlock | `nether_wart_block` | Break nether wart blocks back into nether warts                                                                                        |
-| Painting        | `painting`          | Placeholder shapeless recipes for painting variants (requires upstream stonecutter / data-component support to match vanilla behavior) |
-| RottenFlesh     | `rotten_flesh`      | Cook rotten flesh into leather via furnace, smoker, and campfire                                                                       |
-| WoodLog         | `wood_log`          | Convert wood/hyphae blocks back into 4 logs/stems                                                                                      |
-| WoolToString    | `wool_to_string`    | Convert any wool block into 4 string                                                                                                   |
 
 ## Commands & Permissions
 

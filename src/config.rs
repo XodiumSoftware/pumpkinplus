@@ -7,7 +7,6 @@
 //! |---------------------|----------------------------------------------------|
 //! | `config.toml`       | Master toggles for each module group               |
 //! | `mechanics.toml`    | Per-mechanic settings under `MechanicsConfig`      |
-//! | `recipes.toml`      | Per-recipe pack toggles under `RecipesConfig`      |
 //!
 //! Each file is merged layered onto its typed defaults using the
 //! [`config`](https://crates.io/crates/config) crate, so missing keys fall back
@@ -23,7 +22,6 @@ use toml::Value;
 use tracing::error;
 
 pub(crate) use crate::modules::mechanics::mechanic::MechanicsConfig;
-pub(crate) use crate::modules::recipes::RecipesConfig;
 
 thread_local! {
     static CONFIG: RefCell<Option<PluginConfig>> = const { RefCell::new(None) };
@@ -32,20 +30,14 @@ thread_local! {
 /// Master module group toggles stored in `config.toml`.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
-#[allow(clippy::struct_excessive_bools)]
 pub(crate) struct ModuleToggles {
     /// Master toggle for all mechanic modules.
     pub mechanics: bool,
-    /// Master toggle for all recipe pack modules.
-    pub recipes: bool,
 }
 
 impl Default for ModuleToggles {
     fn default() -> Self {
-        Self {
-            mechanics: true,
-            recipes: true,
-        }
+        Self { mechanics: true }
     }
 }
 
@@ -62,9 +54,6 @@ pub(crate) struct PluginConfig {
     /// All mechanic module configs (from `mechanics.toml`).
     #[serde(skip)]
     pub mechanics: MechanicsConfig,
-    /// Custom recipe pack toggles (from `recipes.toml`).
-    #[serde(skip)]
-    pub recipes: RecipesConfig,
 }
 
 /// Loads and provides access to the plugin configuration.
@@ -98,14 +87,10 @@ impl PluginConfig {
         let mut config = Self {
             modules: modules.clone(),
             mechanics: MechanicsConfig::default(),
-            recipes: RecipesConfig::default(),
         };
 
         if modules.mechanics {
             config.mechanics = load_section(&data_folder, "mechanics.toml");
-        }
-        if modules.recipes {
-            config.recipes = load_section(&data_folder, "recipes.toml");
         }
 
         config

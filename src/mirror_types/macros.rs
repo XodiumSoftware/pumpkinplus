@@ -1,4 +1,4 @@
-/// Generates a mirror enum with serde, `Display`, `matches_config`, and `From` impls.
+/// Generates a mirror enum with serde, `matches_config`, and `From` impls.
 ///
 /// # Usage
 /// ```
@@ -16,7 +16,6 @@
 /// - An enum with `Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Hash`
 /// - `#[serde(rename_all = "PascalCase")]`
 /// - `matches_config(&self, allowed: &[Self]) -> bool`
-/// - `Display` via `Debug` representation
 /// - `From<upstream>` with a catch-all fallback to the first variant
 /// - `From<$name>` back to the upstream type
 #[macro_export]
@@ -41,12 +40,6 @@ macro_rules! mirror_enum {
             /// Returns true if the given list is empty (allow-all) or contains this variant.
             pub fn matches_config(&self, allowed: &[Self]) -> bool {
                 allowed.is_empty() || allowed.contains(self)
-            }
-        }
-
-        impl std::fmt::Display for $name {
-            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                write!(f, "{:?}", self)
             }
         }
 

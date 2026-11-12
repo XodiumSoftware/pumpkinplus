@@ -24,7 +24,7 @@
 //! - On join, the stored nickname is applied to the player's display name and tab list name.
 
 use crate::utils::text::parse_minimessage;
-use crate::{config::ConfigManager, modules::module::Mechanic};
+use crate::{config::ConfigManager, modules::module::Module};
 use pumpkin_plugin_api::{
     Context, PersistentDataHolder, Server,
     command::{Command, CommandError, CommandNode, CommandSender, ConsumedArgs},
@@ -49,7 +49,7 @@ pub(crate) const PERM_NICKNAME: &str = concat!(env!("CARGO_PKG_NAME"), ":command
 #[derive(Default)]
 pub(crate) struct Nickname;
 
-impl Mechanic for Nickname {
+impl Module for Nickname {
     fn enabled(&self) -> bool {
         ConfigManager::get().is_some_and(|cm| cm.mechanics.nickname.enabled)
     }

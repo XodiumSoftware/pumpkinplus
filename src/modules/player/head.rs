@@ -36,7 +36,7 @@
 //! - Uses `ItemStack.of(Material.PLAYER_HEAD)` with `ResolvableProfile` data component
 
 use crate::config::ConfigManager;
-use crate::modules::module::Mechanic;
+use crate::modules::module::Module;
 use pumpkin_plugin_api::events::{EventData, EventHandler, EventPriority, PlayerDeathEvent};
 use pumpkin_plugin_api::permission::{Permission, PermissionDefault};
 use pumpkin_plugin_api::{Context, Server};
@@ -51,7 +51,7 @@ pub(crate) const PERM_HEAD_DROP: &str = concat!(env!("CARGO_PKG_NAME"), ":head.d
 #[derive(Default)]
 pub(crate) struct Head;
 
-impl Mechanic for Head {
+impl Module for Head {
     fn enabled(&self) -> bool {
         ConfigManager::get().is_some_and(|cm| cm.mechanics.head.enabled)
     }

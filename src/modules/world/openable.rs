@@ -42,7 +42,7 @@
 //! box. To restrict them, deny the node via a permissions-management plugin.
 
 use crate::config::ConfigManager;
-use crate::modules::module::Mechanic;
+use crate::modules::module::Module;
 use crate::utils::block::{is_door, is_openable, toggle_open_property};
 use crate::{GameMode, InteractAction};
 use pumpkin_plugin_api::common::Hand;
@@ -65,7 +65,7 @@ pub(crate) const PERM_KNOCK: &str = concat!(env!("CARGO_PKG_NAME"), ":openable.k
 #[derive(Default)]
 pub(crate) struct Openable;
 
-impl Mechanic for Openable {
+impl Module for Openable {
     fn enabled(&self) -> bool {
         ConfigManager::get().is_some_and(|cm| cm.mechanics.openable.enabled)
     }

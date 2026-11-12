@@ -63,7 +63,7 @@
 //! ```
 
 use crate::config::ConfigManager;
-use crate::modules::module::Mechanic;
+use crate::modules::module::Module;
 use pumpkin_plugin_api::command::{Command, CommandError, CommandSender};
 use pumpkin_plugin_api::commands::CommandHandler;
 use pumpkin_plugin_api::permission::{Permission, PermissionDefault};
@@ -86,7 +86,7 @@ pub(crate) const PERM_UNCONDENSE: &str = concat!(env!("CARGO_PKG_NAME"), ":comma
 #[derive(Default)]
 pub(crate) struct Condense;
 
-impl Mechanic for Condense {
+impl Module for Condense {
     fn enabled(&self) -> bool {
         ConfigManager::get().is_some_and(|cm| cm.mechanics.condense.enabled)
     }

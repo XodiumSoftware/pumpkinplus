@@ -35,7 +35,7 @@ Reference implementation: `src/modules/player/nickname.rs`.
         vec![command]
     }
     ```
-2. Implement a `struct {Name}Executor;` + `impl CommandHandler for {Name}Executor` below the `impl Mechanic` block:
+2. Implement a `struct {Name}Executor;` + `impl CommandHandler for {Name}Executor` below the `impl Module` block:
     ```rust
     impl CommandHandler for {Name}Executor {
         fn handle(
@@ -68,7 +68,7 @@ Reference implementation: `src/modules/player/nickname.rs`.
 
 ## Important Constraints
 
-- `cmds()` and `perms()` are paired **by index** in `Mechanic::register` — the Nth permission belongs to the Nth command. Keep both vecs in the same order, and keep them aligned when adding/removing entries.
+- `cmds()` and `perms()` are paired **by index** in `Module::register` — the Nth permission belongs to the Nth command. Keep both vecs in the same order, and keep them aligned when adding/removing entries.
 - Reading an argument: `args.get_value("{arg_name}")` returns an enum; destructure with the `(Arg::Simple(x) | Arg::Msg(x))` or-pattern to treat both shapes the same.
 - `sender.as_player()` returns `Option<Player>` — commands that require a player should return `CommandError::PermissionDenied` for console senders (existing convention).
 - Handler return is `Ok(i32)` — existing modules return `Ok(1)`.

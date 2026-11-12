@@ -37,7 +37,7 @@
 //! - Supports named colors and hex codes
 
 use crate::config::ConfigManager;
-use crate::modules::module::Mechanic;
+use crate::modules::module::Module;
 use crate::utils::text::{parse_color_arg, parse_minimessage};
 use pumpkin_plugin_api::{
     Server,
@@ -57,7 +57,7 @@ pub(crate) const PERM_LOCATOR: &str = concat!(env!("CARGO_PKG_NAME"), ":command.
 #[derive(Default)]
 pub(crate) struct Locator;
 
-impl Mechanic for Locator {
+impl Module for Locator {
     fn enabled(&self) -> bool {
         ConfigManager::get().is_some_and(|cm| cm.mechanics.locator.enabled)
     }

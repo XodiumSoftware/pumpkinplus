@@ -69,7 +69,7 @@ use crate::modules::entity::griefing::Griefing;
 use crate::modules::entity::silence::Silence;
 use crate::modules::entity::spawn_egg::SpawnEgg;
 use crate::modules::entity::tameable::Tameable;
-use crate::modules::module::Mechanic;
+use crate::modules::module::Module;
 use crate::modules::player::anvil::Anvil;
 use crate::modules::player::condense::Condense;
 use crate::modules::player::enderchest::Enderchest;
@@ -95,9 +95,9 @@ pub const PLUGIN_ID: &str = env!("CARGO_PKG_NAME");
 pub struct PumpkinPlus {}
 
 impl PumpkinPlus {
-    /// Registers all mechanics and their commands/permissions.
-    fn register_mechanics(context: &Context) {
-        let mechanics: Vec<&dyn Mechanic> = vec![
+    /// Registers all modules and their commands/permissions.
+    fn register_modules(context: &Context) {
+        let modules: Vec<&dyn Module> = vec![
             &Griefing,
             &Silence,
             &SpawnEgg,
@@ -116,18 +116,18 @@ impl PumpkinPlus {
             &Openable,
             &SpawnProtection,
         ];
-        let enabled_mechanics = mechanics.iter().filter(|m| m.enabled()).count();
+        let enabled_modules = modules.iter().filter(|m| m.enabled()).count();
 
-        let mut mechanic_total_ms = 0u128;
-        for mechanic in mechanics {
+        let mut module_total_ms = 0u128;
+        for module in modules {
             let start = Instant::now();
-            mechanic.register(context);
-            mechanic_total_ms += start.elapsed().as_millis();
+            module.register(context);
+            module_total_ms += start.elapsed().as_millis();
         }
 
         info!(
-            "Registered: {} mechanic(s) | Took {}ms",
-            enabled_mechanics, mechanic_total_ms
+            "Registered: {} module(s) | Took {}ms",
+            enabled_modules, module_total_ms
         );
     }
 }
@@ -157,7 +157,7 @@ impl Plugin for PumpkinPlus {
     fn on_load(&self, context: Context) -> pumpkin_plugin_api::Result<()> {
         ConfigManager::load(&context);
 
-        Self::register_mechanics(&context);
+        Self::register_modules(&context);
 
         info!("Pumpkin+ loaded. NICE TO CYA!");
         Ok(())

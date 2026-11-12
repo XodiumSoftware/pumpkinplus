@@ -46,7 +46,7 @@ use serde::{Deserialize, Serialize};
 use tracing::debug;
 
 use crate::config::ConfigManager;
-use crate::modules::module::Mechanic;
+use crate::modules::module::Module;
 use crate::{GameMode, MirrorHand};
 
 /// Permission node required to silence mobs with the configured tool item.
@@ -63,7 +63,7 @@ const PARTICLE_OFFSET: Position = (0.5, 0.6, 0.5);
 #[derive(Default)]
 pub(crate) struct Silence;
 
-impl Mechanic for Silence {
+impl Module for Silence {
     fn enabled(&self) -> bool {
         ConfigManager::get().is_some_and(|cm| cm.mechanics.silence.enabled)
     }

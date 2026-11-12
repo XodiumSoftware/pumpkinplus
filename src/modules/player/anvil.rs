@@ -38,7 +38,7 @@
 //! - `MiniMessage`: rename text uses formatted text instead of plain
 
 use crate::config::ConfigManager;
-use crate::modules::module::Mechanic;
+use crate::modules::module::Module;
 use serde::{Deserialize, Serialize};
 
 /// Handles custom anvil operations.
@@ -47,7 +47,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Default)]
 pub(crate) struct Anvil;
 
-impl Mechanic for Anvil {
+impl Module for Anvil {
     fn enabled(&self) -> bool {
         ConfigManager::get().is_some_and(|cm| cm.mechanics.anvil.enabled)
     }

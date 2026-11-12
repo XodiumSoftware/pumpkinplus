@@ -1,7 +1,7 @@
 //! Module system for `PumpkinPlus`.
 //!
 //! Each gameplay feature lives under `modules/` as a module implementing the
-//! [`Mechanic`] trait. Modules can register event handlers, commands, and
+//! [`Module`] trait. Modules can register event handlers, commands, and
 //! permission nodes.
 
 pub(crate) use crate::modules::entity::griefing::GriefingConfig;
@@ -28,36 +28,36 @@ use pumpkin_plugin_api::permission::Permission;
 use serde::{Deserialize, Serialize};
 use tracing::error;
 
-/// A trait representing a plugin mechanic that can be enabled or disabled.
+/// A trait representing a plugin module that can be enabled or disabled.
 ///
-/// Mechanics may optionally expose commands, permission nodes, and event handlers,
-/// all registered with the server via [`Mechanic::register`].
-pub(crate) trait Mechanic {
+/// Modules may optionally expose commands, permission nodes, and event handlers,
+/// all registered with the server via [`Module::register`].
+pub(crate) trait Module {
     /// Returns `true` if the module is enabled, `false` otherwise.
     fn enabled(&self) -> bool;
 
-    /// Returns the commands provided by this mechanic.
+    /// Returns the commands provided by this module.
     ///
     /// Each [`Command`] returned here will be registered with the server when
-    /// [`Mechanic::register`] is called. Returns an empty vec by default.
+    /// [`Module::register`] is called. Returns an empty vec by default.
     fn cmds(&self) -> Vec<Command> {
-        vec![]
+        Vec::new()
     }
 
-    /// Returns the permission nodes required by this mechanic.
+    /// Returns the permission nodes required by this module.
     ///
     /// All permissions returned here are registered with the server so permission
     /// plugins can grant/deny them. Enforcement happens inside each command's
     /// [`CommandHandler`] via `sender.has_permission(server, node)`.
-    /// Returns an empty set by default.
+    /// Returns an empty vec by default.
     fn perms(&self) -> Vec<Permission> {
         Vec::new()
     }
 
-    /// Registers event handlers for this mechanic.
+    /// Registers event handlers for this module.
     ///
-    /// Override this to call [`Mechanic::register_event`] for each event this
-    /// mechanic handles. No-op by default.
+    /// Override this to call [`Module::register_event`] for each event this
+    /// module handles. No-op by default.
     fn events(&self, _context: &Context) {}
 
     /// Registers `Self` as the handler for event `T` and panics on failure.
@@ -75,11 +75,11 @@ pub(crate) trait Mechanic {
             .expect("failed to register event handler");
     }
 
-    /// Registers this mechanic's event handlers and commands with the server.
+    /// Registers this module's event handlers and commands with the server.
     ///
-    /// Calls [`Mechanic::events`](Mechanic::events), registers each permission node
-    /// from [`Mechanic::perms`] with the server, then registers each command from
-    /// [`Mechanic::cmds`]. Commands are registered without a server-side permission
+    /// Calls [`Module::events`](Module::events), registers each permission node
+    /// from [`Module::perms`] with the server, then registers each command from
+    /// [`Module::cmds`]. Commands are registered without a server-side permission
     /// gate; they self-enforce their permissions inside [`CommandHandler::handle`]
     /// via `sender.has_permission(server, node)`.
     fn register(&self, context: &Context) {
@@ -98,9 +98,9 @@ pub(crate) trait Mechanic {
     }
 }
 
-/// Top-level configuration for all mechanics.
+/// Top-level configuration for all modules.
 ///
-/// Each field toggles one mechanic module. All mechanics are disabled by default.
+/// Each field toggles one module. All modules are disabled by default.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 #[allow(clippy::struct_excessive_bools)]

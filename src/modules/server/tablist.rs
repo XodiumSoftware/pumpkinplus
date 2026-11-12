@@ -22,7 +22,7 @@
 //! | `{mspt}`    | Milliseconds per tick            | `5.2`          |
 
 use crate::config::ConfigManager;
-use crate::modules::module::Mechanic;
+use crate::modules::module::Module;
 use crate::utils::placeholders::replace_all_placeholders;
 use crate::utils::text::parse_minimessage;
 use pumpkin_plugin_api::events::{
@@ -41,7 +41,7 @@ const REFRESH_TICKS: u64 = 40;
 #[derive(Default)]
 pub(crate) struct Tablist;
 
-impl Mechanic for Tablist {
+impl Module for Tablist {
     fn enabled(&self) -> bool {
         ConfigManager::get().is_some_and(|cm| cm.mechanics.tablist.enabled)
     }

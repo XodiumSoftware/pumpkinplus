@@ -23,7 +23,7 @@
 //! not expose a per-block explode list to selectively remove affected blocks.
 
 use crate::config::ConfigManager;
-use crate::modules::module::Mechanic;
+use crate::modules::module::Module;
 use crate::utils::entity::entity_type_by_id;
 use pumpkin_plugin_api::events::{
     EntityChangeBlockEvent, EntityExplodeEvent, EventData, EventHandler, EventPriority,
@@ -36,7 +36,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Default)]
 pub(crate) struct Griefing;
 
-impl Mechanic for Griefing {
+impl Module for Griefing {
     fn enabled(&self) -> bool {
         ConfigManager::get().is_some_and(|cm| cm.mechanics.griefing.enabled)
     }

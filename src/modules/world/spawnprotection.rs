@@ -46,7 +46,7 @@
 //! | `radius`  | `16`    | Spawn protection radius in blocks (vanilla default) |
 
 use crate::config::ConfigManager;
-use crate::modules::module::Mechanic;
+use crate::modules::module::Module;
 use pumpkin_plugin_api::events::{CreatureSpawnEvent, EventData, EventHandler, EventPriority};
 use pumpkin_plugin_api::world::World;
 use pumpkin_plugin_api::{Context, Server};
@@ -56,7 +56,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Default)]
 pub(crate) struct SpawnProtection;
 
-impl Mechanic for SpawnProtection {
+impl Module for SpawnProtection {
     fn enabled(&self) -> bool {
         ConfigManager::get().is_some_and(|cm| cm.mechanics.spawnprotection.enabled)
     }

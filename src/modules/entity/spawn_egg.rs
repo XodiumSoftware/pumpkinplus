@@ -31,7 +31,7 @@
 //! - Uses `entityType.spawnEgg()` to get the matching spawn egg item
 
 use crate::config::ConfigManager;
-use crate::modules::module::Mechanic;
+use crate::modules::module::Module;
 use pumpkin_plugin_api::events::{EntityDeathEvent, EventData, EventHandler, EventPriority};
 use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};
@@ -46,7 +46,7 @@ pub(crate) const DROP_CHANCE: f32 = 0.001;
 #[derive(Default)]
 pub(crate) struct SpawnEgg;
 
-impl Mechanic for SpawnEgg {
+impl Module for SpawnEgg {
     fn enabled(&self) -> bool {
         ConfigManager::get().is_some_and(|cm| cm.mechanics.spawn_egg.enabled)
     }

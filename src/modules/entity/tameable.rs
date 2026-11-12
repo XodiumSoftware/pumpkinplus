@@ -41,7 +41,7 @@
 
 use crate::MirrorHand;
 use crate::config::ConfigManager;
-use crate::modules::module::Mechanic;
+use crate::modules::module::Module;
 use pumpkin_plugin_api::events::{
     EventData, EventHandler, EventPriority, PlayerInteractEntityEvent,
 };
@@ -60,7 +60,7 @@ pub(crate) const PERM_TAMEABLE_TRANSFER: &str =
 #[derive(Default)]
 pub(crate) struct Tameable;
 
-impl Mechanic for Tameable {
+impl Module for Tameable {
     fn enabled(&self) -> bool {
         ConfigManager::get().is_some_and(|cm| cm.mechanics.tameable.enabled)
     }

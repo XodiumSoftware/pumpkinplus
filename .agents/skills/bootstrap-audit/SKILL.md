@@ -21,18 +21,18 @@ For each of these folders, list the `.rs` files (excluding the trait file) and c
 
 Each declared module whose trait has server-side registration must appear in the right vec in `src/lib.rs`:
 
-- Mechanics → `PumpkinPlus::register_mechanics` `mechanics: Vec<&dyn Mechanic>`
+- Modules → `PumpkinPlus::register_modules` `modules: Vec<&dyn Module>`
 
 Flag any declared-but-unregistered module, and any registered-but-nonexistent import (stale wiring).
 
 ### 3. Config toggle coverage
 
-- Mechanics: every mechanic must have a `{Name}Config` field in `MechanicsConfig` (`src/modules/module.rs`), a matching `pub(crate) use` at the top of that file, and its `enabled()` must read `cm.mechanics.{snake}.enabled`.
+- Every module must have a `{Name}Config` field in `MechanicsConfig` (`src/modules/module.rs`), a matching `pub(crate) use` at the top of that file, and its `enabled()` must read `cm.mechanics.{snake}.enabled`.
 - Cross-check that no _extra_ config fields exist without a corresponding registered module (orphaned toggles), and no registered module is missing its toggle.
 
 ### 4. Command/permission pairing
 
-For mechanics with commands: `cmds()` and `perms()` are paired by index in `Mechanic::register`. Flag mechanics where the vec lengths or intended orderings look mismatched.
+For modules with commands: `cmds()` and `perms()` are paired by index in `Module::register`. Flag modules where the vec lengths or intended orderings look mismatched.
 
 ### 5. Item table docs
 

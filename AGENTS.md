@@ -69,7 +69,7 @@ cargo clippy --all-targets --all-features --target wasm32-wasip2 -- -W clippy::p
 
 ### Module System
 
-Every feature implements the **`Mechanic`** trait (`src/modules/module.rs`):
+Every feature implements the **`Module`** trait (`src/modules/module.rs`):
 
 | Method       | Purpose                                          | Default     |
 | ------------ | ------------------------------------------------ | ----------- |
@@ -117,7 +117,7 @@ src/
 ├── lib.rs                    # Plugin entry point, `PumpkinPlus` struct
 ├── config.rs                 # `ConfigManager` — TOML config load/save
 └── modules/
-    ├── module.rs             # `Mechanic` trait + `MechanicsConfig`
+    ├── module.rs             # `Module` trait + `MechanicsConfig`
     ├── entity/
     │   ├── griefing.rs       # Mob griefing prevention
     │   ├── silence.rs        # Mob silencing
@@ -239,7 +239,7 @@ To add a new module, follow these steps:
 3. Define `{Module}Config` struct with `enabled: bool` + module fields
 4. Implement `Default` for config with sensible defaults
 5. Create `{Module}` struct deriving `Default`
-6. Implement `Mechanic` trait:
+6. Implement `Module` trait:
     - `enabled()` — check config via `ConfigManager::get().is_some_and(|cm| cm.{section}.enabled)`
     - `events()` — register event handlers (if needed)
     - `cmds()` — return commands (if needed)
@@ -250,7 +250,7 @@ To add a new module, follow these steps:
     - Add a `pub {section}: {Module}Config` field to `MechanicsConfig`
 9. In `src/lib.rs`:
     - Add `pub(crate) mod {module}` under the matching `modules::{category}` block
-    - Instantiate and register module in the `register_mechanics` vec
+    - Instantiate and register module in the `register_modules` vec
 10. Run `cargo build --target wasm32-wasip2` to verify
 
 ## Memory System

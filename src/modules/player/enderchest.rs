@@ -25,7 +25,7 @@
 //! chest portable.
 
 use crate::config::ConfigManager;
-use crate::modules::module::Mechanic;
+use crate::modules::module::Module;
 use crate::{GameMode, InteractAction, MirrorHand};
 use pumpkin_plugin_api::events::{EventData, EventHandler, EventPriority, PlayerInteractEvent};
 use pumpkin_plugin_api::item::{Item, ItemStackExt};
@@ -40,7 +40,7 @@ pub(crate) const PERM_ENDERCHEST: &str = concat!(env!("CARGO_PKG_NAME"), ":ender
 #[derive(Default)]
 pub(crate) struct Enderchest;
 
-impl Mechanic for Enderchest {
+impl Module for Enderchest {
     fn enabled(&self) -> bool {
         ConfigManager::get().is_some_and(|cm| cm.mechanics.enderchest.enabled)
     }

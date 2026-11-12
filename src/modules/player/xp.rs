@@ -39,7 +39,7 @@
 //! - Bottle drops at player location if inventory is full
 
 use crate::config::ConfigManager;
-use crate::modules::module::Mechanic;
+use crate::modules::module::Module;
 use pumpkin_plugin_api::events::{EventData, EventHandler, EventPriority, PlayerInteractEvent};
 use pumpkin_plugin_api::permission::{Permission, PermissionDefault};
 use pumpkin_plugin_api::{Context, Server};
@@ -58,7 +58,7 @@ pub(crate) const XP_PER_BOTTLE: u32 = 11;
 #[derive(Default)]
 pub(crate) struct Xp;
 
-impl Mechanic for Xp {
+impl Module for Xp {
     fn enabled(&self) -> bool {
         ConfigManager::get().is_some_and(|cm| cm.mechanics.xp.enabled)
     }

@@ -19,7 +19,7 @@
 //! | `{message}` | `chat_format`                                   |
 
 use crate::config::ConfigManager;
-use crate::modules::module::Mechanic;
+use crate::modules::module::Module;
 use crate::utils::placeholders::replace_placeholders;
 use crate::utils::text::parse_minimessage;
 use pumpkin_plugin_api::events::{AsyncPlayerChatEvent, EventData, EventHandler, EventPriority};
@@ -30,7 +30,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Default)]
 pub(crate) struct Chat;
 
-impl Mechanic for Chat {
+impl Module for Chat {
     fn enabled(&self) -> bool {
         ConfigManager::get().is_some_and(|cm| cm.mechanics.chat.enabled)
     }

@@ -39,7 +39,7 @@
 //! - Page 3: Mod/Admin rules
 
 use crate::config::ConfigManager;
-use crate::modules::module::Mechanic;
+use crate::modules::module::Module;
 use serde::{Deserialize, Serialize};
 
 /// Handles server rules display in book format.
@@ -48,7 +48,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Default)]
 pub(crate) struct Rules;
 
-impl Mechanic for Rules {
+impl Module for Rules {
     fn enabled(&self) -> bool {
         ConfigManager::get().is_some_and(|cm| cm.mechanics.rules.enabled)
     }

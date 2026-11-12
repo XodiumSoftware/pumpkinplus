@@ -20,7 +20,7 @@
 //! | `{player}`  | `join_msg`, `leave_msg`, `kick_msg`, `death_msg` |
 
 use crate::config::ConfigManager;
-use crate::modules::module::Mechanic;
+use crate::modules::module::Module;
 use crate::utils::placeholders::parse_with_player_component;
 use pumpkin_plugin_api::events::{
     EventData, EventHandler, EventPriority, PlayerDeathEvent, PlayerJoinEvent, PlayerLeaveEvent,
@@ -33,7 +33,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Default)]
 pub(crate) struct Messages;
 
-impl Mechanic for Messages {
+impl Module for Messages {
     fn enabled(&self) -> bool {
         ConfigManager::get().is_some_and(|cm| cm.mechanics.messages.enabled)
     }

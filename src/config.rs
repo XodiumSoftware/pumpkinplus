@@ -6,7 +6,6 @@
 //! | File                | Purpose                                            |
 //! |---------------------|----------------------------------------------------|
 //! | `config.toml`       | Master toggles for each module group               |
-//! | `bridges.toml`      | Per-bridge toggles under `BridgesConfig`           |
 //! | `mechanics.toml`    | Per-mechanic settings under `MechanicsConfig`      |
 //! | `enchantments.toml` | Per-enchantment toggles under `EnchantmentsConfig` |
 //! | `recipes.toml`      | Per-recipe pack toggles under `RecipesConfig`      |
@@ -24,7 +23,6 @@ use std::path::{Path, PathBuf};
 use toml::Value;
 use tracing::error;
 
-pub(crate) use crate::modules::bridges::bridge::BridgesConfig;
 pub(crate) use crate::modules::enchantments::enchantment::EnchantmentsConfig;
 pub(crate) use crate::modules::mechanics::mechanic::MechanicsConfig;
 pub(crate) use crate::modules::recipes::RecipesConfig;
@@ -38,8 +36,6 @@ thread_local! {
 #[serde(default)]
 #[allow(clippy::struct_excessive_bools)]
 pub(crate) struct ModuleToggles {
-    /// Master toggle for all bridge modules.
-    pub bridges: bool,
     /// Master toggle for all enchantment modules.
     pub enchantments: bool,
     /// Master toggle for all mechanic modules.
@@ -51,7 +47,6 @@ pub(crate) struct ModuleToggles {
 impl Default for ModuleToggles {
     fn default() -> Self {
         Self {
-            bridges: true,
             enchantments: true,
             mechanics: true,
             recipes: true,
@@ -69,9 +64,6 @@ impl Default for ModuleToggles {
 pub(crate) struct PluginConfig {
     /// Master toggles for each module group (from `config.toml`).
     pub modules: ModuleToggles,
-    /// All bridge module configs (from `bridges.toml`).
-    #[serde(skip)]
-    pub bridges: BridgesConfig,
     /// All mechanic module configs (from `mechanics.toml`).
     #[serde(skip)]
     pub mechanics: MechanicsConfig,
@@ -113,15 +105,11 @@ impl PluginConfig {
 
         let mut config = Self {
             modules: modules.clone(),
-            bridges: BridgesConfig::default(),
             mechanics: MechanicsConfig::default(),
             recipes: RecipesConfig::default(),
             enchantments: EnchantmentsConfig::default(),
         };
 
-        if modules.bridges {
-            config.bridges = load_section(&data_folder, "bridges.toml");
-        }
         if modules.mechanics {
             config.mechanics = load_section(&data_folder, "mechanics.toml");
         }

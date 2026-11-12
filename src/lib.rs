@@ -48,31 +48,6 @@ mod modules {
     }
 
     pub(crate) mod recipes;
-    /// Bridges to client-side mods.
-    pub(crate) mod bridges {
-        pub(crate) mod appleskin;
-        pub(crate) mod bridge;
-        /// Jade (WAILA fork) probe provider bridge.
-        pub(crate) mod jade {
-            pub(crate) mod bridge;
-            pub(crate) mod buf;
-            pub(crate) mod nbt;
-            pub(crate) mod provider;
-            pub(crate) mod providers {
-                pub(crate) mod beehive;
-                pub(crate) mod brewing_stand;
-                pub(crate) mod command_block;
-                pub(crate) mod entity_health;
-                pub(crate) mod hopper_lock;
-                pub(crate) mod mob_breeding;
-                pub(crate) mod mob_growth;
-                pub(crate) mod trial_spawner_cooldown;
-                pub(crate) mod waxed;
-                pub(crate) mod zombie_villager;
-            }
-        }
-        pub(crate) mod xaeromap;
-    }
     /// Server-side gameplay mechanics.
     pub(crate) mod mechanics {
         pub(crate) mod mechanic;
@@ -129,10 +104,6 @@ use crate::mechanics::server::rules::Rules;
 use crate::mechanics::server::tablist::Tablist;
 use crate::mechanics::world::openable::Openable;
 use crate::mechanics::world::spawnprotection::SpawnProtection;
-use crate::modules::bridges::appleskin::AppleSkin;
-use crate::modules::bridges::bridge::Bridge;
-use crate::modules::bridges::jade::bridge::Jade;
-use crate::modules::bridges::xaeromap::XaeroMap;
 use crate::modules::enchantments::enchantment::Enchantment;
 use crate::modules::enchantments::utility::embertread::Embertread;
 use crate::modules::enchantments::vanilla::fortune::Fortune;
@@ -181,23 +152,6 @@ impl PumpkinPlus {
         info!(
             "Registered: {} mechanic(s) | Took {}ms",
             enabled_mechanics, mechanic_total_ms
-        );
-    }
-
-    /// Registers all client-mod bridges (`AppleSkin`, Xaero's Map, Jade).
-    fn register_bridges(context: &Context) {
-        let bridges: Vec<&dyn Bridge> = vec![&AppleSkin, &Jade, &XaeroMap];
-
-        let enabled_bridges = bridges.iter().filter(|b| b.enabled()).count();
-        let mut bridge_total_ms = 0u128;
-        for bridge in bridges {
-            let start = Instant::now();
-            bridge.register(context);
-            bridge_total_ms += start.elapsed().as_millis();
-        }
-        info!(
-            "Registered: {} bridge(s) | Took {}ms",
-            enabled_bridges, bridge_total_ms
         );
     }
 
@@ -260,9 +214,6 @@ impl Plugin for PumpkinPlus {
         }
         if config.modules.enchantments {
             Self::register_enchantments(&context);
-        }
-        if config.modules.bridges {
-            Self::register_bridges(&context);
         }
 
         info!("Pumpkin+ loaded. NICE TO CYA!");

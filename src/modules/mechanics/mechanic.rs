@@ -3,23 +3,23 @@
 //! Each gameplay feature is implemented as a module implementing the [`Mechanic`] trait.
 //! Mechanics can register event handlers, commands, and permission nodes.
 
-pub use crate::modules::mechanics::entity::griefing::GriefingConfig;
-pub use crate::modules::mechanics::entity::silence::SilenceConfig;
-pub use crate::modules::mechanics::entity::spawn_egg::SpawnEggConfig;
-pub use crate::modules::mechanics::entity::tameable::TameableConfig;
-pub use crate::modules::mechanics::player::anvil::AnvilConfig;
-pub use crate::modules::mechanics::player::condense::CondenseConfig;
-pub use crate::modules::mechanics::player::enderchest::EnderchestConfig;
-pub use crate::modules::mechanics::player::head::HeadConfig;
-pub use crate::modules::mechanics::player::locator::LocatorConfig;
-pub use crate::modules::mechanics::player::nickname::NicknameConfig;
-pub use crate::modules::mechanics::player::xp::XpConfig;
-pub use crate::modules::mechanics::server::chat::ChatConfig;
-pub use crate::modules::mechanics::server::messages::MessagesConfig;
-pub use crate::modules::mechanics::server::rules::RulesConfig;
-pub use crate::modules::mechanics::server::tablist::TablistConfig;
-pub use crate::modules::mechanics::world::openable::OpenableConfig;
-pub use crate::modules::mechanics::world::spawnprotection::SpawnProtectionConfig;
+pub(crate) use crate::modules::mechanics::entity::griefing::GriefingConfig;
+pub(crate) use crate::modules::mechanics::entity::silence::SilenceConfig;
+pub(crate) use crate::modules::mechanics::entity::spawn_egg::SpawnEggConfig;
+pub(crate) use crate::modules::mechanics::entity::tameable::TameableConfig;
+pub(crate) use crate::modules::mechanics::player::anvil::AnvilConfig;
+pub(crate) use crate::modules::mechanics::player::condense::CondenseConfig;
+pub(crate) use crate::modules::mechanics::player::enderchest::EnderchestConfig;
+pub(crate) use crate::modules::mechanics::player::head::HeadConfig;
+pub(crate) use crate::modules::mechanics::player::locator::LocatorConfig;
+pub(crate) use crate::modules::mechanics::player::nickname::NicknameConfig;
+pub(crate) use crate::modules::mechanics::player::xp::XpConfig;
+pub(crate) use crate::modules::mechanics::server::chat::ChatConfig;
+pub(crate) use crate::modules::mechanics::server::messages::MessagesConfig;
+pub(crate) use crate::modules::mechanics::server::rules::RulesConfig;
+pub(crate) use crate::modules::mechanics::server::tablist::TablistConfig;
+pub(crate) use crate::modules::mechanics::world::openable::OpenableConfig;
+pub(crate) use crate::modules::mechanics::world::spawnprotection::SpawnProtectionConfig;
 use pumpkin_plugin_api::Context;
 use pumpkin_plugin_api::command::Command;
 use pumpkin_plugin_api::events::{EventHandler, EventPriority, FromIntoEvent};
@@ -31,7 +31,7 @@ use tracing::error;
 ///
 /// Mechanics may optionally expose commands, permission nodes, and event handlers,
 /// all registered with the server via [`Mechanic::register`].
-pub trait Mechanic {
+pub(crate) trait Mechanic {
     /// Returns `true` if the module is enabled, `false` otherwise.
     fn enabled(&self) -> bool;
 
@@ -103,7 +103,7 @@ pub trait Mechanic {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 #[allow(clippy::struct_excessive_bools)]
-pub struct MechanicsConfig {
+pub(crate) struct MechanicsConfig {
     /// Custom anvil operations (disenchant, cost bypass).
     pub anvil: AnvilConfig,
     /// Item condensing commands.

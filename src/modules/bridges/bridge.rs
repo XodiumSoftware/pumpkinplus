@@ -28,9 +28,9 @@
 //! 3. Bidirectional payloads flow via `JavaPlayer::send_custom_payload`
 //!    (server → client) and `PlayerCustomPayloadEvent` (client → server).
 
-pub use crate::modules::bridges::appleskin::AppleSkinConfig;
-pub use crate::modules::bridges::jade::bridge::JadeConfig;
-pub use crate::modules::bridges::xaeromap::XaeroMapConfig;
+pub(crate) use crate::modules::bridges::appleskin::AppleSkinConfig;
+pub(crate) use crate::modules::bridges::jade::bridge::JadeConfig;
+pub(crate) use crate::modules::bridges::xaeromap::XaeroMapConfig;
 use pumpkin_plugin_api::Context;
 use pumpkin_plugin_api::events::{EventHandler, EventPriority, FromIntoEvent};
 use serde::{Deserialize, Serialize};
@@ -39,7 +39,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// Bridges register event handlers via [`Bridge::events`]. They have no
 /// commands or permission nodes — those are mechanics' concern.
-pub trait Bridge {
+pub(crate) trait Bridge {
     /// Returns `true` if the bridge is enabled, `false` otherwise.
     fn enabled(&self) -> bool;
 
@@ -78,7 +78,7 @@ pub trait Bridge {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 #[allow(clippy::struct_excessive_bools)]
-pub struct BridgesConfig {
+pub(crate) struct BridgesConfig {
     /// `AppleSkin` saturation/exhaustion/gamerule sync.
     pub appleskin: AppleSkinConfig,
     /// Jade (WAILA) block/entity data providers.

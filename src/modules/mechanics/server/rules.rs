@@ -46,7 +46,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// See module-level docs for the current implementation status and missing APIs.
 #[derive(Default)]
-pub struct Rules;
+pub(crate) struct Rules;
 
 impl Mechanic for Rules {
     fn enabled(&self) -> bool {
@@ -59,7 +59,7 @@ impl Mechanic for Rules {
 
 /// Configuration for the rules mechanics module.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct RulesConfig {
+pub(crate) struct RulesConfig {
     /// Whether this module is active.
     pub enabled: bool,
 }

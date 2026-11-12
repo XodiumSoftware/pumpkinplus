@@ -39,7 +39,7 @@ const REFRESH_TICKS: u64 = 40;
 
 /// Handles tab-list mechanics, including custom messages.
 #[derive(Default)]
-pub struct Tablist;
+pub(crate) struct Tablist;
 
 impl Mechanic for Tablist {
     fn enabled(&self) -> bool {
@@ -133,7 +133,7 @@ impl EventHandler<PlayerLeaveEvent> for Tablist {
 
 /// Configuration for the tablist mechanics module.
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
-pub struct TablistConfig {
+pub(crate) struct TablistConfig {
     /// Whether this module is active.
     pub enabled: bool,
     /// Header lines displayed at the top of the tab list, joined with newlines. Supports `MiniMessage` tags. Leave empty to disable.

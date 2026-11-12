@@ -35,7 +35,7 @@ use crate::config::ConfigManager;
 ///
 /// Wraps one of the upstream Pumpkin recipe builders so a heterogeneous list
 /// of recipes can be returned from a single source.
-pub enum RecipeEntry {
+pub(crate) enum RecipeEntry {
     /// A shaped crafting recipe builder.
     Shaped(ShapedRecipeBuilder),
     /// A shapeless crafting recipe builder.
@@ -61,7 +61,7 @@ impl RecipeEntry {
 /// Registers all recipes defined in `recipes.toml` with the server.
 ///
 /// Any malformed entry is logged and skipped; the others still register.
-pub fn register_all(context: &Context) {
+pub(crate) fn register_all(context: &Context) {
     let Some(config) = ConfigManager::get() else {
         return;
     };
@@ -88,7 +88,7 @@ pub fn register_all(context: &Context) {
 /// A shaped crafting recipe entry.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
-pub struct ShapedRecipe {
+pub(crate) struct ShapedRecipe {
     /// Recipe id (auto-prefixed with the plugin id if not already namespaced).
     pub id: String,
     /// Pattern rows, e.g. `["AAA", "A A"]`. Each character must appear in `keys`.
@@ -122,7 +122,7 @@ impl Default for ShapedRecipe {
 /// A shapeless crafting recipe entry.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
-pub struct ShapelessRecipe {
+pub(crate) struct ShapelessRecipe {
     /// Recipe id.
     pub id: String,
     /// List of required ingredients. Each entry follows the same format as
@@ -151,7 +151,7 @@ impl Default for ShapelessRecipe {
 /// A cooking (furnace-style) recipe entry.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
-pub struct CookingRecipe {
+pub(crate) struct CookingRecipe {
     /// Recipe id.
     pub id: String,
     /// Cooking type: `smelting`, `blasting`, `smoking`, or `campfire`.
@@ -190,7 +190,7 @@ impl Default for CookingRecipe {
 /// The output of a recipe.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
-pub struct RecipeResult {
+pub(crate) struct RecipeResult {
     /// Result item id, e.g. `"minecraft:diamond"`.
     pub item: String,
     /// Stack size (1–64). Defaults to `1`.
@@ -209,7 +209,7 @@ impl Default for RecipeResult {
 /// A config-format ingredient, mapping 1:1 onto the API's `Ingredient` cases.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
-pub enum IngredientValue {
+pub(crate) enum IngredientValue {
     /// A single item id (`"minecraft:diamond"`) or tag (`"#minecraft:logs"`).
     Single(String),
     /// Any of the listed item ids.
@@ -244,7 +244,7 @@ impl From<&IngredientValue> for pumpkin_plugin_api::recipe::Ingredient {
 /// these defaults so admins can edit or remove entries without touching Rust code.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
-pub struct RecipesConfig {
+pub(crate) struct RecipesConfig {
     /// Shaped crafting recipes.
     pub shaped: Vec<ShapedRecipe>,
     /// Shapeless crafting recipes.

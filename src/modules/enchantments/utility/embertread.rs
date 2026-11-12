@@ -30,7 +30,7 @@ const EMBERTREAD_ID: &str = namespaced_id!("embertread");
 
 /// Handles the Embertread custom enchantment.
 #[derive(Default)]
-pub struct Embertread;
+pub(crate) struct Embertread;
 
 impl Enchantment for Embertread {
     fn enabled(&self) -> bool {

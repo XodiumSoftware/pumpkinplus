@@ -71,7 +71,7 @@ const RECEIVE_DATA_CHANNEL: &str = "jade:receive_data";
 
 /// Handles Jade (WAILA) plugin channel synchronization.
 #[derive(Default)]
-pub struct Jade;
+pub(crate) struct Jade;
 
 impl Bridge for Jade {
     fn enabled(&self) -> bool {
@@ -324,7 +324,7 @@ fn len(n: usize) -> i32 {
 /// Configuration for the Jade bridge.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
-pub struct JadeConfig {
+pub(crate) struct JadeConfig {
     /// Whether this bridge is active.
     pub enabled: bool,
     /// Per-provider enable toggles.

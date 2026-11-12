@@ -6,123 +6,110 @@
 #![allow(clippy::must_use_candidate)]
 
 mod config;
+/// Shared helpers used across modules (blocks, entities, text, placeholders).
 mod utils {
-    pub mod block;
-    pub mod entity;
-    pub mod macros;
-    pub mod placeholders;
-    pub mod player;
-    pub mod text;
+    pub(crate) mod block;
+    pub(crate) mod entity;
+    pub(crate) mod macros;
+    pub(crate) mod placeholders;
+    pub(crate) mod player;
+    pub(crate) mod text;
 }
 
+/// Config-friendly mirrors of API enums that cannot be deserialized directly.
 mod mirror_types {
-    pub mod entity_type;
-    pub mod gamemode;
-    pub mod hand;
-    pub mod interaction;
+    pub(crate) mod entity_type;
+    pub(crate) mod gamemode;
+    pub(crate) mod hand;
+    pub(crate) mod interaction;
     mod macros;
 }
 
-pub use mirror_types::gamemode::GameMode;
-pub use mirror_types::hand::Hand as MirrorHand;
-pub use mirror_types::interaction::InteractAction;
+pub(crate) use mirror_types::gamemode::GameMode;
+pub(crate) use mirror_types::hand::Hand as MirrorHand;
+pub(crate) use mirror_types::interaction::InteractAction;
 
+/// All feature modules, grouped by category.
 mod modules {
-    pub mod enchantments {
-        pub mod enchantment;
-        pub mod utility {
-            pub mod embertread;
-            pub mod nimbus;
-            pub mod tether;
-            pub mod vinemine;
+    /// Enchantment definitions and behavior overrides.
+    pub(crate) mod enchantments {
+        pub(crate) mod enchantment;
+        pub(crate) mod utility {
+            pub(crate) mod embertread;
+            pub(crate) mod nimbus;
+            pub(crate) mod tether;
+            pub(crate) mod vinemine;
         }
-        pub mod vanilla {
-            pub mod feather_falling;
-            pub mod fortune;
-            pub mod silk_touch;
+        pub(crate) mod vanilla {
+            pub(crate) mod feather_falling;
+            pub(crate) mod fortune;
+            pub(crate) mod silk_touch;
         }
     }
 
-    pub mod recipes;
-    pub mod bridges {
-        pub mod appleskin;
-        pub mod bridge;
-        pub mod jade {
-            pub mod bridge;
-            pub mod buf;
-            pub mod nbt;
-            pub mod provider;
-            pub mod providers {
-                pub mod beehive;
-                pub mod brewing_stand;
-                pub mod command_block;
-                pub mod entity_health;
-                pub mod hopper_lock;
-                pub mod mob_breeding;
-                pub mod mob_growth;
-                pub mod trial_spawner_cooldown;
-                pub mod waxed;
-                pub mod zombie_villager;
+    pub(crate) mod recipes;
+    /// Bridges to client-side mods.
+    pub(crate) mod bridges {
+        pub(crate) mod appleskin;
+        pub(crate) mod bridge;
+        /// Jade (WAILA fork) probe provider bridge.
+        pub(crate) mod jade {
+            pub(crate) mod bridge;
+            pub(crate) mod buf;
+            pub(crate) mod nbt;
+            pub(crate) mod provider;
+            pub(crate) mod providers {
+                pub(crate) mod beehive;
+                pub(crate) mod brewing_stand;
+                pub(crate) mod command_block;
+                pub(crate) mod entity_health;
+                pub(crate) mod hopper_lock;
+                pub(crate) mod mob_breeding;
+                pub(crate) mod mob_growth;
+                pub(crate) mod trial_spawner_cooldown;
+                pub(crate) mod waxed;
+                pub(crate) mod zombie_villager;
             }
         }
-        pub mod xaeromap;
+        pub(crate) mod xaeromap;
     }
-    pub mod mechanics {
-        pub mod mechanic;
-        pub mod entity {
-            pub mod griefing;
-            pub mod silence;
-            pub mod spawn_egg;
-            pub mod tameable;
+    /// Server-side gameplay mechanics.
+    pub(crate) mod mechanics {
+        pub(crate) mod mechanic;
+        /// Entity-related mechanics.
+        pub(crate) mod entity {
+            pub(crate) mod griefing;
+            pub(crate) mod silence;
+            pub(crate) mod spawn_egg;
+            pub(crate) mod tameable;
         }
-        pub mod world {
-            pub mod openable;
-            pub mod spawnprotection;
+        /// World/block-related mechanics.
+        pub(crate) mod world {
+            pub(crate) mod openable;
+            pub(crate) mod spawnprotection;
         }
-        pub mod player {
-            pub mod anvil;
-            pub mod condense;
-            pub mod enderchest;
-            pub mod head;
-            pub mod locator;
-            pub mod nickname;
-            pub mod xp;
+        /// Player-related mechanics.
+        pub(crate) mod player {
+            pub(crate) mod anvil;
+            pub(crate) mod condense;
+            pub(crate) mod enderchest;
+            pub(crate) mod head;
+            pub(crate) mod locator;
+            pub(crate) mod nickname;
+            pub(crate) mod xp;
         }
-        pub mod server {
-            pub mod chat;
-            pub mod messages;
-            pub mod rules;
-            pub mod tablist;
+        /// Server-wide mechanics.
+        pub(crate) mod server {
+            pub(crate) mod chat;
+            pub(crate) mod messages;
+            pub(crate) mod rules;
+            pub(crate) mod tablist;
         }
     }
 }
 
-pub use config::*;
-pub use modules::*;
-
-pub use modules::bridges::appleskin::AppleSkinConfig;
-pub use modules::bridges::bridge::BridgesConfig;
-pub use modules::bridges::xaeromap::XaeroMapConfig;
-pub use modules::enchantments::enchantment::EnchantmentsConfig;
-
-pub use modules::mechanics::entity::griefing::GriefingConfig;
-pub use modules::mechanics::entity::silence::SilenceConfig;
-pub use modules::mechanics::entity::spawn_egg::SpawnEggConfig;
-pub use modules::mechanics::entity::tameable::TameableConfig;
-pub use modules::mechanics::player::anvil::AnvilConfig;
-pub use modules::mechanics::player::condense::CondenseConfig;
-pub use modules::mechanics::player::enderchest::EnderchestConfig;
-pub use modules::mechanics::player::head::HeadConfig;
-pub use modules::mechanics::player::locator::LocatorConfig;
-pub use modules::mechanics::player::nickname::NicknameConfig;
-pub use modules::mechanics::player::xp::XpConfig;
-pub use modules::mechanics::server::chat::ChatConfig;
-pub use modules::mechanics::server::messages::MessagesConfig;
-pub use modules::mechanics::server::rules::RulesConfig;
-pub use modules::mechanics::server::tablist::TablistConfig;
-pub use modules::mechanics::world::openable::OpenableConfig;
-pub use modules::mechanics::world::spawnprotection::SpawnProtectionConfig;
-pub use modules::recipes::RecipesConfig;
+pub(crate) use config::ConfigManager;
+pub(crate) use modules::{mechanics, recipes};
 
 use crate::mechanics::entity::griefing::Griefing;
 use crate::mechanics::entity::silence::Silence;
@@ -154,8 +141,10 @@ use pumpkin_plugin_api::{Plugin, PluginMetadata};
 use std::time::Instant;
 use tracing::info;
 
+/// The plugin identifier, derived from the crate name.
 pub const PLUGIN_ID: &str = env!("CARGO_PKG_NAME");
 
+/// The `PumpkinPlus` plugin entry point.
 pub struct PumpkinPlus {}
 
 impl PumpkinPlus {
@@ -215,7 +204,7 @@ impl PumpkinPlus {
     /// Registers all config-defined recipes.
     fn register_recipes(context: &Context) {
         let start = Instant::now();
-        crate::modules::recipes::register_all(context);
+        recipes::register_all(context);
         let total_ms = start.elapsed().as_millis();
         info!("Recipe registration took {total_ms}ms");
     }
@@ -249,7 +238,7 @@ impl Plugin for PumpkinPlus {
             version: env!("CARGO_PKG_VERSION").into(),
             authors: env!("CARGO_PKG_AUTHORS")
                 .split(',')
-                .map(std::string::ToString::to_string)
+                .map(ToString::to_string)
                 .collect(),
             description: env!("CARGO_PKG_DESCRIPTION").into(),
             dependencies: vec![],
@@ -286,4 +275,21 @@ impl Plugin for PumpkinPlus {
     }
 }
 
-pumpkin_plugin_api::register_plugin!(PumpkinPlus);
+/// The plugin entry point the host calls by export name.
+///
+/// The body is a macro expansion, so the generated `__init_plugin` cannot carry
+/// its own rustdoc. The expectation is scoped to this module rather than the
+/// invocation, because an attribute on a macro call does not reach what it
+/// expands to.
+///
+/// The module is `pub` because the expansion defines `pub extern "C" fn
+/// __init_plugin`, and the host calls it by export name.
+#[expect(
+    missing_docs,
+    reason = "the generated __init_plugin is documented by the macro, not here"
+)]
+pub mod entry {
+    use super::PumpkinPlus;
+
+    pumpkin_plugin_api::register_plugin!(PumpkinPlus);
+}

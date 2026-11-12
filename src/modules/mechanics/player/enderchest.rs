@@ -34,11 +34,11 @@ use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};
 
 /// Permission node required to open the enderchest via the item interaction.
-pub const PERM_ENDERCHEST: &str = concat!(env!("CARGO_PKG_NAME"), ":enderchest.use");
+pub(crate) const PERM_ENDERCHEST: &str = concat!(env!("CARGO_PKG_NAME"), ":enderchest.use");
 
 /// Handles enderchest mechanics.
 #[derive(Default)]
-pub struct Enderchest;
+pub(crate) struct Enderchest;
 
 impl Mechanic for Enderchest {
     fn enabled(&self) -> bool {
@@ -111,7 +111,7 @@ impl EventHandler<PlayerInteractEvent> for Enderchest {
 
 /// Configuration for the enderchest mechanics module.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct EnderchestConfig {
+pub(crate) struct EnderchestConfig {
     /// Whether this module is active.
     pub enabled: bool,
     /// List of gamemodes allowed to use enderchests. Use variant names like "Survival", "Creative", etc. Leave empty to allow all.

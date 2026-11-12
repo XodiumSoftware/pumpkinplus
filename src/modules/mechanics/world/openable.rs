@@ -53,17 +53,17 @@ use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};
 
 /// Permission node required to trigger double-door sync.
-pub const PERM_SYNC: &str = concat!(env!("CARGO_PKG_NAME"), ":openable.sync");
+pub(crate) const PERM_SYNC: &str = concat!(env!("CARGO_PKG_NAME"), ":openable.sync");
 
 /// Permission node required to knock on openable blocks.
-pub const PERM_KNOCK: &str = concat!(env!("CARGO_PKG_NAME"), ":openable.knock");
+pub(crate) const PERM_KNOCK: &str = concat!(env!("CARGO_PKG_NAME"), ":openable.knock");
 
 // /// Sound played when a player knocks on an openable block.
 // const KNOCK_SOUND: Sound = Sound::EntityZombieAttackWoodenDoor;
 
 /// Handles openable block synchronization and door knocking.
 #[derive(Default)]
-pub struct Openable;
+pub(crate) struct Openable;
 
 impl Mechanic for Openable {
     fn enabled(&self) -> bool {
@@ -274,7 +274,7 @@ fn find_adjacent_door(world: &World, pos: BlockPos) -> Option<BlockPos> {
 // does not apply here since fields are deserialized independently.
 #[allow(clippy::struct_excessive_bools)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct OpenableConfig {
+pub(crate) struct OpenableConfig {
     /// Whether this module is active.
     pub enabled: bool,
     /// Whether double door sync is enabled.

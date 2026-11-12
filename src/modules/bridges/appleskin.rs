@@ -101,7 +101,7 @@ fn sync_states() -> &'static Mutex<HashMap<(u64, u64), SyncState>> {
 
 /// Handles `AppleSkin` plugin channel synchronization.
 #[derive(Default)]
-pub struct AppleSkin;
+pub(crate) struct AppleSkin;
 
 impl Bridge for AppleSkin {
     fn enabled(&self) -> bool {
@@ -281,7 +281,7 @@ impl AppleSkin {
 
 /// Configuration for the `AppleSkin` bridge.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct AppleSkinConfig {
+pub(crate) struct AppleSkinConfig {
     /// Whether this bridge is active.
     pub enabled: bool,
 }

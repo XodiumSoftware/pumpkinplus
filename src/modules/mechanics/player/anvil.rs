@@ -45,7 +45,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// See module-level docs for the current implementation status and missing APIs.
 #[derive(Default)]
-pub struct Anvil;
+pub(crate) struct Anvil;
 
 impl Mechanic for Anvil {
     fn enabled(&self) -> bool {
@@ -58,7 +58,7 @@ impl Mechanic for Anvil {
 
 /// Configuration for the anvil mechanics module.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct AnvilConfig {
+pub(crate) struct AnvilConfig {
     /// Whether this module is active.
     pub enabled: bool,
 }

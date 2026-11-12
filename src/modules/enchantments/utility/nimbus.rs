@@ -19,8 +19,9 @@
 use crate::modules::enchantments::enchantment::Enchantment;
 
 /// Stub for the Nimbus custom enchantment.
+#[allow(dead_code, reason = "not yet registered in register_enchantments")]
 #[derive(Default)]
-pub struct Nimbus;
+pub(crate) struct Nimbus;
 
 impl Enchantment for Nimbus {
     fn enabled(&self) -> bool {

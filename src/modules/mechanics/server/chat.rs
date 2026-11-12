@@ -28,7 +28,7 @@ use serde::{Deserialize, Serialize};
 
 /// Handles chat formatting and word filtering.
 #[derive(Default)]
-pub struct Chat;
+pub(crate) struct Chat;
 
 impl Mechanic for Chat {
     fn enabled(&self) -> bool {
@@ -78,7 +78,7 @@ impl EventHandler<AsyncPlayerChatEvent> for Chat {
 
 /// Configuration for the chat module.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct ChatConfig {
+pub(crate) struct ChatConfig {
     /// Whether this module is active.
     pub enabled: bool,
     /// Custom chat format. Use `{player}` and `{message}` as placeholders. Supports `MiniMessage` tags. Leave empty to disable.

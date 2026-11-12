@@ -9,7 +9,7 @@ use pumpkin_plugin_api::world::{BlockStateInfo, resolve_block_state};
 /// Uses name-based suffix matching instead of the typed [`BlockType`] registry
 /// so that custom/modded openables are detected without hardcoding.
 #[must_use]
-pub fn is_openable(info: &BlockStateInfo) -> bool {
+pub(crate) fn is_openable(info: &BlockStateInfo) -> bool {
     let name = &info.name;
     name.ends_with("_door") || name.ends_with("_trapdoor") || name.ends_with("_fence_gate")
 }
@@ -18,7 +18,7 @@ pub fn is_openable(info: &BlockStateInfo) -> bool {
 ///
 /// Doors support double-block sync; trapdoors and fence gates do not.
 #[must_use]
-pub fn is_door(info: &BlockStateInfo) -> bool {
+pub(crate) fn is_door(info: &BlockStateInfo) -> bool {
     info.name.ends_with("_door")
 }
 
@@ -28,7 +28,7 @@ pub fn is_door(info: &BlockStateInfo) -> bool {
 /// Returns `None` if the block has no `open` property or if the resulting
 /// property set cannot be resolved back to a valid state ID.
 #[must_use]
-pub fn toggle_open_property(info: &BlockStateInfo) -> Option<u16> {
+pub(crate) fn toggle_open_property(info: &BlockStateInfo) -> Option<u16> {
     let mut properties = info.properties.clone();
     for (key, value) in &mut properties {
         if key == "open" {

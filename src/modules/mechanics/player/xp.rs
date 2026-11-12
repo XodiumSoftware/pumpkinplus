@@ -46,16 +46,17 @@ use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};
 
 /// Permission node required to convert XP into experience bottles.
-pub const PERM_XP_BOTTLE: &str = concat!(env!("CARGO_PKG_NAME"), ":xp.bottle");
+pub(crate) const PERM_XP_BOTTLE: &str = concat!(env!("CARGO_PKG_NAME"), ":xp.bottle");
 
 /// Cost in raw XP points (not levels) to produce one experience bottle.
-pub const XP_PER_BOTTLE: u32 = 11;
+#[allow(dead_code, reason = "used once XP bottle conversion is implemented")]
+pub(crate) const XP_PER_BOTTLE: u32 = 11;
 
 /// Handles XP to bottle conversion.
 ///
 /// See module-level docs for the current implementation status and missing APIs.
 #[derive(Default)]
-pub struct Xp;
+pub(crate) struct Xp;
 
 impl Mechanic for Xp {
     fn enabled(&self) -> bool {
@@ -113,7 +114,7 @@ impl EventHandler<PlayerInteractEvent> for Xp {
 
 /// Configuration for the XP mechanics module.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct XpConfig {
+pub(crate) struct XpConfig {
     /// Whether this module is active.
     pub enabled: bool,
 }

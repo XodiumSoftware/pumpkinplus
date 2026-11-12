@@ -31,6 +31,7 @@ macro_rules! mirror_enum {
         #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize, Hash)]
         #[serde(rename_all = "PascalCase")]
         $(#[$meta])*
+        #[allow(missing_docs)]
         $vis enum $name {
             $first,
             $($variant),*

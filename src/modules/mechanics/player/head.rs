@@ -43,13 +43,13 @@ use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};
 
 /// Permission node required for a player's head to drop on death.
-pub const PERM_HEAD_DROP: &str = concat!(env!("CARGO_PKG_NAME"), ":head.drop");
+pub(crate) const PERM_HEAD_DROP: &str = concat!(env!("CARGO_PKG_NAME"), ":head.drop");
 
 /// Handles player head drops on death.
 ///
 /// See module-level docs for the current implementation status and missing APIs.
 #[derive(Default)]
-pub struct Head;
+pub(crate) struct Head;
 
 impl Mechanic for Head {
     fn enabled(&self) -> bool {
@@ -109,7 +109,7 @@ impl EventHandler<PlayerDeathEvent> for Head {
 
 /// Configuration for the head mechanics module.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct HeadConfig {
+pub(crate) struct HeadConfig {
     /// Whether this module is active.
     pub enabled: bool,
 }

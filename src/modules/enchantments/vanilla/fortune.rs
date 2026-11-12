@@ -25,7 +25,7 @@ const MIN_FORTUNE_LEVEL: u32 = 2;
 
 /// Handles Fortune-based crop auto-replanting.
 #[derive(Default)]
-pub struct Fortune;
+pub(crate) struct Fortune;
 
 impl Enchantment for Fortune {
     fn enabled(&self) -> bool {

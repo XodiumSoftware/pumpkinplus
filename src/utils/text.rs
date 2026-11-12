@@ -24,7 +24,7 @@ use pumpkin_plugin_api::text::TextComponent;
 /// returned as a plain text component so a typo in the config never breaks
 /// message delivery.
 #[must_use]
-pub fn parse_minimessage(input: &str) -> TextComponent {
+pub(crate) fn parse_minimessage(input: &str) -> TextComponent {
     parse_minimessage_with_args(input, &HashMap::new())
 }
 
@@ -39,7 +39,10 @@ pub fn parse_minimessage(input: &str) -> TextComponent {
 /// an argument value are not re-parsed. This keeps the surrounding format's
 /// styling in control of the final rendering.
 #[must_use]
-pub fn parse_minimessage_with_args(input: &str, args: &HashMap<&str, &str>) -> TextComponent {
+pub(crate) fn parse_minimessage_with_args(
+    input: &str,
+    args: &HashMap<&str, &str>,
+) -> TextComponent {
     let nodes: Vec<Node<'_>> = Parser::new(Tokenizer::new(input))
         .collect::<Result<Vec<_>, _>>()
         .unwrap_or_else(|err| {
@@ -194,7 +197,7 @@ fn map_named_color(color: NamedColor) -> pumpkin_plugin_api::common::NamedColor 
 ///
 /// Returns `None` if the descriptor is blank or unrecognized.
 #[must_use]
-pub fn parse_color_arg(input: &str) -> Option<RgbColor> {
+pub(crate) fn parse_color_arg(input: &str) -> Option<RgbColor> {
     use minimessage_impl::style::color::Color;
 
     let trimmed = input.trim();

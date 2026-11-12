@@ -10,7 +10,7 @@ use crate::utils::text::parse_minimessage;
 
 /// Replaces a set of `key` → `value` placeholders in `text`.
 #[must_use]
-pub fn replace_placeholders(text: &str, replacements: &[(&str, &str)]) -> String {
+pub(crate) fn replace_placeholders(text: &str, replacements: &[(&str, &str)]) -> String {
     replacements
         .iter()
         .fold(text.to_string(), |acc, (key, value)| {
@@ -20,13 +20,13 @@ pub fn replace_placeholders(text: &str, replacements: &[(&str, &str)]) -> String
 
 /// Replaces `{player}` with the player's current display name.
 #[must_use]
-pub fn replace_player_placeholders(text: &str, player: &Player) -> String {
+pub(crate) fn replace_player_placeholders(text: &str, player: &Player) -> String {
     text.replace("{player}", &player.get_display_name().get_text())
 }
 
 /// Replaces `{online}`, `{tps}`, and `{mspt}` with live server data.
 #[must_use]
-pub fn replace_server_placeholders(text: &str, server: &Server) -> String {
+pub(crate) fn replace_server_placeholders(text: &str, server: &Server) -> String {
     text.replace("{online}", &server.get_player_count().to_string())
         .replace("{tps}", &format!("{:.1}", server.get_tps()))
         .replace("{mspt}", &format!("{:.1}", server.get_mspt()))
@@ -34,7 +34,7 @@ pub fn replace_server_placeholders(text: &str, server: &Server) -> String {
 
 /// Replaces all known player and server placeholders.
 #[must_use]
-pub fn replace_all_placeholders(text: &str, server: &Server, player: &Player) -> String {
+pub(crate) fn replace_all_placeholders(text: &str, server: &Server, player: &Player) -> String {
     replace_server_placeholders(&replace_player_placeholders(text, player), server)
 }
 
@@ -57,7 +57,7 @@ pub fn replace_all_placeholders(text: &str, server: &Server, player: &Player) ->
 /// Falls back to parsing `format` with the placeholder replaced by the plain-text
 /// display name if any JSON step fails.
 #[must_use]
-pub fn parse_with_player_component(format: &str, player: &Player) -> TextComponent {
+pub(crate) fn parse_with_player_component(format: &str, player: &Player) -> TextComponent {
     if !format.contains("{player}") {
         return parse_minimessage(format);
     }

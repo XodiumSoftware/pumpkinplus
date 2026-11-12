@@ -8,6 +8,6 @@ use pumpkin_plugin_api::player::Player;
 /// exposed by the plugin API.
 #[must_use]
 #[expect(dead_code)]
-pub fn uuid_string(player: &Player) -> String {
+pub(crate) fn uuid_string(player: &Player) -> String {
     format!("{}-{}", player.get_id().high, player.get_id().low)
 }

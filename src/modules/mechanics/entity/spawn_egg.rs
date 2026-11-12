@@ -37,13 +37,14 @@ use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};
 
 /// Drop chance for a spawn egg (0.1%).
-pub const DROP_CHANCE: f32 = 0.001;
+#[allow(dead_code, reason = "used once random-source host call is available")]
+pub(crate) const DROP_CHANCE: f32 = 0.001;
 
 /// Handles spawn egg drops from mob deaths.
 ///
 /// See module-level docs for the current implementation status and missing APIs.
 #[derive(Default)]
-pub struct SpawnEgg;
+pub(crate) struct SpawnEgg;
 
 impl Mechanic for SpawnEgg {
     fn enabled(&self) -> bool {
@@ -91,7 +92,7 @@ impl EventHandler<EntityDeathEvent> for SpawnEgg {
 
 /// Configuration for the spawn egg mechanics module.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct SpawnEggConfig {
+pub(crate) struct SpawnEggConfig {
     /// Whether this module is active.
     pub enabled: bool,
 }

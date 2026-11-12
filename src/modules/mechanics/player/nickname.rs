@@ -38,16 +38,16 @@ use pumpkin_plugin_api::{
 use serde::{Deserialize, Serialize};
 
 /// Plugin namespace for persistent data keys.
-pub const DATA_NAMESPACE: &str = "pumpkinplus";
+pub(crate) const DATA_NAMESPACE: &str = "pumpkinplus";
 /// Persistent data key storing a player's nickname.
-pub const NICKNAME_KEY: &str = "nickname";
+pub(crate) const NICKNAME_KEY: &str = "nickname";
 
 /// Permission node required to use the `/nickname` command.
-pub const PERM_NICKNAME: &str = concat!(env!("CARGO_PKG_NAME"), ":command.nickname");
+pub(crate) const PERM_NICKNAME: &str = concat!(env!("CARGO_PKG_NAME"), ":command.nickname");
 
 /// Handles player nicknames.
 #[derive(Default)]
-pub struct Nickname;
+pub(crate) struct Nickname;
 
 impl Mechanic for Nickname {
     fn enabled(&self) -> bool {
@@ -143,7 +143,7 @@ impl EventHandler<PlayerJoinEvent> for Nickname {
 }
 
 /// Applies a nickname to a player's display name and tab list name.
-pub fn update_player(player: &Player, nickname: Option<&str>) {
+pub(crate) fn update_player(player: &Player, nickname: Option<&str>) {
     let display = nickname.map_or_else(
         || TextComponent::text(&player.get_name()),
         parse_minimessage,
@@ -160,7 +160,7 @@ pub fn update_player(player: &Player, nickname: Option<&str>) {
 
 /// Configuration for the nickname mechanics module.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct NicknameConfig {
+pub(crate) struct NicknameConfig {
     /// Whether this module is active.
     pub enabled: bool,
 }

@@ -30,8 +30,9 @@ use pumpkin_plugin_api::enchantment::Enchantment;
 use pumpkin_plugin_api::player::Player;
 
 /// Stub for the Feather Falling enchantment override.
+#[allow(dead_code, reason = "not yet registered in register_enchantments")]
 #[derive(Default)]
-pub struct FeatherFalling;
+pub(crate) struct FeatherFalling;
 
 impl EnchantmentBehavior for FeatherFalling {
     fn enabled(&self) -> bool {
@@ -52,7 +53,8 @@ impl EnchantmentBehavior for FeatherFalling {
 /// This helper is used by the (currently stubbed) trample-cancel handler; it
 /// is also exposed for other modules that need the same check.
 #[must_use]
-pub fn has_feather_falling_boots(player: &Player) -> bool {
+#[allow(dead_code, reason = "helper for the currently stubbed trample handler")]
+pub(crate) fn has_feather_falling_boots(player: &Player) -> bool {
     let inventory = player.get_inventory();
     inventory.get_boots().is_some_and(|boots| {
         boots

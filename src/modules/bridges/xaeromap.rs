@@ -40,7 +40,7 @@ const MINIMAP_CHANNEL: &str = "xaerominimap:main";
 
 /// Handles Xaero's World Map / Minimap plugin channel synchronization.
 #[derive(Default)]
-pub struct XaeroMap;
+pub(crate) struct XaeroMap;
 
 impl Bridge for XaeroMap {
     fn enabled(&self) -> bool {
@@ -108,7 +108,7 @@ impl EventHandler<PlayerChangedWorldEvent> for XaeroMap {
 
 /// Configuration for the Xaero Map bridge.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct XaeroMapConfig {
+pub(crate) struct XaeroMapConfig {
     /// Whether this bridge is active.
     pub enabled: bool,
     /// Stable server-level world id shared with Xaero clients.

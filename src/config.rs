@@ -24,10 +24,10 @@ use std::path::{Path, PathBuf};
 use toml::Value;
 use tracing::error;
 
-pub use crate::modules::bridges::bridge::BridgesConfig;
-pub use crate::modules::enchantments::enchantment::EnchantmentsConfig;
-pub use crate::modules::mechanics::mechanic::MechanicsConfig;
-pub use crate::modules::recipes::RecipesConfig;
+pub(crate) use crate::modules::bridges::bridge::BridgesConfig;
+pub(crate) use crate::modules::enchantments::enchantment::EnchantmentsConfig;
+pub(crate) use crate::modules::mechanics::mechanic::MechanicsConfig;
+pub(crate) use crate::modules::recipes::RecipesConfig;
 
 thread_local! {
     static CONFIG: RefCell<Option<PluginConfig>> = const { RefCell::new(None) };
@@ -37,7 +37,7 @@ thread_local! {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 #[allow(clippy::struct_excessive_bools)]
-pub struct ModuleToggles {
+pub(crate) struct ModuleToggles {
     /// Master toggle for all bridge modules.
     pub bridges: bool,
     /// Master toggle for all enchantment modules.
@@ -66,7 +66,7 @@ impl Default for ModuleToggles {
 /// fully-merged per-group configurations loaded from their own TOML files.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
-pub struct PluginConfig {
+pub(crate) struct PluginConfig {
     /// Master toggles for each module group (from `config.toml`).
     pub modules: ModuleToggles,
     /// All bridge module configs (from `bridges.toml`).
@@ -85,14 +85,14 @@ pub struct PluginConfig {
 
 /// Loads and provides access to the plugin configuration.
 #[derive(Debug, Clone, Copy)]
-pub struct ConfigManager;
+pub(crate) struct ConfigManager;
 
 impl ConfigManager {
     /// Loads `config.toml` plus all enabled module group configs, stores the
     /// merged result globally, and persists merged files back to disk.
     ///
     /// Call this once in `Plugin::on_load` after all modules are ready.
-    pub fn load(context: &Context) -> PluginConfig {
+    pub(crate) fn load(context: &Context) -> PluginConfig {
         let config = PluginConfig::load(context);
         CONFIG.with(|c| *c.borrow_mut() = Some(config.clone()));
         config
@@ -100,7 +100,7 @@ impl ConfigManager {
 
     /// Returns the loaded configuration, if any.
     #[must_use]
-    pub fn get() -> Option<PluginConfig> {
+    pub(crate) fn get() -> Option<PluginConfig> {
         CONFIG.with(|c| c.borrow().clone())
     }
 }

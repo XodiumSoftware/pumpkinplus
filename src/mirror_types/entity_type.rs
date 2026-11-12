@@ -193,7 +193,7 @@ mirror_enum! {
 
 /// Helper module for serializing/deserializing `Vec<EntityType>` via the
 /// remote `EntityTypeDef` definition.
-pub mod entity_type_vec {
+pub(crate) mod entity_type_vec {
     use pumpkin_plugin_api::world::EntityType;
     use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
@@ -216,7 +216,7 @@ pub mod entity_type_vec {
     }
 
     /// Serializes a slice of upstream `EntityType` values.
-    pub fn serialize<S: Serializer>(
+    pub(crate) fn serialize<S: Serializer>(
         value: &[EntityType],
         serializer: S,
     ) -> Result<S::Ok, S::Error> {
@@ -229,7 +229,7 @@ pub mod entity_type_vec {
     }
 
     /// Deserializes a vector of upstream `EntityType` values.
-    pub fn deserialize<'de, D: Deserializer<'de>>(
+    pub(crate) fn deserialize<'de, D: Deserializer<'de>>(
         deserializer: D,
     ) -> Result<Vec<EntityType>, D::Error> {
         let wrapped = Vec::<DeserializeOwned>::deserialize(deserializer)?;

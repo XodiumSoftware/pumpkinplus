@@ -49,13 +49,13 @@ use pumpkin_plugin_api::{
 use serde::{Deserialize, Serialize};
 
 /// Permission node required to use the `/locator` command.
-pub const PERM_LOCATOR: &str = concat!(env!("CARGO_PKG_NAME"), ":command.locator");
+pub(crate) const PERM_LOCATOR: &str = concat!(env!("CARGO_PKG_NAME"), ":command.locator");
 
 /// Handles locator bar customization.
 ///
 /// See module-level docs for the current implementation status and missing APIs.
 #[derive(Default)]
-pub struct Locator;
+pub(crate) struct Locator;
 
 impl Mechanic for Locator {
     fn enabled(&self) -> bool {
@@ -142,7 +142,7 @@ impl CommandHandler for LocatorExecutor {
 
 /// Configuration for the locator mechanics module.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct LocatorConfig {
+pub(crate) struct LocatorConfig {
     /// Whether this module is active.
     pub enabled: bool,
 }

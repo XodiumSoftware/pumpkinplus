@@ -24,8 +24,9 @@
 use crate::modules::enchantments::enchantment::Enchantment;
 
 /// Stub for the Vinemine custom enchantment.
+#[allow(dead_code, reason = "not yet registered in register_enchantments")]
 #[derive(Default)]
-pub struct Vinemine;
+pub(crate) struct Vinemine;
 
 impl Enchantment for Vinemine {
     fn enabled(&self) -> bool {

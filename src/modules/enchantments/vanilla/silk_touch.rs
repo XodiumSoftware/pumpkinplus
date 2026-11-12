@@ -20,8 +20,9 @@
 use crate::modules::enchantments::enchantment::Enchantment;
 
 /// Stub for the Silk Touch enchantment override.
+#[allow(dead_code, reason = "not yet registered in register_enchantments")]
 #[derive(Default)]
-pub struct SilkTouch;
+pub(crate) struct SilkTouch;
 
 impl Enchantment for SilkTouch {
     fn enabled(&self) -> bool {

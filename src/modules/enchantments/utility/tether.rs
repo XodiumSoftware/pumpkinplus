@@ -20,8 +20,9 @@
 use crate::modules::enchantments::enchantment::Enchantment;
 
 /// Stub for the Tether custom enchantment.
+#[allow(dead_code, reason = "not yet registered in register_enchantments")]
 #[derive(Default)]
-pub struct Tether;
+pub(crate) struct Tether;
 
 impl Enchantment for Tether {
     fn enabled(&self) -> bool {

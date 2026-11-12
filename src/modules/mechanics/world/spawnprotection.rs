@@ -54,7 +54,7 @@ use serde::{Deserialize, Serialize};
 
 /// Handles spawn protection (hostile-mob spawn cancellation).
 #[derive(Default)]
-pub struct SpawnProtection;
+pub(crate) struct SpawnProtection;
 
 impl Mechanic for SpawnProtection {
     fn enabled(&self) -> bool {
@@ -165,7 +165,7 @@ fn is_hostile_entity_type(entity_type: &str) -> bool {
 
 /// Configuration for the spawn protection mechanics module.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SpawnProtectionConfig {
+pub(crate) struct SpawnProtectionConfig {
     /// Whether this module is active.
     pub enabled: bool,
     /// Spawn protection radius in blocks. The protected area is a square of

@@ -50,7 +50,7 @@ use crate::mechanics::mechanic::Mechanic;
 use crate::{GameMode, MirrorHand};
 
 /// Permission node required to silence mobs with the configured tool item.
-pub const PERM_SILENCE: &str = concat!(env!("CARGO_PKG_NAME"), ":silence.use");
+pub(crate) const PERM_SILENCE: &str = concat!(env!("CARGO_PKG_NAME"), ":silence.use");
 
 /// Number of dust particles spawned around the target entity.
 const PARTICLE_COUNT: i32 = 10;
@@ -61,7 +61,7 @@ const PARTICLE_OFFSET: Position = (0.5, 0.6, 0.5);
 
 /// Handles mob silencing with amethyst shards.
 #[derive(Default)]
-pub struct Silence;
+pub(crate) struct Silence;
 
 impl Mechanic for Silence {
     fn enabled(&self) -> bool {
@@ -267,7 +267,7 @@ fn is_monster(entity_type: EntityType) -> bool {
 
 /// Configuration for the silence mechanics module.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SilenceConfig {
+pub(crate) struct SilenceConfig {
     /// Whether this module is active.
     pub enabled: bool,
     /// Registry key of the item held to trigger the silence toggle.

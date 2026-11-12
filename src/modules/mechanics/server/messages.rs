@@ -31,7 +31,7 @@ use serde::{Deserialize, Serialize};
 
 /// Handles player join, leave, and kick messages.
 #[derive(Default)]
-pub struct Messages;
+pub(crate) struct Messages;
 
 impl Mechanic for Messages {
     fn enabled(&self) -> bool {
@@ -116,7 +116,7 @@ impl EventHandler<PlayerDeathEvent> for Messages {
 
 /// Configuration for the messages module.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct MessagesConfig {
+pub(crate) struct MessagesConfig {
     /// Whether this module is active.
     pub enabled: bool,
     /// Message broadcast when a player joins. Use `{player}` as a placeholder for the player's name. Supports `MiniMessage` tags. Leave empty to disable.

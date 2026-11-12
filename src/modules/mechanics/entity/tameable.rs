@@ -51,13 +51,14 @@ use pumpkin_plugin_api::{Context, Item, ItemStackExt, Server};
 use serde::{Deserialize, Serialize};
 
 /// Permission node required to transfer pet ownership with a lead.
-pub const PERM_TAMEABLE_TRANSFER: &str = concat!(env!("CARGO_PKG_NAME"), ":tameable.transfer");
+pub(crate) const PERM_TAMEABLE_TRANSFER: &str =
+    concat!(env!("CARGO_PKG_NAME"), ":tameable.transfer");
 
 /// Handles pet ownership transfer between players.
 ///
 /// See module-level docs for the current implementation status and missing APIs.
 #[derive(Default)]
-pub struct Tameable;
+pub(crate) struct Tameable;
 
 impl Mechanic for Tameable {
     fn enabled(&self) -> bool {
@@ -135,7 +136,7 @@ impl EventHandler<PlayerInteractEntityEvent> for Tameable {
 
 /// Configuration for the tameable mechanics module.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TameableConfig {
+pub(crate) struct TameableConfig {
     /// Whether this module is active.
     pub enabled: bool,
     /// Registry key of the item held to trigger the ownership transfer.

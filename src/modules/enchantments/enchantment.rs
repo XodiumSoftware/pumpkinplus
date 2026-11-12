@@ -21,7 +21,7 @@ use tracing::error;
 ///
 /// Types implementing this trait may register a custom enchantment definition
 /// and/or event-based behavior.
-pub trait Enchantment {
+pub(crate) trait Enchantment {
     /// Returns `true` if this enchantment is enabled in the configuration.
     ///
     /// Defaults to `false`.
@@ -84,7 +84,7 @@ pub trait Enchantment {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 #[allow(clippy::struct_excessive_bools)]
-pub struct EnchantmentsConfig {
+pub(crate) struct EnchantmentsConfig {
     /// Cancel contact and fire damage when wearing Embertread boots.
     pub embertread: bool,
     /// Cancel farmland trampling when wearing Feather Falling boots.

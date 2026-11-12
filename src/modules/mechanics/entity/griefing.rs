@@ -34,7 +34,7 @@ use serde::{Deserialize, Serialize};
 
 /// Handles mob griefing prevention.
 #[derive(Default)]
-pub struct Griefing;
+pub(crate) struct Griefing;
 
 impl Mechanic for Griefing {
     fn enabled(&self) -> bool {
@@ -97,7 +97,7 @@ impl EventHandler<EntityExplodeEvent> for Griefing {
 
 /// Configuration for the griefing mechanics module.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct GriefingConfig {
+pub(crate) struct GriefingConfig {
     /// Whether this module is active.
     pub enabled: bool,
     /// Entity types whose griefing actions (block changes and explosions) are blocked.

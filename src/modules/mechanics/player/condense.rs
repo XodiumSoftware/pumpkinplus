@@ -77,14 +77,14 @@ use std::collections::HashMap;
 const CONDENSE_AMOUNT: u8 = 9;
 
 /// Permission node required to use the `/condense` command.
-pub const PERM_CONDENSE: &str = concat!(env!("CARGO_PKG_NAME"), ":command.condense");
+pub(crate) const PERM_CONDENSE: &str = concat!(env!("CARGO_PKG_NAME"), ":command.condense");
 
 /// Permission node required to use the `/uncondense` command.
-pub const PERM_UNCONDENSE: &str = concat!(env!("CARGO_PKG_NAME"), ":command.uncondense");
+pub(crate) const PERM_UNCONDENSE: &str = concat!(env!("CARGO_PKG_NAME"), ":command.uncondense");
 
 /// Handles item condensing and uncondensing.
 #[derive(Default)]
-pub struct Condense;
+pub(crate) struct Condense;
 
 impl Mechanic for Condense {
     fn enabled(&self) -> bool {
@@ -284,7 +284,7 @@ fn add_items(inventory: &pumpkin_plugin_api::inventory::Inventory, item: Item, m
 
 /// Configuration for the condense mechanics module.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct CondenseConfig {
+pub(crate) struct CondenseConfig {
     /// Whether this module is active.
     pub enabled: bool,
     /// Map of item IDs to block IDs for condensing.

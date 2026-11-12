@@ -41,7 +41,7 @@
 
 use crate::MirrorHand;
 use crate::config::ConfigManager;
-use crate::mechanics::mechanic::Mechanic;
+use crate::modules::module::Mechanic;
 use pumpkin_plugin_api::events::{
     EventData, EventHandler, EventPriority, PlayerInteractEntityEvent,
 };

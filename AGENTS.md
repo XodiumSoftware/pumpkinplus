@@ -69,7 +69,7 @@ cargo clippy --all-targets --all-features --target wasm32-wasip2 -- -W clippy::p
 
 ### Module System
 
-Every feature implements the **`Mechanic`** trait (`src/modules/mechanics/mechanic.rs`):
+Every feature implements the **`Mechanic`** trait (`src/modules/module.rs`):
 
 | Method       | Purpose                                          | Default     |
 | ------------ | ------------------------------------------------ | ----------- |
@@ -94,12 +94,12 @@ Modules are plain structs (not singletons) instantiated with `Default::default()
 
 ### Active Modules
 
-| Module     | File                                       | Description                                                                   |
-| ---------- | ------------------------------------------ | ----------------------------------------------------------------------------- |
-| `Messages` | `src/modules/mechanics/player/messages.rs` | Custom join/leave/kick messages                                               |
-| `Chat`     | `src/modules/mechanics/server/chat.rs`     | Chat format/filter                                                            |
-| `Tablist`  | `src/modules/mechanics/tablist.rs`         | Dynamic tab list header/footer with `{player}`, `{online}`, `{tps}`, `{mspt}` |
-| `Locator`  | `src/modules/mechanics/locator.rs`         | Locator bar personalization (`/locator` command, stub)                        |
+| Module     | File                             | Description                                                                   |
+| ---------- | -------------------------------- | ----------------------------------------------------------------------------- |
+| `Messages` | `src/modules/server/messages.rs` | Custom join/leave/kick messages                                               |
+| `Chat`     | `src/modules/server/chat.rs`     | Chat format/filter                                                            |
+| `Tablist`  | `src/modules/server/tablist.rs`  | Dynamic tab list header/footer with `{player}`, `{online}`, `{tps}`, `{mspt}` |
+| `Locator`  | `src/modules/player/locator.rs`  | Locator bar personalization (`/locator` command, stub)                        |
 
 ### Placeholders
 
@@ -118,17 +118,28 @@ src/
 ├── lib.rs                    # Plugin entry point, `PumpkinPlus` struct
 ├── config.rs                 # `ConfigManager` — TOML config load/save
 └── modules/
-    ├── module.rs             # `Module` trait definition
-    └── mechanics/
-        ├── player/
-        │   ├── messages.rs   # Join/leave/kick messages
-        │   ├── enderchest.rs # Enderchest sharing
-        │   └── locator.rs    # Locator bar commands
-        ├── server/
-        │   ├── chat.rs       # Chat format/filter
-        │   └── tablist.rs    # Tab list header/footer
-        └── world/
-            └── openable.rs   # Double door sync
+    ├── module.rs             # `Mechanic` trait + `MechanicsConfig`
+    ├── entity/
+    │   ├── griefing.rs       # Mob griefing prevention
+    │   ├── silence.rs        # Mob silencing
+    │   ├── spawn_egg.rs      # Spawn egg drops
+    │   └── tameable.rs       # Pet ownership transfer
+    ├── player/
+    │   ├── anvil.rs          # Custom anvil operations
+    │   ├── condense.rs       # Item condensing
+    │   ├── enderchest.rs     # Enderchest sharing
+    │   ├── head.rs           # Player head drops
+    │   ├── locator.rs        # Locator bar commands
+    │   ├── nickname.rs       # Nicknames
+    │   └── xp.rs             # XP to bottle
+    ├── server/
+    │   ├── chat.rs           # Chat format/filter
+    │   ├── messages.rs       # Join/leave/kick messages
+    │   ├── rules.rs          # Server rules book
+    │   └── tablist.rs        # Tab list header/footer
+    └── world/
+        ├── openable.rs       # Double door sync
+        └── spawnprotection.rs # Spawn protection area
 ```
 
 ### Key Conventions
@@ -224,7 +235,7 @@ GitHub Actions workflows in `.github/workflows/`:
 
 To add a new module, follow these steps:
 
-1. Create new file in `src/modules/mechanics/{module}.rs`
+1. Create new file in `src/modules/{category}/{module}.rs`
 2. Add module-level docs `//!` with description and config table
 3. Define `{Module}Config` struct with `enabled: bool` + module fields
 4. Implement `Default` for config with sensible defaults
@@ -235,12 +246,12 @@ To add a new module, follow these steps:
     - `cmds()` — return commands (if needed)
     - `perms()` — return permission nodes (if commands)
 7. Implement `EventHandler<T>` for each event (if needed)
-8. In `src/config.rs`:
-    - Add `pub use crate::modules::mechanics::{module}::{Module}Config;`
-    - Add a `pub {section}: {Module}Config` field to `PluginConfig`
+8. In `src/modules/module.rs`:
+    - Add `pub(crate) use crate::modules::{category}::{module}::{Module}Config;`
+    - Add a `pub {section}: {Module}Config` field to `MechanicsConfig`
 9. In `src/lib.rs`:
-    - Add `pub mod {module}` in `modules::mechanics`
-    - Instantiate and register module in modules vec
+    - Add `pub(crate) mod {module}` under the matching `modules::{category}` block
+    - Instantiate and register module in the `register_mechanics` vec
 10. Run `cargo build --target wasm32-wasip2` to verify
 
 ## Memory System

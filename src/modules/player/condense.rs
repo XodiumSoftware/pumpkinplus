@@ -63,7 +63,7 @@
 //! ```
 
 use crate::config::ConfigManager;
-use crate::mechanics::mechanic::Mechanic;
+use crate::modules::module::Mechanic;
 use pumpkin_plugin_api::command::{Command, CommandError, CommandSender};
 use pumpkin_plugin_api::commands::CommandHandler;
 use pumpkin_plugin_api::permission::{Permission, PermissionDefault};

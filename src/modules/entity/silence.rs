@@ -46,7 +46,7 @@ use serde::{Deserialize, Serialize};
 use tracing::debug;
 
 use crate::config::ConfigManager;
-use crate::mechanics::mechanic::Mechanic;
+use crate::modules::module::Mechanic;
 use crate::{GameMode, MirrorHand};
 
 /// Permission node required to silence mobs with the configured tool item.

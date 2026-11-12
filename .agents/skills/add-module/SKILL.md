@@ -9,7 +9,7 @@ Use this skill when the user wants to add a new feature to PumpkinPlus. PumpkinP
 
 | Kind          | Trait                        | Location                                                    | Config style                         | Registered with server?                 |
 | ------------- | ---------------------------- | ----------------------------------------------------------- | ------------------------------------ | --------------------------------------- |
-| `mechanic`    | `Mechanic`                   | `src/modules/mechanics/{entity,player,server,world}/`       | Own `{Name}Config` struct            | Yes (events, commands, permissions)     |
+| `mechanic`    | `Mechanic`                   | `src/modules/{entity,player,server,world}/`                 | Own `{Name}Config` struct            | Yes (events, commands, permissions)     |
 | `enchantment` | `Enchantment`                | `src/modules/enchantments/{utility,vanilla}/`               | `bool` field in `EnchantmentsConfig` | Yes (custom definition and/or events)   |
 | `item`        | `Item` (`items::item::Item`) | `src/modules/items/{category}/` (currently only `weapons/`) | None                                 | No — pure builder used by other modules |
 | `recipe`      | `Recipe`                     | `src/modules/recipes/vanilla/`                              | `bool` field in `RecipesConfig`      | Yes (recipe entries)                    |
@@ -24,7 +24,7 @@ Use this skill when the user wants to add a new feature to PumpkinPlus. PumpkinP
     - For items: the item category subfolder, the vanilla base item, custom name, and any data components/NBT markers.
     - For recipes: shaped/shapeless/cooking recipes, patterns, ingredient keys, and output items.
 3. If unsure about values, mirror a similar existing module:
-    - Mechanic: `src/modules/mechanics/server/tablist.rs`
+    - Mechanic: `src/modules/server/tablist.rs`
     - Utility enchantment: `src/modules/enchantments/utility/embertread.rs`
     - Vanilla enchantment: `src/modules/enchantments/vanilla/fortune.rs`
     - Item: `src/modules/items/weapons/longsword.rs`
@@ -46,7 +46,7 @@ Every module file follows this item order (per `AGENTS.md` code style):
 3. `const` values (e.g. `EMBERTREAD_ID`)
 4. `#[derive(Default)] pub struct {Name};`
 5. `impl {Trait} for {Name}` — `enabled()`, then `events()`/`enchantment()`/`recipes()`/`build()`
-6. `impl EventHandler<T> for {Name}` blocks (mechanics/enchantments only)
+6. `impl EventHandler<T> for {Name}` blocks (mechanics only)
 7. Helper fns (private, at bottom, before any local config struct)
 8. `{Name}Config` struct at bottom (mechanics only)
 
@@ -56,7 +56,7 @@ Never log with `println!` — use `tracing::{info, debug, error}`.
 
 ## Mechanic
 
-1. Create `src/modules/mechanics/{category}/{name}.rs`.
+1. Create `src/modules/{category}/{name}.rs`.
 2. `enabled()` must be:
     ```rust
     fn enabled(&self) -> bool {
@@ -74,13 +74,12 @@ Never log with `println!` — use `tracing::{info, debug, error}`.
         // module fields...
     }
     ```
-5. Wire the config into `src/modules/mechanics/mechanic.rs`:
-    - Add `pub use crate::modules::mechanics::{category}::{name}::{Name}Config;` with the other `pub use` lines.
+5. Wire the config into `src/modules/module.rs`:
+    - Add `pub(crate) use crate::modules::{category}::{name}::{Name}Config;` with the other `pub(crate) use` lines.
     - Add `pub {snake_name}: {Name}Config,` with a `///` doc comment to `MechanicsConfig` (keep alphabetical with existing fields).
 6. Wire into `src/lib.rs`:
-    - Add `pub mod {name};` inside `mod modules { mod mechanics { mod {category} { ... } } }`, alphabetical.
-    - Add `pub use modules::mechanics::{category}::{name}::{Name}Config;` with the other re-exports.
-    - Add `use crate::mechanics::{category}::{name}::{Name};` with the other imports.
+    - Add `pub(crate) mod {name};` inside `mod modules { mod {category} { ... } }`, alphabetical.
+    - Add `use crate::modules::{category}::{name}::{Name};` with the other imports.
     - Add `&{Name},` to the `mechanics` vec inside `register_mechanics`, keeping existing ordering style.
 
 ## Enchantment

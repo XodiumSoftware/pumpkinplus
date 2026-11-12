@@ -38,7 +38,7 @@
 //! - `MiniMessage`: rename text uses formatted text instead of plain
 
 use crate::config::ConfigManager;
-use crate::mechanics::mechanic::Mechanic;
+use crate::modules::module::Mechanic;
 use serde::{Deserialize, Serialize};
 
 /// Handles custom anvil operations.

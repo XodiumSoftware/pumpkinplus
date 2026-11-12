@@ -46,7 +46,7 @@
 //! | `radius`  | `16`    | Spawn protection radius in blocks (vanilla default) |
 
 use crate::config::ConfigManager;
-use crate::mechanics::mechanic::Mechanic;
+use crate::modules::module::Mechanic;
 use pumpkin_plugin_api::events::{CreatureSpawnEvent, EventData, EventHandler, EventPriority};
 use pumpkin_plugin_api::world::World;
 use pumpkin_plugin_api::{Context, Server};

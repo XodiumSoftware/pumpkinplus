@@ -39,7 +39,7 @@
 //! - Page 3: Mod/Admin rules
 
 use crate::config::ConfigManager;
-use crate::mechanics::mechanic::Mechanic;
+use crate::modules::module::Mechanic;
 use serde::{Deserialize, Serialize};
 
 /// Handles server rules display in book format.

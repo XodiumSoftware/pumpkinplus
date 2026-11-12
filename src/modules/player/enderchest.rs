@@ -25,7 +25,7 @@
 //! chest portable.
 
 use crate::config::ConfigManager;
-use crate::mechanics::mechanic::Mechanic;
+use crate::modules::module::Mechanic;
 use crate::{GameMode, InteractAction, MirrorHand};
 use pumpkin_plugin_api::events::{EventData, EventHandler, EventPriority, PlayerInteractEvent};
 use pumpkin_plugin_api::item::{Item, ItemStackExt};

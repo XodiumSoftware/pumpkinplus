@@ -31,62 +31,58 @@ pub(crate) use mirror_types::interaction::InteractAction;
 
 /// All feature modules, grouped by category.
 mod modules {
-    /// Server-side gameplay mechanics.
-    pub(crate) mod mechanics {
-        pub(crate) mod mechanic;
-        /// Entity-related mechanics.
-        pub(crate) mod entity {
-            pub(crate) mod griefing;
-            pub(crate) mod silence;
-            pub(crate) mod spawn_egg;
-            pub(crate) mod tameable;
-        }
-        /// World/block-related mechanics.
-        pub(crate) mod world {
-            pub(crate) mod openable;
-            pub(crate) mod spawnprotection;
-        }
-        /// Player-related mechanics.
-        pub(crate) mod player {
-            pub(crate) mod anvil;
-            pub(crate) mod condense;
-            pub(crate) mod enderchest;
-            pub(crate) mod head;
-            pub(crate) mod locator;
-            pub(crate) mod nickname;
-            pub(crate) mod xp;
-        }
-        /// Server-wide mechanics.
-        pub(crate) mod server {
-            pub(crate) mod chat;
-            pub(crate) mod messages;
-            pub(crate) mod rules;
-            pub(crate) mod tablist;
-        }
+    pub(crate) mod module;
+    /// Entity-related mechanics.
+    pub(crate) mod entity {
+        pub(crate) mod griefing;
+        pub(crate) mod silence;
+        pub(crate) mod spawn_egg;
+        pub(crate) mod tameable;
+    }
+    /// World/block-related mechanics.
+    pub(crate) mod world {
+        pub(crate) mod openable;
+        pub(crate) mod spawnprotection;
+    }
+    /// Player-related mechanics.
+    pub(crate) mod player {
+        pub(crate) mod anvil;
+        pub(crate) mod condense;
+        pub(crate) mod enderchest;
+        pub(crate) mod head;
+        pub(crate) mod locator;
+        pub(crate) mod nickname;
+        pub(crate) mod xp;
+    }
+    /// Server-wide mechanics.
+    pub(crate) mod server {
+        pub(crate) mod chat;
+        pub(crate) mod messages;
+        pub(crate) mod rules;
+        pub(crate) mod tablist;
     }
 }
 
 pub(crate) use config::ConfigManager;
-pub(crate) use modules::mechanics;
 
-use crate::mechanics::entity::griefing::Griefing;
-use crate::mechanics::entity::silence::Silence;
-use crate::mechanics::entity::spawn_egg::SpawnEgg;
-use crate::mechanics::entity::tameable::Tameable;
-use crate::mechanics::mechanic::Mechanic;
-use crate::mechanics::player::anvil::Anvil;
-use crate::mechanics::player::condense::Condense;
-use crate::mechanics::player::enderchest::Enderchest;
-use crate::mechanics::player::head::Head;
-use crate::mechanics::player::locator::Locator;
-use crate::mechanics::player::nickname::Nickname;
-use crate::mechanics::player::xp::Xp;
-use crate::mechanics::server::chat::Chat;
-use crate::mechanics::server::messages::Messages;
-use crate::mechanics::server::rules::Rules;
-use crate::mechanics::server::tablist::Tablist;
-use crate::mechanics::world::openable::Openable;
-use crate::mechanics::world::spawnprotection::SpawnProtection;
+use crate::modules::entity::griefing::Griefing;
+use crate::modules::entity::silence::Silence;
+use crate::modules::entity::spawn_egg::SpawnEgg;
+use crate::modules::entity::tameable::Tameable;
+use crate::modules::module::Mechanic;
+use crate::modules::player::anvil::Anvil;
+use crate::modules::player::condense::Condense;
+use crate::modules::player::enderchest::Enderchest;
+use crate::modules::player::head::Head;
+use crate::modules::player::locator::Locator;
+use crate::modules::player::nickname::Nickname;
+use crate::modules::player::xp::Xp;
+use crate::modules::server::chat::Chat;
+use crate::modules::server::messages::Messages;
+use crate::modules::server::rules::Rules;
+use crate::modules::server::tablist::Tablist;
+use crate::modules::world::openable::Openable;
+use crate::modules::world::spawnprotection::SpawnProtection;
 use pumpkin_plugin_api::Context;
 use pumpkin_plugin_api::{Plugin, PluginMetadata};
 use std::time::Instant;

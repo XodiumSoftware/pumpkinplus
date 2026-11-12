@@ -31,7 +31,7 @@
 //! - Uses `entityType.spawnEgg()` to get the matching spawn egg item
 
 use crate::config::ConfigManager;
-use crate::mechanics::mechanic::Mechanic;
+use crate::modules::module::Mechanic;
 use pumpkin_plugin_api::events::{EntityDeathEvent, EventData, EventHandler, EventPriority};
 use pumpkin_plugin_api::{Context, Server};
 use serde::{Deserialize, Serialize};

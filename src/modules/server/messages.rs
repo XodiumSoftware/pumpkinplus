@@ -20,7 +20,7 @@
 //! | `{player}`  | `join_msg`, `leave_msg`, `kick_msg`, `death_msg` |
 
 use crate::config::ConfigManager;
-use crate::mechanics::mechanic::Mechanic;
+use crate::modules::module::Mechanic;
 use crate::utils::placeholders::parse_with_player_component;
 use pumpkin_plugin_api::events::{
     EventData, EventHandler, EventPriority, PlayerDeathEvent, PlayerJoinEvent, PlayerLeaveEvent,

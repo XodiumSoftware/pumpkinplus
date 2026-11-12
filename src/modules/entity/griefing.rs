@@ -23,7 +23,7 @@
 //! not expose a per-block explode list to selectively remove affected blocks.
 
 use crate::config::ConfigManager;
-use crate::mechanics::mechanic::Mechanic;
+use crate::modules::module::Mechanic;
 use crate::utils::entity::entity_type_by_id;
 use pumpkin_plugin_api::events::{
     EntityChangeBlockEvent, EntityExplodeEvent, EventData, EventHandler, EventPriority,

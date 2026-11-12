@@ -1,25 +1,26 @@
-//! Mechanic system for `PumpkinPlus`.
+//! Module system for `PumpkinPlus`.
 //!
-//! Each gameplay feature is implemented as a module implementing the [`Mechanic`] trait.
-//! Mechanics can register event handlers, commands, and permission nodes.
+//! Each gameplay feature lives under `modules/` as a module implementing the
+//! [`Mechanic`] trait. Modules can register event handlers, commands, and
+//! permission nodes.
 
-pub(crate) use crate::modules::mechanics::entity::griefing::GriefingConfig;
-pub(crate) use crate::modules::mechanics::entity::silence::SilenceConfig;
-pub(crate) use crate::modules::mechanics::entity::spawn_egg::SpawnEggConfig;
-pub(crate) use crate::modules::mechanics::entity::tameable::TameableConfig;
-pub(crate) use crate::modules::mechanics::player::anvil::AnvilConfig;
-pub(crate) use crate::modules::mechanics::player::condense::CondenseConfig;
-pub(crate) use crate::modules::mechanics::player::enderchest::EnderchestConfig;
-pub(crate) use crate::modules::mechanics::player::head::HeadConfig;
-pub(crate) use crate::modules::mechanics::player::locator::LocatorConfig;
-pub(crate) use crate::modules::mechanics::player::nickname::NicknameConfig;
-pub(crate) use crate::modules::mechanics::player::xp::XpConfig;
-pub(crate) use crate::modules::mechanics::server::chat::ChatConfig;
-pub(crate) use crate::modules::mechanics::server::messages::MessagesConfig;
-pub(crate) use crate::modules::mechanics::server::rules::RulesConfig;
-pub(crate) use crate::modules::mechanics::server::tablist::TablistConfig;
-pub(crate) use crate::modules::mechanics::world::openable::OpenableConfig;
-pub(crate) use crate::modules::mechanics::world::spawnprotection::SpawnProtectionConfig;
+pub(crate) use crate::modules::entity::griefing::GriefingConfig;
+pub(crate) use crate::modules::entity::silence::SilenceConfig;
+pub(crate) use crate::modules::entity::spawn_egg::SpawnEggConfig;
+pub(crate) use crate::modules::entity::tameable::TameableConfig;
+pub(crate) use crate::modules::player::anvil::AnvilConfig;
+pub(crate) use crate::modules::player::condense::CondenseConfig;
+pub(crate) use crate::modules::player::enderchest::EnderchestConfig;
+pub(crate) use crate::modules::player::head::HeadConfig;
+pub(crate) use crate::modules::player::locator::LocatorConfig;
+pub(crate) use crate::modules::player::nickname::NicknameConfig;
+pub(crate) use crate::modules::player::xp::XpConfig;
+pub(crate) use crate::modules::server::chat::ChatConfig;
+pub(crate) use crate::modules::server::messages::MessagesConfig;
+pub(crate) use crate::modules::server::rules::RulesConfig;
+pub(crate) use crate::modules::server::tablist::TablistConfig;
+pub(crate) use crate::modules::world::openable::OpenableConfig;
+pub(crate) use crate::modules::world::spawnprotection::SpawnProtectionConfig;
 use pumpkin_plugin_api::Context;
 use pumpkin_plugin_api::command::Command;
 use pumpkin_plugin_api::events::{EventHandler, EventPriority, FromIntoEvent};

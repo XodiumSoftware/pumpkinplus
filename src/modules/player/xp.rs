@@ -39,7 +39,7 @@
 //! - Bottle drops at player location if inventory is full
 
 use crate::config::ConfigManager;
-use crate::mechanics::mechanic::Mechanic;
+use crate::modules::module::Mechanic;
 use pumpkin_plugin_api::events::{EventData, EventHandler, EventPriority, PlayerInteractEvent};
 use pumpkin_plugin_api::permission::{Permission, PermissionDefault};
 use pumpkin_plugin_api::{Context, Server};

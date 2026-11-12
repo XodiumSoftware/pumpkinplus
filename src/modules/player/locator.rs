@@ -37,7 +37,7 @@
 //! - Supports named colors and hex codes
 
 use crate::config::ConfigManager;
-use crate::mechanics::mechanic::Mechanic;
+use crate::modules::module::Mechanic;
 use crate::utils::text::{parse_color_arg, parse_minimessage};
 use pumpkin_plugin_api::{
     Server,

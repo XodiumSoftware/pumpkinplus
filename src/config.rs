@@ -21,7 +21,7 @@ use std::path::{Path, PathBuf};
 use toml::Value;
 use tracing::error;
 
-pub(crate) use crate::modules::mechanics::mechanic::MechanicsConfig;
+pub(crate) use crate::modules::module::MechanicsConfig;
 
 thread_local! {
     static CONFIG: RefCell<Option<PluginConfig>> = const { RefCell::new(None) };

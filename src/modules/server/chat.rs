@@ -19,7 +19,7 @@
 //! | `{message}` | `chat_format`                                   |
 
 use crate::config::ConfigManager;
-use crate::mechanics::mechanic::Mechanic;
+use crate::modules::module::Mechanic;
 use crate::utils::placeholders::replace_placeholders;
 use crate::utils::text::parse_minimessage;
 use pumpkin_plugin_api::events::{AsyncPlayerChatEvent, EventData, EventHandler, EventPriority};

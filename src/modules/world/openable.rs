@@ -42,7 +42,7 @@
 //! box. To restrict them, deny the node via a permissions-management plugin.
 
 use crate::config::ConfigManager;
-use crate::mechanics::mechanic::Mechanic;
+use crate::modules::module::Mechanic;
 use crate::utils::block::{is_door, is_openable, toggle_open_property};
 use crate::{GameMode, InteractAction};
 use pumpkin_plugin_api::common::Hand;

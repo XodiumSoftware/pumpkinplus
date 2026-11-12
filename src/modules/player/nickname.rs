@@ -24,7 +24,7 @@
 //! - On join, the stored nickname is applied to the player's display name and tab list name.
 
 use crate::utils::text::parse_minimessage;
-use crate::{config::ConfigManager, mechanics::mechanic::Mechanic};
+use crate::{config::ConfigManager, modules::module::Mechanic};
 use pumpkin_plugin_api::{
     Context, PersistentDataHolder, Server,
     command::{Command, CommandError, CommandNode, CommandSender, ConsumedArgs},

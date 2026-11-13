@@ -2,9 +2,9 @@ name: Xodium CI/CD
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -38,7 +38,7 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@d197c158264056996cfba74a9c2d93886346edc3
         with:
           toolchain: stable
-          target: wasm32-wasip2
+          target: wasm32-wasip3
           components: rustfmt, clippy
 
       - id: run_sccache_cache
@@ -53,12 +53,12 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: ${{ runner.os }}-wasm32-wasip2-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-wasm32-wasip3-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - id: run_lint
         name: Run Lint
         run: |
-          cargo clippy --all-targets --all-features --target wasm32-wasip2 -- -W clippy::pedantic -D warnings
+          cargo clippy --all-targets --all-features --target wasm32-wasip3 -- -W clippy::pedantic -D warnings
           cargo fmt --all -- --check
         shell: bash
 
@@ -84,14 +84,14 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: ${{ runner.os }}-wasm32-wasip2-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-wasm32-wasip3-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - id: setup_rust
         name: Setup Rust
         uses: actions-rust-lang/setup-rust-toolchain@d197c158264056996cfba74a9c2d93886346edc3
         with:
           toolchain: stable
-          target: wasm32-wasip2
+          target: wasm32-wasip3
 
       - id: run_sccache_cache
         name: Run sccache-cache
@@ -99,7 +99,7 @@ jobs:
 
       - id: build_artifact
         name: Build Artefact
-        run: cargo build --release --target wasm32-wasip2 --timings
+        run: cargo build --release --target wasm32-wasip3 --timings
         shell: bash
 
       - id: get_name
@@ -117,13 +117,13 @@ jobs:
         name: Upload Artifact
         uses: actions/upload-artifact@v7.0.2
         with:
-          name: ${{ steps.get_name.outputs.NAME }}-wasm32-wasip2
-          path: target/wasm32-wasip2/release/${{ steps.get_name.outputs.NAME }}.wasm
+          name: ${{ steps.get_name.outputs.NAME }}-wasm32-wasip3
+          path: target/wasm32-wasip3/release/${{ steps.get_name.outputs.NAME }}.wasm
           retention-days: 7
 
   nightly_release:
     name: Nightly Release
-    needs: [ build ]
+    needs: [build]
     runs-on: ubuntu-latest
     environment:
       name: "${{ github.ref_name }}"

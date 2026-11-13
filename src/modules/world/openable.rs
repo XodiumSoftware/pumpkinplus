@@ -102,9 +102,8 @@ impl EventHandler<PlayerInteractEvent> for Openable {
             return event;
         }
 
-        let config: OpenableConfig = ConfigManager::get()
-            .map(|cm| cm.mechanics.openable)
-            .unwrap_or_default();
+        let config: OpenableConfig =
+            ConfigManager::get().map_or_else(Default::default, |cm| cm.mechanics.openable);
 
         let action = InteractAction::from(event.action);
 

@@ -196,9 +196,8 @@ fn condensable_map(config: &CondenseConfig, reverse: bool) -> HashMap<Item, Item
 ///
 /// Returns the total number of items condensed/uncondensed.
 fn condense_inventory(player: &Player, reverse: bool) -> u32 {
-    let config: CondenseConfig = ConfigManager::get()
-        .map(|cm| cm.mechanics.condense)
-        .unwrap_or_default();
+    let config: CondenseConfig =
+        ConfigManager::get().map_or_else(Default::default, |cm| cm.mechanics.condense);
 
     let map = condensable_map(&config, reverse);
     let inventory = player.get_inventory().as_inventory();

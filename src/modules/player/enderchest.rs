@@ -69,9 +69,8 @@ impl EventHandler<PlayerInteractEvent> for Enderchest {
             return event;
         }
 
-        let config: EnderchestConfig = ConfigManager::get()
-            .map(|cm| cm.mechanics.enderchest)
-            .unwrap_or_default();
+        let config: EnderchestConfig =
+            ConfigManager::get().map_or_else(Default::default, |cm| cm.mechanics.enderchest);
 
         let action = InteractAction::from(event.action);
         if !action.matches_config(&config.actions) {

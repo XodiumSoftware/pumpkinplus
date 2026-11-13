@@ -52,9 +52,8 @@ impl EventHandler<PlayerJoinEvent> for Messages {
         _server: Server,
         mut event: EventData<PlayerJoinEvent>,
     ) -> EventData<PlayerJoinEvent> {
-        let config: MessagesConfig = ConfigManager::get()
-            .map(|cm| cm.mechanics.messages)
-            .unwrap_or_default();
+        let config: MessagesConfig =
+            ConfigManager::get().map_or_else(Default::default, |cm| cm.mechanics.messages);
         if config.join_msg.is_empty() {
             return event;
         }
@@ -69,9 +68,8 @@ impl EventHandler<PlayerLeaveEvent> for Messages {
         _server: Server,
         mut event: EventData<PlayerLeaveEvent>,
     ) -> EventData<PlayerLeaveEvent> {
-        let config: MessagesConfig = ConfigManager::get()
-            .map(|cm| cm.mechanics.messages)
-            .unwrap_or_default();
+        let config: MessagesConfig =
+            ConfigManager::get().map_or_else(Default::default, |cm| cm.mechanics.messages);
         if config.leave_msg.is_empty() {
             return event;
         }
@@ -86,9 +84,8 @@ impl EventHandler<PlayerLoginEvent> for Messages {
         _server: Server,
         mut event: EventData<PlayerLoginEvent>,
     ) -> EventData<PlayerLoginEvent> {
-        let config: MessagesConfig = ConfigManager::get()
-            .map(|cm| cm.mechanics.messages)
-            .unwrap_or_default();
+        let config: MessagesConfig =
+            ConfigManager::get().map_or_else(Default::default, |cm| cm.mechanics.messages);
         if config.kick_msg.is_empty() {
             return event;
         }
@@ -103,9 +100,8 @@ impl EventHandler<PlayerDeathEvent> for Messages {
         _server: Server,
         mut event: EventData<PlayerDeathEvent>,
     ) -> EventData<PlayerDeathEvent> {
-        let config: MessagesConfig = ConfigManager::get()
-            .map(|cm| cm.mechanics.messages)
-            .unwrap_or_default();
+        let config: MessagesConfig =
+            ConfigManager::get().map_or_else(Default::default, |cm| cm.mechanics.messages);
         if config.death_msg.is_empty() {
             return event;
         }

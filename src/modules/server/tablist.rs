@@ -75,9 +75,8 @@ impl Tablist {
 
     /// Refreshes the tab list header and footer for every online player.
     fn update_tablist_for_all_players(server: &Server) {
-        let config: TablistConfig = ConfigManager::get()
-            .map(|cm| cm.mechanics.tablist)
-            .unwrap_or_default();
+        let config: TablistConfig =
+            ConfigManager::get().map_or_else(Default::default, |cm| cm.mechanics.tablist);
 
         if !config.enabled {
             return;
@@ -95,9 +94,8 @@ impl EventHandler<PlayerJoinEvent> for Tablist {
         server: Server,
         event: EventData<PlayerJoinEvent>,
     ) -> EventData<PlayerJoinEvent> {
-        let config: TablistConfig = ConfigManager::get()
-            .map(|cm| cm.mechanics.tablist)
-            .unwrap_or_default();
+        let config: TablistConfig =
+            ConfigManager::get().map_or_else(Default::default, |cm| cm.mechanics.tablist);
 
         if !self.enabled() {
             return event;

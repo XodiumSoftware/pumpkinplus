@@ -60,9 +60,8 @@ impl EventHandler<EntityChangeBlockEvent> for Griefing {
                 .try_into()
                 .expect("entity id should fit in u32"),
         ) {
-            let config: GriefingConfig = ConfigManager::get()
-                .map(|cm| cm.mechanics.griefing)
-                .unwrap_or_default();
+            let config: GriefingConfig =
+                ConfigManager::get().map_or_else(Default::default, |cm| cm.mechanics.griefing);
             if config.cancelled_entities.contains(&entity_type) {
                 event.cancelled = true;
             }
@@ -84,9 +83,8 @@ impl EventHandler<EntityExplodeEvent> for Griefing {
                 .try_into()
                 .expect("entity id should fit in u32"),
         ) {
-            let config: GriefingConfig = ConfigManager::get()
-                .map(|cm| cm.mechanics.griefing)
-                .unwrap_or_default();
+            let config: GriefingConfig =
+                ConfigManager::get().map_or_else(Default::default, |cm| cm.mechanics.griefing);
             if config.cancelled_entities.contains(&entity_type) {
                 event.cancelled = true;
             }

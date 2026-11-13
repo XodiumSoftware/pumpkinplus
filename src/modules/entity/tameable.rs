@@ -85,9 +85,8 @@ impl EventHandler<PlayerInteractEntityEvent> for Tameable {
         _server: Server,
         event: EventData<PlayerInteractEntityEvent>,
     ) -> EventData<PlayerInteractEntityEvent> {
-        let config: TameableConfig = ConfigManager::get()
-            .map(|cm| cm.mechanics.tameable)
-            .unwrap_or_default();
+        let config: TameableConfig =
+            ConfigManager::get().map_or_else(Default::default, |cm| cm.mechanics.tameable);
 
         if !config.enabled {
             return event;

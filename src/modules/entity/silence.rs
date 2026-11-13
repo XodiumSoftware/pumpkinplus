@@ -88,9 +88,8 @@ impl EventHandler<PlayerInteractEntityEvent> for Silence {
         _server: Server,
         mut event: EventData<PlayerInteractEntityEvent>,
     ) -> EventData<PlayerInteractEntityEvent> {
-        let config: SilenceConfig = ConfigManager::get()
-            .map(|cm| cm.mechanics.silence)
-            .unwrap_or_default();
+        let config: SilenceConfig =
+            ConfigManager::get().map_or_else(Default::default, |cm| cm.mechanics.silence);
 
         if !config.enabled {
             return event;

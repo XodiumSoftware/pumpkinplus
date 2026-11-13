@@ -27,4 +27,4 @@ build-copy: build
 doc:
     cargo doc --no-deps
 
-validate: lint fmt build
+validate: lint fmt build-copy

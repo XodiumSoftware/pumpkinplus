@@ -226,14 +226,14 @@ GitHub Actions workflows in `.github/workflows/`:
 - **docs.yml** — Builds rustdoc and deploys it to GitHub Pages on push to `main` (PRs build only)
 - **enforce_pr_title.yml** — Validates PR titles follow conventional commits
 
-GitHub Pages is deployed from a workflow, so nothing generated is committed. The
-site is built with `--document-private-items` because nearly all items are
-`pub(crate)`; that flag is also what makes rustdoc emit the `src/` tree the
-"Source" links point at. The workflow uploads `target/wasm32-wasip3/doc/pumpkinplus`
-as the site root rather than `.../doc`, so the landing page lives at
-<https://xodiumsoftware.github.io/pumpkinplus/> instead of the doubled
-`/pumpkinplus/pumpkinplus/` rustdoc would otherwise produce. The repository's
-Pages source must stay set to **GitHub Actions**.
+GitHub Pages is deployed from a workflow, so nothing generated is committed, and
+the repository's Pages source must stay set to **GitHub Actions**. rustdoc writes
+the site to `target/wasm32-wasip3/doc/`, and the workflow uploads that directory
+as the artifact unchanged. Do not hoist `doc/<crate>/` to the artifact root:
+every page embeds `root-path="../"`, which only resolves to
+`/pumpkinplus/static.files/` while the crate sits one level down. Flattening it
+makes the page request `/static.files/` at the domain root, where nothing is
+served. Live at <https://xodiumsoftware.github.io/pumpkinplus/pumpkinplus/>.
 
 ## Adding a New Module
 

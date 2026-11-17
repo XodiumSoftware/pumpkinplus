@@ -51,28 +51,12 @@ jobs:
         run: cargo doc --no-deps --document-private-items --target wasm32-wasip3
         shell: bash
 
-      - id: flatten_docs
-        name: Flatten Docs
-        # rustdoc nests the crate's pages in <crate>/ and keeps the shared assets
-        # (static.files, crates.js, search.index, src, ...) alongside it, linked
-        # as ../<asset>. Uploading <crate>/ alone would 404 every asset, so hoist
-        # only the crate's own pages to the site root and drop the shared ones in
-        # beside them.
-        run: |
-          doc=target/wasm32-wasip3/doc
-          mkdir -p site
-          mv "$doc/pumpkinplus"/* site/
-          for asset in "$doc"/*; do
-            [ "$(basename "$asset")" = pumpkinplus ] || mv "$asset" site/
-          done
-        shell: bash
-
       - id: upload_pages_artifact
         name: Upload Pages Artefact
         if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v5.0.0
         with:
-          path: site
+          path: target/wasm32-wasip3/doc
 
   deploy:
     name: Deploy

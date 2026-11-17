@@ -27,4 +27,8 @@ build-copy: build
 doc:
     cargo doc --no-deps
 
+# Local preview of the GitHub Pages rustdoc site (same flags as docs.yml).
+docs:
+    cargo doc --no-deps --document-private-items --target wasm32-wasip3
+
 validate: lint fmt build-copy

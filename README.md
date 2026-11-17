@@ -18,12 +18,14 @@
 [![Contributors][contributors_shield_url]][contributors_url]
 [![Issues][issues_shield_url]][issues_url]
 [![Deps][deps_shield_url]][deps_url]
+[![Docs][docs_shield_url]][docs_url]
 </div>
 
 ## Table of Contents
 
 - [Overview](#overview)
 - [Built With](#built-with)
+- [API Docs][docs_url]
 - [Guide][guide_url]
 - [Contributing][contributing_url]
 - [Code of Conduct][code_of_conduct_url]
@@ -51,6 +53,8 @@
 [contributors_url]: https://github.com/XodiumSoftware/pumpkinplus/graphs/contributors
 [deps_shield_url]: https://deps.rs/repo/github/XodiumSoftware/pumpkinplus/status.svg?style=for-the-badge
 [deps_url]: https://deps.rs/repo/github/XodiumSoftware/pumpkinplus
+[docs_shield_url]: https://img.shields.io/badge/docs-rustdoc-blue?style=for-the-badge
+[docs_url]: https://xodiumsoftware.github.io/pumpkinplus/pumpkinplus/
 [guide_url]: GUIDE.md
 [built_with_shield_url]: https://skillicons.dev/icons?i=rust,github,githubactions
 [built_with_url]: https://skillicons.dev

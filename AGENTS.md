@@ -213,7 +213,8 @@ src/
     - Add new modules or public APIs
     - Change config fields or placeholders
     - Add commands or events
-    - **Run `cargo doc --no-deps --target wasm32-wasip2`** to verify
+    - **Run `cargo doc --no-deps --target wasm32-wasip3`** to verify
+    - Locally preview the published site with **`just docs`** (same flags as CI)
 
 **Rule of thumb:** If a code change would confuse someone reading the docs, update the docs.
 
@@ -221,9 +222,15 @@ src/
 
 GitHub Actions workflows in `.github/workflows/`:
 
-- **plugin.yml** — Builds WASM plugin on push/PR, uploads artifact
-- **docs.yml** — Generates rustdoc and deploys to GitHub Pages
+- **rust.yml** — Lints and builds the WASM plugin on push/PR, publishes the nightly release
+- **docs.yml** — Builds rustdoc and deploys it to GitHub Pages on push to `main`
 - **enforce_pr_title.yml** — Validates PR titles follow conventional commits
+
+GitHub Pages is deployed from a workflow, so nothing generated is committed. The
+site is built with `--document-private-items` because nearly all items are
+`pub(crate)`; that flag is also what makes rustdoc emit the `src/` tree the
+"Source" links point at. Live at <https://xodiumsoftware.github.io/pumpkinplus/pumpkinplus/>.
+The repository's Pages source must stay set to **GitHub Actions**.
 
 ## Adding a New Module
 

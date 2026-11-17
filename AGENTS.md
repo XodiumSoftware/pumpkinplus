@@ -214,7 +214,6 @@ src/
     - Change config fields or placeholders
     - Add commands or events
     - **Run `cargo doc --no-deps --target wasm32-wasip3`** to verify
-    - Locally preview the published site with **`just docs`** (same flags as CI)
 
 **Rule of thumb:** If a code change would confuse someone reading the docs, update the docs.
 
@@ -223,17 +222,7 @@ src/
 GitHub Actions workflows in `.github/workflows/`:
 
 - **rust.yml** — Lints and builds the WASM plugin on push/PR, publishes the nightly release
-- **docs.yml** — Builds rustdoc and deploys it to GitHub Pages on push to `main` (PRs build only)
 - **enforce_pr_title.yml** — Validates PR titles follow conventional commits
-
-GitHub Pages is deployed from a workflow, so nothing generated is committed, and
-the repository's Pages source must stay set to **GitHub Actions**. rustdoc writes
-the site to `target/wasm32-wasip3/doc/`, and the workflow uploads that directory
-as the artifact unchanged. Do not hoist `doc/<crate>/` to the artifact root:
-every page embeds `root-path="../"`, which only resolves to
-`/pumpkinplus/static.files/` while the crate sits one level down. Flattening it
-makes the page request `/static.files/` at the domain root, where nothing is
-served. Live at <https://xodiumsoftware.github.io/pumpkinplus/pumpkinplus/>.
 
 ## Adding a New Module
 

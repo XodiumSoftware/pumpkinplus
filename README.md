@@ -54,7 +54,7 @@
 [deps_shield_url]: https://deps.rs/repo/github/XodiumSoftware/pumpkinplus/status.svg?style=for-the-badge
 [deps_url]: https://deps.rs/repo/github/XodiumSoftware/pumpkinplus
 [docs_shield_url]: https://img.shields.io/badge/docs-rustdoc-blue?style=for-the-badge
-[docs_url]: https://xodiumsoftware.github.io/pumpkinplus/pumpkinplus/
+[docs_url]: https://xodiumsoftware.github.io/pumpkinplus/
 [guide_url]: GUIDE.md
 [built_with_shield_url]: https://skillicons.dev/icons?i=rust,github,githubactions
 [built_with_url]: https://skillicons.dev

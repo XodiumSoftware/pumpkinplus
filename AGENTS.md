@@ -223,14 +223,17 @@ src/
 GitHub Actions workflows in `.github/workflows/`:
 
 - **rust.yml** — Lints and builds the WASM plugin on push/PR, publishes the nightly release
-- **docs.yml** — Builds rustdoc and deploys it to GitHub Pages on push to `main`
+- **docs.yml** — Builds rustdoc and deploys it to GitHub Pages on push to `main` (PRs build only)
 - **enforce_pr_title.yml** — Validates PR titles follow conventional commits
 
 GitHub Pages is deployed from a workflow, so nothing generated is committed. The
 site is built with `--document-private-items` because nearly all items are
 `pub(crate)`; that flag is also what makes rustdoc emit the `src/` tree the
-"Source" links point at. Live at <https://xodiumsoftware.github.io/pumpkinplus/pumpkinplus/>.
-The repository's Pages source must stay set to **GitHub Actions**.
+"Source" links point at. The workflow uploads `target/wasm32-wasip3/doc/pumpkinplus`
+as the site root rather than `.../doc`, so the landing page lives at
+<https://xodiumsoftware.github.io/pumpkinplus/> instead of the doubled
+`/pumpkinplus/pumpkinplus/` rustdoc would otherwise produce. The repository's
+Pages source must stay set to **GitHub Actions**.
 
 ## Adding a New Module
 

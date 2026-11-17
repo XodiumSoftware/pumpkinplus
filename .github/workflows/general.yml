@@ -1,4 +1,4 @@
-name: Xodium CI/CD
+name: Lint, Build & Release CI/CD
 
 on:
   push:

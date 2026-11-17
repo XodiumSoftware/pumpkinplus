@@ -1,4 +1,4 @@
-name: Docs
+name: Docs CI/CD
 
 on:
   push:

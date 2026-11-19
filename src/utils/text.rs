@@ -4,7 +4,6 @@
 //! formatted strings into Pumpkin `TextComponent` trees.
 
 use std::borrow::Cow;
-use std::collections::HashMap;
 use std::str::FromStr;
 
 use minimessage_impl::parser::{Expression, Node, Parser};
@@ -17,32 +16,15 @@ use pumpkin_plugin_api::text::TextComponent;
 /// `<click:open_url:...>`) and returns a styled `TextComponent`.
 ///
 /// Text placeholders written as `{name}` (Adventure's interpolation syntax) are
-/// preserved literally — they are not resolved. Use [`parse_minimessage_with_args`]
-/// to substitute named placeholders with values.
+/// rendered as their literal source text so typos stay visible instead of being
+/// silently dropped. Substituting a styled player name is handled separately by
+/// [`parse_with_player_component`](crate::utils::placeholders::parse_with_player_component).
 ///
 /// If the input fails to parse, the error is logged and the raw input is
 /// returned as a plain text component so a typo in the config never breaks
 /// message delivery.
 #[must_use]
 pub(crate) fn parse_minimessage(input: &str) -> TextComponent {
-    parse_minimessage_with_args(input, &HashMap::new())
-}
-
-/// Parses a `MiniMessage` string, substituting `{name}` expressions with the
-/// corresponding values from `args`.
-///
-/// Each `{name}` placeholder found in the input is replaced with the matching
-/// value from `args`. Unknown placeholders are rendered as their literal source
-/// text (e.g. `{name}`) so typos are visible instead of silently dropped.
-///
-/// Placeholder values are inserted as literal text — `MiniMessage` tags inside
-/// an argument value are not re-parsed. This keeps the surrounding format's
-/// styling in control of the final rendering.
-#[must_use]
-pub(crate) fn parse_minimessage_with_args(
-    input: &str,
-    args: &HashMap<&str, &str>,
-) -> TextComponent {
     let nodes: Vec<Node<'_>> = Parser::new(Tokenizer::new(input))
         .collect::<Result<Vec<_>, _>>()
         .unwrap_or_else(|err| {
@@ -52,30 +34,19 @@ pub(crate) fn parse_minimessage_with_args(
 
     let mut root = TextComponent::text("");
     for node in &nodes {
-        root = root.add_child(node_to_component(node, args));
+        root = root.add_child(node_to_component(node));
     }
     root
 }
 
 /// Recursively converts a [`Node`] from `minimessage-impl` into a [`TextComponent`].
-fn node_to_component(node: &Node<'_>, args: &HashMap<&str, &str>) -> TextComponent {
+fn node_to_component(node: &Node<'_>) -> TextComponent {
     match node {
         Node::Text(text) => TextComponent::text(text.as_ref()),
 
-        Node::Expression(Expression::Unnamed) => {
-            // Unnamed placeholders (`{}`, `{<index>}`) aren't supported — render
-            // as empty text.
-            TextComponent::text("")
-        }
+        Node::Expression(Expression::Unnamed) => TextComponent::text(""),
 
-        Node::Expression(Expression::Named(name)) => {
-            // Named placeholders (`{name}`) are looked up in `args`. Unknown
-            // names render as their literal source text so typos stay visible.
-            args.get(name.as_ref()).map_or_else(
-                || TextComponent::text(&format!("{{{name}}}")),
-                |value| TextComponent::text(value),
-            )
-        }
+        Node::Expression(Expression::Named(name)) => TextComponent::text(&format!("{{{name}}}")),
 
         Node::Element {
             tag,
@@ -85,7 +56,6 @@ fn node_to_component(node: &Node<'_>, args: &HashMap<&str, &str>) -> TextCompone
             let mut comp = TextComponent::text("");
             let mut matched = false;
 
-            // Decorations (bold, italic, etc.)
             if let Ok(decoration) = Decoration::from_str(tag) {
                 matched = true;
                 comp = match decoration {
@@ -97,7 +67,6 @@ fn node_to_component(node: &Node<'_>, args: &HashMap<&str, &str>) -> TextCompone
                 };
             }
 
-            // Special tags (click, hover, color, rainbow)
             if !matched {
                 match Special::from_descriptor(tag, tag_descriptors.clone()) {
                     Ok(special) => {
@@ -112,20 +81,18 @@ fn node_to_component(node: &Node<'_>, args: &HashMap<&str, &str>) -> TextCompone
                 }
             }
 
-            // Named colors
             if !matched && let Ok(color) = NamedColor::from_str(tag) {
                 matched = true;
                 comp = comp.color_named(map_named_color(color));
             }
 
-            // Unknown tag — treat as literal text
             if !matched {
                 tracing::warn!("Unknown MiniMessage tag: {tag:?}");
                 return TextComponent::text("");
             }
 
             for child in children {
-                comp = comp.add_child(node_to_component(child, args));
+                comp = comp.add_child(node_to_component(child));
             }
 
             comp
@@ -158,8 +125,6 @@ fn apply_special(comp: TextComponent, special: Special) -> TextComponent {
             b: color.2,
         }),
         Special::Rainbow(_rainbow) => {
-            // Rainbow is applied per-character, which requires splitting text
-            // into per-char children — not yet supported in our simple converter.
             tracing::warn!("MiniMessage <rainbow> tag is not yet supported");
             comp
         }
@@ -205,14 +170,11 @@ pub(crate) fn parse_color_arg(input: &str) -> Option<RgbColor> {
         return None;
     }
 
-    // Strip `<...>` wrapping so `<red>`, `<#FF8800>`, and `<color:#FF8800>`
-    // all reduce to a bare descriptor we can parse below.
     let unwrapped = trimmed
         .strip_prefix('<')
         .and_then(|s| s.strip_suffix('>'))
         .map_or(trimmed, |inner| inner.trim());
 
-    // Split on `:` to handle `<color:#FF8800>` / `<c:#FF8800>` aliases.
     let descriptor = match unwrapped.split_once(':') {
         Some(("color" | "colour" | "c", value)) => value.trim(),
         _ => unwrapped,

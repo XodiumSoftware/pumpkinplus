@@ -226,14 +226,12 @@ fn condense_inventory(player: &Player, reverse: bool) -> u32 {
         let remaining = count - (amount * CONDENSE_AMOUNT);
         let produced = u32::from(amount);
 
-        // Update the source slot
         if remaining > 0 {
             item.set_count(remaining);
         } else {
             inventory.set_item(slot, None);
         }
 
-        // Add the target items (manual overflow handling — no drop_item API)
         add_items(&inventory, target, amount);
 
         total += produced;

@@ -148,9 +148,6 @@ impl EventHandler<PlayerInteractEntityEvent> for Silence {
         let pos = entity.get_position();
 
         if let Some(java) = event.player.as_java() {
-            // Java clients get a properly colored dust particle via the raw
-            // c-particle packet; the high-level WIT spawn_particle call cannot
-            // carry dust option bytes.
             let (red, green, blue) = if now_silent {
                 (1.0_f32, 0.0_f32, 0.0_f32)
             } else {
@@ -174,7 +171,6 @@ impl EventHandler<PlayerInteractEntityEvent> for Silence {
             });
             java.send_packet(&packet);
         } else {
-            // Non-Java players see a generic dust cloud without color data.
             event.player.spawn_particles(
                 Particle::Dust,
                 pos,

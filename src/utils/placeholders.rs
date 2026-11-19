@@ -57,7 +57,6 @@ pub(crate) fn parse_with_player_component(format: &str, player: &Player) -> Text
     let player_json = player.get_display_name().to_json();
 
     let Some(substituted) = substitute_text_placeholder(&json, "{player}", &player_json) else {
-        // No text node contained the placeholder — return the parsed format as-is.
         return parsed;
     };
 
@@ -85,50 +84,30 @@ fn substitute_text_placeholder(
     let mut any_replaced = false;
 
     while let Some(idx) = rest.find(placeholder) {
-        // Find the enclosing JSON string for this occurrence.
         let Some((str_start, str_end)) = find_enclosing_json_string(rest, idx) else {
-            // Not inside a string — give up on this occurrence and continue scanning.
             out.push_str(&rest[..idx]);
             out.push_str(placeholder);
             rest = &rest[idx + placeholder.len()..];
             continue;
         };
 
-        // The enclosing string must be the value of a `"text":"..."` pair.
-        // Check the bytes immediately before the opening quote for a `"text":`
-        // prefix (allowing whitespace).
         if !is_text_value_at(rest, str_start) {
-            // Copy everything up to and including this string verbatim and keep scanning.
             out.push_str(&rest[..=str_end]);
             rest = &rest[str_end + 1..];
             continue;
         }
 
-        // The string may contain the placeholder multiple times and may sit beside
-        // other text. Split at every placeholder, emitting alternating text leaves
-        // and the replacement component.
         let content = &rest[str_start + 1..str_end];
         let pieces: Vec<&str> = content.split(placeholder).collect();
 
         if pieces.len() == 1 {
-            // No placeholder in this particular string (shouldn't happen given the
-            // find above, but be safe).
             out.push_str(&rest[..=str_end]);
             rest = &rest[str_end + 1..];
             continue;
         }
 
-        // Everything up to (but not including) the string's opening quote.
         out.push_str(&rest[..str_start]);
 
-        // Replace the `"..."` string value with a shorter string containing only
-        // the first piece, then append an `extra` array with the replacement
-        // component followed by the remaining pieces as text leaves:
-        //
-        //   {"text":"first","extra":[<replacement>,{"text":"second"},...]}
-        //
-        // The trailing bytes of the original object (typically `}` or `,...`) are
-        // re-attached afterwards, which closes the rewritten object correctly.
         out.push('"');
         out.push_str(pieces[0]);
         out.push_str("\",\"extra\":[");
@@ -167,26 +146,21 @@ fn is_text_value_at(json: &str, str_start: usize) -> bool {
         return false;
     }
 
-    // Skip whitespace backwards.
     let mut i = str_start;
     while i > 0 && bytes[i - 1].is_ascii_whitespace() {
         i -= 1;
     }
-    // Expect `:`.
     if i == 0 || bytes[i - 1] != b':' {
         return false;
     }
     i -= 1;
-    // Skip whitespace.
     while i > 0 && bytes[i - 1].is_ascii_whitespace() {
         i -= 1;
     }
-    // Expect closing quote of `"text"`.
     if i == 0 || bytes[i - 1] != b'"' {
         return false;
     }
     i -= 1;
-    // Expect "text".
     if i < 4 {
         return false;
     }
@@ -201,7 +175,6 @@ fn is_text_value_at(json: &str, str_start: usize) -> bool {
 fn find_enclosing_json_string(json: &str, pos: usize) -> Option<(usize, usize)> {
     let bytes = json.as_bytes();
 
-    // Scan backwards for a non-escaped `"`.
     let mut start = pos;
     loop {
         if start == 0 {
@@ -209,7 +182,6 @@ fn find_enclosing_json_string(json: &str, pos: usize) -> Option<(usize, usize)> 
         }
         start -= 1;
         if bytes[start] == b'"' {
-            // Count consecutive backslashes before this quote.
             let mut backslashes = 0;
             let mut i = start;
             while i > 0 && bytes[i - 1] == b'\\' {
@@ -222,7 +194,6 @@ fn find_enclosing_json_string(json: &str, pos: usize) -> Option<(usize, usize)> 
         }
     }
 
-    // Scan forwards for the matching non-escaped `"`.
     let mut end = pos;
     loop {
         if end >= bytes.len() {

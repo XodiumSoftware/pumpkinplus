@@ -51,9 +51,6 @@ impl Module for Anvil {
     fn enabled(&self) -> bool {
         ConfigManager::get().is_some_and(|cm| cm.mechanics.anvil.enabled)
     }
-
-    // No events registered — stub module due to missing APIs.
-    // The required anvil events (InventoryOpen, PrepareAnvil) don't exist.
 }
 
 /// Configuration for the anvil mechanics module.

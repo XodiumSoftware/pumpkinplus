@@ -58,6 +58,7 @@ pub(crate) const PERM_SYNC: &str = concat!(env!("CARGO_PKG_NAME"), ":openable.sy
 /// Permission node required to knock on openable blocks.
 pub(crate) const PERM_KNOCK: &str = concat!(env!("CARGO_PKG_NAME"), ":openable.knock");
 
+// TODO: Re-enable once world.play_sound() accepts this typed Sound without an ABI error.
 // /// Sound played when a player knocks on an openable block.
 // const KNOCK_SOUND: Sound = Sound::EntityZombieAttackWoodenDoor;
 
@@ -171,8 +172,6 @@ fn handle_sync(
         return event;
     };
 
-    // Both halves share one `open` state, so the clicked door decides the target
-    // and any half already there is left untouched.
     let target_id = if clicked_state_id == closed_id {
         open_id
     } else if clicked_state_id == open_id {
@@ -282,8 +281,6 @@ fn find_adjacent_door(world: &World, pos: BlockPos) -> Option<BlockPos> {
 }
 
 /// Configuration for the openable mechanics module.
-// Config structs intentionally use multiple feature toggles; a state machine
-// does not apply here since fields are deserialized independently.
 #[allow(clippy::struct_excessive_bools)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub(crate) struct OpenableConfig {

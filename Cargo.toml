@@ -4,6 +4,7 @@ version = "0.0.6"
 edition = "2024"
 authors = ["Xodium"]
 description = "Minecraft Pumpkin plugin that enhances the base gameplay"
+publish = false
 
 [lib]
 crate-type = ["cdylib"]

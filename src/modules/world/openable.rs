@@ -43,7 +43,7 @@
 
 use crate::config::ConfigManager;
 use crate::modules::module::Module;
-use crate::utils::block::{is_door, is_openable, toggle_open_property};
+use crate::utils::block::{door_open_pair, is_door, is_openable};
 use crate::{GameMode, InteractAction};
 use pumpkin_plugin_api::common::Hand;
 use pumpkin_plugin_api::events::{EventData, EventHandler, EventPriority, PlayerInteractEvent};
@@ -167,10 +167,17 @@ fn handle_sync(
         return event;
     }
 
-    let Some(new_clicked_id) = toggle_open_property(&clicked_info) else {
+    let Some((closed_id, open_id)) = door_open_pair(&clicked_info) else {
         return event;
     };
-    let Some(new_adjacent_id) = toggle_open_property(&adjacent_info) else {
+
+    // Both halves share one `open` state, so the clicked door decides the target
+    // and any half already there is left untouched.
+    let target_id = if clicked_state_id == closed_id {
+        open_id
+    } else if clicked_state_id == open_id {
+        closed_id
+    } else {
         return event;
     };
 
@@ -178,8 +185,14 @@ fn handle_sync(
 
     let flags = BlockFlags::NOTIFY_NEIGHBORS | BlockFlags::NOTIFY_LISTENERS;
 
-    world.set_block_state(clicked_pos, new_clicked_id, flags);
-    world.set_block_state(adjacent_pos, new_adjacent_id, flags);
+    for (pos, current_id) in [
+        (clicked_pos, clicked_state_id),
+        (adjacent_pos, adjacent_state_id),
+    ] {
+        if current_id != target_id {
+            world.set_block_state(pos, target_id, flags);
+        }
+    }
 
     event
 }

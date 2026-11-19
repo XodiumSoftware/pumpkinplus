@@ -1,6 +1,6 @@
 //! Block state manipulation helpers.
 
-use pumpkin_plugin_api::world::{BlockStateInfo, resolve_block_state};
+use pumpkin_plugin_api::world::{Block, BlockStateInfo, resolve_block_state};
 
 /// Checks whether the block described by `info` is an openable structure
 /// (door, trapdoor, or fence gate).
@@ -21,24 +21,30 @@ pub(crate) fn is_door(info: &BlockStateInfo) -> bool {
     info.name.ends_with("_door")
 }
 
-/// Returns the state ID of a block identical to `info` but with its `open`
-/// property toggled (`true` ↔ `false`).
+/// Returns the `(closed, open)` state ID pair of the door described by
+/// `info`, keyed by the `open` property.
 ///
-/// Returns `None` if the block has no `open` property or if the resulting
-/// property set cannot be resolved back to a valid state ID.
+/// Resolves `open=true` through the API once and derives `open=false` from the
+/// door's state list, so a double door needs a single API call instead of two.
+/// Returns `None` if the block has no `open` property, the door does not have
+/// exactly two states, or the open state cannot be resolved.
 #[must_use]
-pub(crate) fn toggle_open_property(info: &BlockStateInfo) -> Option<u16> {
-    let mut properties = info.properties.clone();
-    for (key, value) in &mut properties {
-        if key == "open" {
-            *value = if value == "true" {
-                "false".into()
-            } else {
-                "true".into()
-            };
-            break;
-        }
+pub(crate) fn door_open_pair(info: &BlockStateInfo) -> Option<(u16, u16)> {
+    if !info.properties.iter().any(|(key, _)| key == "open") {
+        return None;
     }
 
-    resolve_block_state(&info.name, &properties)
+    let mut properties = info.properties.clone();
+    let (_, value) = properties.iter_mut().find(|(key, _)| key == "open")?;
+    value.clear();
+    value.push_str("true");
+
+    let open_id = resolve_block_state(&info.name, &properties)?;
+    let block = Block::from_state_id(open_id)?;
+    if block.state_ids.len() != 2 {
+        return None;
+    }
+    let closed_id = block.state_ids.into_iter().find(|&id| id != open_id)?;
+
+    Some((closed_id, open_id))
 }
